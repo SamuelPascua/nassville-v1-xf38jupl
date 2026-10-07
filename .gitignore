@@ -1,0 +1,15 @@
+desktop.ini
+Thumbs.db
+.DS_Store
+node_modules/
+.impeccable/review/
+.impeccable/live/
+*.log
+.playwright-mcp/
+.impeccable/build/
+
+# Fotos y vídeos: se quedan en local, fuera del repositorio
+img/
+videos/
+assets/img/
+assets/video/

@@ -1,0 +1,250 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>nassville® — Tienda oficial</title>
+  <meta name="description" content="nassville, streetwear de Zaragoza. Drops, catálogo y todo lo que queda en tu talla.">
+  <meta name="theme-color" content="#151a40">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@700;800;900&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/styles.css">
+  <script type="importmap">
+    { "imports": {
+      "three": "https://cdn.jsdelivr.net/npm/three@0.169.0/build/three.module.js",
+      "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.169.0/examples/jsm/"
+    } }
+  </script>
+</head>
+<body>
+  <a class="skip" href="#tienda">Saltar a la tienda</a>
+
+  <!-- Barra superior: cabecera de conversación -->
+  <header class="chatbar" data-chatbar>
+    <a class="chatbar__who" href="#top" aria-label="nassville, inicio">
+      <span class="avatar" data-logo="emblem" aria-hidden="true"></span>
+      <span class="chatbar__name">
+        <strong>nassville<sup>®</sup></strong>
+        <small><span class="dot" aria-hidden="true"></span> en línea</small>
+      </span>
+    </a>
+    <nav class="chatbar__nav" aria-label="Secciones">
+      <a href="#hilo">Drops</a>
+      <a href="#tienda">Tienda</a>
+      <a href="#videos">Vídeos</a>
+      <a href="#conocenos">Conócenos</a>
+      <a href="#redes">Redes</a>
+    </nav>
+    <button class="bag" type="button" data-bag-button aria-label="Bolsa, 0 prendas">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 8h12l-1 12H7L6 8Z"/><path d="M9 8V6a3 3 0 0 1 6 0v2"/></svg>
+      <span class="bag__count" data-bag-count>0</span>
+    </button>
+    <button class="menu" type="button" data-menu-button aria-expanded="false" aria-controls="menu" aria-label="Abrir menú">
+      <span></span><span></span>
+    </button>
+  </header>
+
+  <div class="sheet" id="menu" data-menu hidden>
+    <nav aria-label="Menú">
+      <a href="#hilo">Drops</a>
+      <a href="#tienda">Tienda</a>
+      <a href="#videos">Vídeos</a>
+      <a href="#conocenos">Conócenos</a>
+      <a href="#redes">Redes</a>
+    </nav>
+  </div>
+
+  <main id="top">
+    <!-- 1 · HERO: logo 3D sobre vídeo -->
+    <section class="hero" aria-label="nassville">
+      <div class="hero__media" aria-hidden="true">
+        <video class="hero__video hero__video--wide" autoplay muted loop playsinline preload="auto" poster="assets/video/hero.jpg">
+          <source src="assets/video/hero.mp4" type="video/mp4">
+        </video>
+        <video class="hero__video hero__video--tall" autoplay muted loop playsinline preload="auto" poster="assets/video/hero-mobile.jpg">
+          <source src="assets/video/hero-mobile.mp4" type="video/mp4">
+        </video>
+        <div class="hero__veil"></div>
+      </div>
+
+      <div class="hero__stage">
+        <canvas class="hero__canvas" data-hero-canvas aria-hidden="true"></canvas>
+        <span class="hero__emblem-fallback" data-logo="emblem" aria-hidden="true"></span>
+        <h1 class="hero__word">
+          <span class="sr-only">nassville</span>
+          <span data-logo="word" aria-hidden="true"></span>
+        </h1>
+      </div>
+
+      <div class="hero__thread">
+        <div class="typing" data-typing aria-hidden="true"><i></i><i></i><i></i></div>
+        <div class="bubble bubble--in bubble--hero" data-hero-bubble>
+          <p class="bubble__muted">me vas a matar pero...</p>
+          <p>Nuevo drop: <em>Losing Interest</em>. Navy, oversize, quedan pocas tallas.</p>
+          <div class="bubble__actions">
+            <a class="btn btn--primary" href="#tienda" data-filter-link="sudaderas">Ver drop</a>
+            <a class="btn btn--ghost" href="#hilo">Ver el hilo</a>
+          </div>
+          <span class="stamp">22:05</span>
+        </div>
+      </div>
+
+      <a class="hero__scroll" href="#hilo" aria-label="Bajar al hilo">
+        <span>desliza</span>
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 4v16m0 0-6-6m6 6 6-6"/></svg>
+      </a>
+    </section>
+
+    <!-- 2 · EL HILO: drops como conversación -->
+    <section class="thread" id="hilo" aria-labelledby="hilo-title">
+      <div class="thread__head">
+        <h2 id="hilo-title" class="display">El hilo</h2>
+        <p class="lede">Cada drop nos llega como un mensaje. Aquí están todos, del primero al último.</p>
+      </div>
+      <ol class="thread__list" data-thread></ol>
+    </section>
+
+    <!-- 3 · TIENDA -->
+    <section class="shop" id="tienda" aria-labelledby="tienda-title">
+      <div class="shop__head">
+        <div class="bubble bubble--in bubble--wide reveal">
+          <h2 id="tienda-title" class="display display--xl">Lo que queda</h2>
+          <p>Elige prenda y talla. Lo agotado baja al archivo.</p>
+        </div>
+        <div class="chips" role="toolbar" aria-label="Filtrar productos" data-filters>
+          <button class="chip is-active" type="button" data-filter="todo" aria-pressed="true">Todo</button>
+          <button class="chip" type="button" data-filter="sudaderas" aria-pressed="false">Sudaderas</button>
+          <button class="chip" type="button" data-filter="camisetas" aria-pressed="false">Camisetas</button>
+          <button class="chip" type="button" data-filter="disponible" aria-pressed="false">Solo disponible</button>
+        </div>
+      </div>
+
+      <ul class="products" data-products aria-live="polite"></ul>
+      <p class="products__empty" data-products-empty hidden>Nada por aquí con ese filtro. Prueba con <button type="button" class="linklike" data-filter-reset>todo</button>.</p>
+
+      <div class="archive" aria-labelledby="archivo-title">
+        <div class="archive__head">
+          <h3 id="archivo-title" class="display">Archivo</h3>
+          <p>Agotado. Leído y no contestado.</p>
+        </div>
+        <ul class="archive__list" data-archive></ul>
+      </div>
+    </section>
+
+    <!-- 4 · VÍDEOS -->
+    <section class="videos" id="videos" aria-labelledby="videos-title">
+      <div class="videos__head">
+        <h2 id="videos-title" class="display display--xl">Notas de vídeo</h2>
+        <p class="lede">Lo que grabamos mientras lo hacemos. Toca para verlo con sonido.</p>
+      </div>
+      <ul class="notes" data-notes></ul>
+      <ul class="films" data-films></ul>
+    </section>
+
+    <!-- 5 · CONÓCENOS -->
+    <section class="about" id="conocenos" aria-labelledby="about-title">
+      <h2 id="about-title" class="sr-only">Conócenos</h2>
+      <p class="manifesto reveal" aria-label="Actuamos primero, pensamos después, nos lamentamos: nunca.">
+        <span>Actuamos primero,</span>
+        <span>pensamos después,</span>
+        <span>nos lamentamos:</span>
+        <span class="manifesto__last">nunca.</span>
+      </p>
+
+      <div class="about__grid">
+        <figure class="about__photo reveal">
+          <img src="assets/img/DQ6awDBiDKX-3.jpg" alt="Dos personas con la crewneck Losing Interest navy en el estudio" loading="lazy" width="1120" height="1400">
+        </figure>
+        <div class="about__thread">
+          <div class="bubble bubble--in reveal">
+            <p>Somos nassville, una marca de streetwear nacida en Zaragoza. Diseñamos cada prenda, la fotografiamos nosotros y la soltamos en drops cortos. Cuando se acaba, se acaba.</p>
+          </div>
+          <div class="bubble bubble--in reveal">
+            <p>Hacemos camisetas boxy, crewnecks y zip-ups pensadas para durar: algodón pesado, hombro caído y costura doble.</p>
+          </div>
+          <div class="bubble bubble--in bubble--attach reveal">
+            <img src="assets/img/DNJDF6FIfKv-4.jpg" alt="Ficha técnica de la camiseta boxy de nassville" loading="lazy" width="1120" height="1400">
+            <dl class="spec">
+              <div><dt>Corte</dt><dd>Boxy fit</dd></div>
+              <div><dt>Gramaje</dt><dd>195 GSM</dd></div>
+              <div><dt>Tejido</dt><dd>100% algodón</dd></div>
+              <div><dt>Costura</dt><dd>Doble pespunte</dd></div>
+            </dl>
+          </div>
+          <div class="bubble bubble--in reveal">
+            <p>Nos verás en pop-ups por Zaragoza, en el campo de la Almozara y, a veces, delante de unas pirámides.</p>
+            <span class="stamp">Leído</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 6 · REDES -->
+    <section class="social" id="redes" aria-labelledby="redes-title">
+      <div class="social__card reveal">
+        <span class="avatar avatar--xl" data-logo="emblem" aria-hidden="true"></span>
+        <h2 id="redes-title" class="display display--xl">Síguenos</h2>
+        <p class="social__handle" data-handle>@nassville.inc</p>
+        <div class="social__links">
+          <a class="btn btn--primary" data-ig-link href="https://www.instagram.com/nassville.inc/" target="_blank" rel="noopener">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1" class="fill"/></svg>
+            Instagram
+          </a>
+          <a class="btn btn--ghost" href="#tienda">Ir a la tienda</a>
+        </div>
+      </div>
+      <ul class="feed" data-feed aria-label="Últimas fotos de Instagram"></ul>
+    </section>
+  </main>
+
+  <!-- Cierre: la barra de escribir -->
+  <footer class="footer">
+    <form class="composer" data-composer novalidate>
+      <label for="email" class="composer__label">Avísame del próximo drop</label>
+      <div class="composer__row">
+        <input id="email" name="email" type="email" inputmode="email" autocomplete="email" placeholder="Escribe tu email…" required>
+        <button type="submit" class="composer__send" aria-label="Enviar">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 19V5m0 0-6 6m6-6 6 6"/></svg>
+        </button>
+      </div>
+      <p class="composer__error" data-composer-error role="alert" hidden></p>
+      <div class="composer__sent" data-composer-sent aria-live="polite"></div>
+    </form>
+
+    <div class="footer__word" data-logo="word" aria-hidden="true"></div>
+    <div class="footer__meta">
+      <p>© 2026 nassville® · Zaragoza</p>
+      <div class="footer__legal">
+        <span>Envíos y devoluciones <small>pronto</small></span>
+        <span>Guía de tallas <small>pronto</small></span>
+        <span>Privacidad <small>pronto</small></span>
+      </div>
+      <p class="footer__note">v1 · precios y stock de ejemplo</p>
+    </div>
+  </footer>
+
+  <!-- Reproductor de vídeo -->
+  <dialog class="player" data-player aria-label="Reproductor de vídeo">
+    <button class="player__close" type="button" data-player-close aria-label="Cerrar vídeo">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg>
+    </button>
+    <video data-player-video controls playsinline></video>
+  </dialog>
+
+  <!-- Visor de fotos -->
+  <dialog class="viewer" data-viewer aria-label="Foto">
+    <button class="player__close" type="button" data-viewer-close aria-label="Cerrar foto">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg>
+    </button>
+    <img data-viewer-img src="assets/video/hero.jpg" alt="">
+  </dialog>
+
+  <div class="toast" data-toast role="status" aria-live="polite"></div>
+
+  <script src="js/data.js"></script>
+  <script src="js/logo-paths.js"></script>
+  <script src="js/main.js"></script>
+  <script src="js/hero3d.js"></script>
+</body>
+</html>

@@ -1,0 +1,101 @@
+{
+  "title": "Elige el mundo visual de nassville",
+  "question": "La tirada ha asignado 'El drop llega por mensaje'. Quédatela, elige una alternativa o vuelve a tirar. (El hero con el logo 3D sobre vídeo se mantiene en todas.)",
+  "options": [
+    {
+      "id": "assigned",
+      "label": "El drop llega por mensaje",
+      "kicker": "THE ROLL",
+      "lineage": "El anuncio de Losing Interest como iMessage ('me vas a matar pero...')",
+      "thesis": "La tienda es el hilo de mensajes de la marca: cada drop llega como un mensaje, cada prenda como un adjunto, cada agotado como un 'Leído'.",
+      "palette": ["#1f2550", "#e4e4e6", "#0b0d1c", "#3b82f6", "#f2f2f4"],
+      "materials": ["burbujas de chat sobre azul marino", "fotos de campaña como adjuntos", "marcas de hora y 'Entregado/Leído'"],
+      "viewport": "Logo 3D girando sobre el vídeo de parking nocturno; debajo, el primer mensaje del hilo con el drop actual y su botón 'Ver drop'.",
+      "risk": "Si el chat se vuelve un truco, tapa a la fotografía, que es la verdadera prueba de la marca.",
+      "raised": [
+        {"from": "challenger-combo-sheet", "raise": "Jerarquía por tamaño: lo que está a la venta grita; lo agotado cae a un bloque denso de archivo al final del hilo."},
+        {"from": "challenger-silkscreen", "raise": "Ediciones: cada prenda muestra sus colores como fotos repetidas que recorres, no como un selector."},
+        {"from": "challenger-deep-dive", "raise": "Un solo eje vertical de fechas y horas ordena toda la página, como el hilo."}
+      ]
+    },
+    {
+      "id": "model-pick",
+      "label": "Cinta REC",
+      "kicker": "IMPECCABLE’S PICK",
+      "lineage": "El visor de videocámara de los propios vídeos de nassville (REC, CAM 1, 06/08/2025)",
+      "thesis": "Toda la web es metraje de la marca: visor con REC, timecode y CAM; cada sección es un clip y cada agotado un 'FIN DE CINTA'.",
+      "palette": ["#1f2550", "#0a0a0a", "#e4e4e6", "#ff2a2a"],
+      "materials": ["esquinas de visor", "timecode en mono", "grano y scanlines suaves"],
+      "viewport": "Logo 3D sobre el vídeo, enmarcado como visor de cámara con REC parpadeando y timecode corriendo; el CTA 'Ver drop' en la barra del visor.",
+      "risk": "La estética VHS es un recurso muy visto en streetwear; si no se cuida queda a disfraz retro.",
+      "comp": ".impeccable/mocks/decision/model-pick.webp"
+    },
+    {
+      "id": "challenger-shader",
+      "label": "Portal WebGL",
+      "verdict": "competitive",
+      "lineage": "Webs experienciales de estudio con shader a pantalla completa",
+      "thesis": "Un campo azul marino vivo que se deforma con el cursor y textos finos encima; las prendas aparecen a través del campo.",
+      "palette": ["#141a3f", "#262c57", "#e4e4e6", "#9fb4ff"],
+      "materials": ["shader a pantalla completa", "grano de película", "un acento incandescente"],
+      "viewport": "Logo 3D dentro del shader con el vídeo deformado; enlaces mínimos en las esquinas.",
+      "case": "Encaja con el logo 3D (gana en impacto), pero pierde en claridad: los precios y los agotados se leen peor.",
+      "risk": "Puede pesar en móvil y esconder la tienda detrás del efecto.",
+      "hero": "https://impeccable.style/worlds/cards/webgl-shader-portal-hero.webp"
+    },
+    {
+      "id": "challenger-combo-sheet",
+      "label": "Cartel doble de exploitation",
+      "verdict": "declined",
+      "lineage": "Carteles de cine de los 70",
+      "palette": ["#0a0a0a", "#f5d000", "#c8102e"],
+      "materials": ["offset desregistrado", "letras a mano"],
+      "thesis": "Dos títulos peleándose en el mismo cartel.",
+      "viewport": "Cartel gritón a pantalla completa.",
+      "risk": "Muy lejos del tono limpio de la marca.",
+      "case": "Pierde en las dos: la marca no grita así.",
+      "kept": "Jerarquía por tamaño y los agotados cayendo a un bloque de archivo.",
+      "hero": "https://impeccable.style/worlds/cards/posters-covers-sleeves-exploitation-combo-sheet-hero.webp"
+    },
+    {
+      "id": "challenger-silkscreen",
+      "label": "Taller de serigrafía",
+      "verdict": "declined",
+      "lineage": "Loft de serigrafía pop",
+      "palette": ["#c0c0c0", "#0a0a0a", "#ff3ea5"],
+      "materials": ["papel de plata", "trama de semitono"],
+      "thesis": "La misma imagen repetida treinta veces, cada copia distinta.",
+      "viewport": "Rejilla de repeticiones secándose.",
+      "risk": "Plata y rosa no son la marca.",
+      "case": "Pierde en las dos: no es su mundo.",
+      "kept": "Ediciones: los colores de una prenda como repeticiones que se recorren.",
+      "hero": "https://impeccable.style/worlds/cards/design-canon-factory-silkscreen-loft-hero.webp"
+    },
+    {
+      "id": "challenger-deep-dive",
+      "label": "Inmersión profunda",
+      "verdict": "declined",
+      "lineage": "Ordenador de buceo",
+      "palette": ["#04122b", "#e8f0ff", "#3fd6e6"],
+      "materials": ["nieve marina", "dígitos de profundidad"],
+      "thesis": "Bajar por una pared de coral marcando la profundidad.",
+      "viewport": "Eje vertical de profundidad.",
+      "risk": "Ajeno a la marca.",
+      "case": "Pierde en las dos.",
+      "kept": "Un solo eje vertical que ordena todo.",
+      "hero": "https://impeccable.style/worlds/cards/rivers-tides-ocean-depths-mesophotic-deep-dive-hero.webp"
+    }
+  ],
+  "reroll": {"registers": ["safer", "bolder"]},
+  "buildPath": {"value": "code", "toggle": false},
+  "canon": true,
+  "canonCard": {
+    "label": "La tienda streetwear estándar",
+    "thesis": "Lo que hace toda tienda streetwear, ejecutado con mucho cuidado.",
+    "palette": ["#0a0a0a", "#ffffff", "#262c57"],
+    "materials": ["rejilla limpia", "fotografía de producto"],
+    "viewport": "Logo 3D sobre el vídeo, después una cuadrícula de productos y bloques de campaña.",
+    "risk": "Se parece a cualquier otra marca, por diseño."
+  },
+  "steer": true
+}

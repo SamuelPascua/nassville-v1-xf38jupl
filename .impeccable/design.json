@@ -1,0 +1,173 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-10-07T00:00:00Z",
+  "title": "Design System: nassville",
+  "extensions": {
+    "colorMeta": {
+      "navy-950": { "role": "neutral", "displayName": "Navy 950", "canonical": "#0a0c24", "tonalRamp": ["#0a0c24", "#0f1233", "#131740", "#181d4a", "#20265a", "#262c57", "#343b72", "#4a5290"] },
+      "navy-900": { "role": "neutral", "displayName": "Navy 900 (hero, glass)", "canonical": "#0f1233", "tonalRamp": ["#0a0c24", "#0f1233", "#131740", "#181d4a", "#20265a", "#262c57", "#343b72", "#4a5290"] },
+      "navy-850": { "role": "neutral", "displayName": "Navy 850 (page)", "canonical": "#131740", "tonalRamp": ["#0a0c24", "#0f1233", "#131740", "#181d4a", "#20265a", "#262c57", "#343b72", "#4a5290"] },
+      "navy-800": { "role": "neutral", "displayName": "Navy 800 (text on pearl)", "canonical": "#181d4a", "tonalRamp": ["#0a0c24", "#0f1233", "#131740", "#181d4a", "#20265a", "#262c57", "#343b72", "#4a5290"] },
+      "navy-700": { "role": "neutral", "displayName": "Navy 700 (cards)", "canonical": "#20265a", "tonalRamp": ["#0a0c24", "#0f1233", "#131740", "#181d4a", "#20265a", "#262c57", "#343b72", "#4a5290"] },
+      "navy-600": { "role": "neutral", "displayName": "Logo Navy", "canonical": "#262c57", "tonalRamp": ["#0a0c24", "#0f1233", "#131740", "#181d4a", "#20265a", "#262c57", "#343b72", "#4a5290"] },
+      "navy-500": { "role": "neutral", "displayName": "Navy 500", "canonical": "#343b72", "tonalRamp": ["#0a0c24", "#0f1233", "#131740", "#181d4a", "#20265a", "#262c57", "#343b72", "#4a5290"] },
+      "navy-400": { "role": "neutral", "displayName": "Navy 400", "canonical": "#4a5290", "tonalRamp": ["#0a0c24", "#0f1233", "#131740", "#181d4a", "#20265a", "#262c57", "#343b72", "#4a5290"] },
+      "pearl": { "role": "neutral", "displayName": "Pearl", "canonical": "#e4e4e8", "tonalRamp": ["#26262a", "#3d3d42", "#57575d", "#77777e", "#9a9aa1", "#bdbdc3", "#e4e4e8", "#f3f3f6"] },
+      "pearl-strong": { "role": "neutral", "displayName": "Pearl Bright", "canonical": "#f3f3f6", "tonalRamp": ["#26262a", "#3d3d42", "#57575d", "#77777e", "#9a9aa1", "#bdbdc3", "#e4e4e8", "#f3f3f6"] },
+      "ink-soft": { "role": "neutral", "displayName": "Mist", "canonical": "#b7bbdb", "tonalRamp": ["#1e2140", "#30345c", "#474c7e", "#6267a0", "#8d93c2", "#b7bbdb", "#d6d8ec", "#eeeff8"] },
+      "ink-faint": { "role": "neutral", "displayName": "Haze", "canonical": "#8d93c2", "tonalRamp": ["#1e2140", "#30345c", "#474c7e", "#6267a0", "#8d93c2", "#b7bbdb", "#d6d8ec", "#eeeff8"] },
+      "sent": { "role": "primary", "displayName": "Sent Blue", "canonical": "#3a63e0", "tonalRamp": ["#0d1a4a", "#152a78", "#1f3ca6", "#2a4fcc", "#3a63e0", "#5a80f0", "#7d9dff", "#c9d6ff"] },
+      "sent-strong": { "role": "primary", "displayName": "Sent Blue Light", "canonical": "#7d9dff", "tonalRamp": ["#0d1a4a", "#152a78", "#1f3ca6", "#2a4fcc", "#3a63e0", "#5a80f0", "#7d9dff", "#c9d6ff"] },
+      "line": { "role": "neutral", "displayName": "Hairline", "canonical": "rgba(228, 228, 232, 0.12)" },
+      "line-strong": { "role": "neutral", "displayName": "Hairline Strong", "canonical": "rgba(228, 228, 232, 0.22)" }
+    },
+    "typographyMeta": {
+      "display": { "displayName": "Display", "purpose": "Section heads and archive head; Big Shoulders Display 900 uppercase, balanced." },
+      "display-xl": { "displayName": "Display XL", "purpose": "Standalone section titles (Lo que queda, Notas de vídeo, Síguenos); thread head and manifesto push larger." },
+      "headline": { "displayName": "Drop Headline", "purpose": "Titles of non-lead drops in the thread." },
+      "title": { "displayName": "Product Title", "purpose": "Product names; prices use 800 at 1.7rem with tabular numerals." },
+      "serif-name": { "displayName": "Serif Name", "purpose": "The current drop's name and the manifesto's punchline word only." },
+      "serif-note": { "displayName": "Serif Note", "purpose": "Garment type, film notes, archive aside, Instagram handle; ink-soft on navy." },
+      "body": { "displayName": "Body (chat material)", "purpose": "System UI stack; 17px desktop, 16px under 720px. Bubbles 1rem/1.4, ledes 1.05rem max 42ch." },
+      "label": { "displayName": "Stamp / Label", "purpose": "Timestamps, receipts, tags, legends; tabular numerals, 0.72 to 0.82rem." }
+    },
+    "shadows": [
+      { "name": "shadow-1", "value": "0 1px 2px rgba(5, 6, 20, 0.35), 0 8px 24px -8px rgba(5, 6, 20, 0.55)", "purpose": "Bubble lift: bubbles, typing indicator, link cards, product cards." },
+      { "name": "shadow-2", "value": "0 2px 6px rgba(5, 6, 20, 0.35), 0 24px 60px -20px rgba(5, 6, 20, 0.75)", "purpose": "Attachment lift: photo/video attachments, films, about photo, feed, dialogs, toast." },
+      { "name": "hairline-ring", "value": "inset 0 0 0 1px rgba(228, 228, 232, 0.22)", "purpose": "Edge for ghost buttons, chips, sizes, composer; 12% variant on product cards." },
+      { "name": "focus-halo", "value": "inset 0 0 0 1px #7d9dff, 0 0 0 4px rgba(58, 99, 224, 0.18)", "purpose": "Composer focus-within." }
+    ],
+    "motion": [
+      { "name": "ease-out", "value": "cubic-bezier(0.23, 1, 0.32, 1)", "purpose": "Default: arrivals, presses, image zooms, sheet." },
+      { "name": "ease-in-out", "value": "cubic-bezier(0.77, 0, 0.175, 1)", "purpose": "Looping scroll nudge." },
+      { "name": "ease-drawer", "value": "cubic-bezier(0.32, 0.72, 0, 1)", "purpose": "Toast slide-up (400ms)." },
+      { "name": "press", "value": "transform scale(0.92 to 0.98) 160ms ease-out", "purpose": "Active state on every tappable surface." },
+      { "name": "arrive", "value": "opacity 520ms, transform 620ms, filter 520ms ease-out from translateY(14px) scale(0.98) blur(4px); stagger 70ms capped at 420ms", "purpose": "Message arrival after a ~650ms typing indicator; origin bottom-left." },
+      { "name": "typing", "value": "1.1s infinite ease-in-out, 4px bounce, 0.15s stagger", "purpose": "Three-dot typing indicator." },
+      { "name": "emblem-spring", "value": "rotation k=60 d=11; scale k=80 d=12", "purpose": "Hero 3D emblem follows cursor/drag with spring inertia." },
+      { "name": "reduced-motion", "value": "opacity 300ms ease only", "purpose": "prefers-reduced-motion replaces transforms, blur and zooms." }
+    ],
+    "breakpoints": [
+      { "name": "mobile", "value": "720px" },
+      { "name": "films-2up", "value": "800px" },
+      { "name": "nav-collapse", "value": "860px" },
+      { "name": "split", "value": "900px" },
+      { "name": "drop-rail", "value": "960px" }
+    ]
+  },
+  "components": [
+    {
+      "name": "Incoming Bubble",
+      "kind": "card",
+      "refersTo": "bubble-in",
+      "description": "The brand speaking: pearl bubble with bottom-left tail and timestamp.",
+      "html": "<div class=\"ds-bubble-in\"><p>me vas a matar pero... nuevo drop: <em>Losing Interest</em></p><span class=\"ds-stamp\">22:05</span></div>",
+      "css": ".ds-bubble-in { max-width: 440px; padding: 12px 16px; border-radius: 22px 22px 22px 6px; background: var(--pearl, #e4e4e8); color: var(--navy-800, #181d4a); font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; font-size: 1rem; line-height: 1.4; box-shadow: 0 1px 2px rgba(5,6,20,0.35), 0 8px 24px -8px rgba(5,6,20,0.55); } .ds-bubble-in p { margin: 0; } .ds-bubble-in em { font-family: 'Instrument Serif', serif; font-style: italic; font-size: 1.15em; } .ds-stamp { display: block; margin-top: 6px; text-align: right; font-size: 0.72rem; font-variant-numeric: tabular-nums; color: var(--navy-400, #4a5290); }"
+    },
+    {
+      "name": "Outgoing Bubble",
+      "kind": "card",
+      "refersTo": "bubble-out",
+      "description": "The visitor's side: Sent Blue bubble with bottom-right tail and 'Entregado'.",
+      "html": "<div class=\"ds-bubble-out\"><p>yo@correo.com</p><span class=\"ds-stamp-out\">Entregado</span></div>",
+      "css": ".ds-bubble-out { max-width: 440px; margin-left: auto; padding: 12px 16px; border-radius: 22px 22px 6px 22px; background: var(--sent, #3a63e0); color: #fff; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; font-size: 1rem; line-height: 1.4; box-shadow: 0 1px 2px rgba(5,6,20,0.35), 0 8px 24px -8px rgba(5,6,20,0.55); } .ds-bubble-out p { margin: 0; } .ds-stamp-out { display: block; margin-top: 6px; text-align: right; font-size: 0.75rem; color: var(--ink-faint, #8d93c2); }"
+    },
+    {
+      "name": "Primary Button",
+      "kind": "button",
+      "refersTo": "button-primary",
+      "description": "Pearl pill on navy; main CTA.",
+      "html": "<button class=\"ds-btn ds-btn-primary\">Ver drop</button>",
+      "css": ".ds-btn { display: inline-flex; align-items: center; justify-content: center; gap: 10px; min-height: 46px; padding: 0 22px; border: 0; border-radius: 999px; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; font-weight: 600; font-size: 0.98rem; cursor: pointer; transition: transform 160ms cubic-bezier(0.23,1,0.32,1), background-color 200ms ease, box-shadow 200ms ease; } .ds-btn:active { transform: scale(0.97); } .ds-btn:focus-visible { outline: 2px solid #7d9dff; outline-offset: 3px; } .ds-btn-primary { background: var(--pearl, #e4e4e8); color: var(--navy-800, #181d4a); } .ds-btn-primary:hover { background: var(--pearl-strong, #f3f3f6); }"
+    },
+    {
+      "name": "Ghost Button",
+      "kind": "button",
+      "refersTo": "button-ghost",
+      "description": "Transparent pill with hairline ring; secondary action.",
+      "html": "<button class=\"ds-btn-ghost\">Ver el hilo</button>",
+      "css": ".ds-btn-ghost { display: inline-flex; align-items: center; min-height: 46px; padding: 0 22px; border: 0; border-radius: 999px; background: transparent; color: var(--pearl, #e4e4e8); box-shadow: inset 0 0 0 1px rgba(228,228,232,0.22); font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; font-weight: 600; font-size: 0.98rem; cursor: pointer; transition: box-shadow 200ms ease, transform 160ms cubic-bezier(0.23,1,0.32,1); } .ds-btn-ghost:hover { box-shadow: inset 0 0 0 1px #e4e4e8; } .ds-btn-ghost:active { transform: scale(0.97); } .ds-btn-ghost:focus-visible { outline: 2px solid #7d9dff; outline-offset: 3px; }"
+    },
+    {
+      "name": "Sent Button",
+      "kind": "button",
+      "refersTo": "button-sent",
+      "description": "Sent Blue pill for the visitor's commit action (add to bag).",
+      "html": "<button class=\"ds-btn-sent\">Añadir a la bolsa</button>",
+      "css": ".ds-btn-sent { display: inline-flex; align-items: center; justify-content: center; min-height: 46px; padding: 0 22px; border: 0; border-radius: 999px; background: var(--sent, #3a63e0); color: #fff; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; font-weight: 600; font-size: 0.98rem; cursor: pointer; transition: background-color 200ms ease, transform 160ms cubic-bezier(0.23,1,0.32,1); } .ds-btn-sent:hover { background: var(--sent-strong, #7d9dff); } .ds-btn-sent:active { transform: scale(0.97); } .ds-btn-sent:focus-visible { outline: 2px solid #7d9dff; outline-offset: 3px; } .ds-btn-sent[disabled] { opacity: 0.6; cursor: not-allowed; }"
+    },
+    {
+      "name": "Filter Chip",
+      "kind": "chip",
+      "refersTo": "chip",
+      "description": "Hairline pill filter; active is Sent Blue.",
+      "html": "<div class=\"ds-chips\"><button class=\"ds-chip is-active\" aria-pressed=\"true\">Todo</button><button class=\"ds-chip\" aria-pressed=\"false\">Sudaderas</button></div>",
+      "css": ".ds-chips { display: flex; gap: 8px; } .ds-chip { min-height: 40px; padding: 0 16px; border: 0; border-radius: 999px; background: transparent; box-shadow: inset 0 0 0 1px rgba(228,228,232,0.22); color: #e4e4e8; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; font-size: 0.92rem; font-weight: 500; cursor: pointer; transition: background-color 200ms ease, box-shadow 200ms ease, transform 160ms cubic-bezier(0.23,1,0.32,1); } .ds-chip:hover:not(.is-active) { box-shadow: inset 0 0 0 1px #e4e4e8; } .ds-chip:active { transform: scale(0.96); } .ds-chip:focus-visible { outline: 2px solid #7d9dff; outline-offset: 3px; } .ds-chip.is-active { background: #3a63e0; color: #fff; box-shadow: none; }"
+    },
+    {
+      "name": "Size Selector",
+      "kind": "input",
+      "refersTo": "size",
+      "description": "Radio sizes: selected pearl, sold-out struck, low-stock blue dot.",
+      "html": "<div class=\"ds-sizes\"><label class=\"ds-size\"><input type=\"radio\" name=\"s\" disabled><span>S</span></label><label class=\"ds-size\"><input type=\"radio\" name=\"s\" checked><span>M</span><i class=\"ds-low\"></i></label><label class=\"ds-size\"><input type=\"radio\" name=\"s\"><span>L</span></label></div>",
+      "css": ".ds-sizes { display: flex; gap: 6px; } .ds-size { position: relative; min-width: 48px; min-height: 42px; display: grid; place-items: center; padding: 0 12px; border-radius: 12px; box-shadow: inset 0 0 0 1px rgba(228,228,232,0.22); color: #e4e4e8; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; font-size: 0.9rem; font-weight: 600; cursor: pointer; transition: background-color 180ms ease, transform 140ms cubic-bezier(0.23,1,0.32,1); } .ds-size input { position: absolute; opacity: 0; pointer-events: none; } .ds-size:active { transform: scale(0.95); } .ds-size:has(input:checked) { background: #e4e4e8; color: #181d4a; box-shadow: none; } .ds-size:has(input:focus-visible) { outline: 2px solid #7d9dff; outline-offset: 2px; } .ds-size:has(input:disabled) { color: #8d93c2; background: rgba(10,12,36,0.35); box-shadow: none; cursor: not-allowed; } .ds-size:has(input:disabled) span { text-decoration: line-through; } .ds-low { position: absolute; top: -5px; right: -5px; width: 10px; height: 10px; border-radius: 50%; background: #3a63e0; box-shadow: 0 0 0 2px #20265a; }"
+    },
+    {
+      "name": "Link Card",
+      "kind": "custom",
+      "refersTo": "linkcard",
+      "description": "A garment as a link preview inside the thread.",
+      "html": "<a class=\"ds-linkcard\" href=\"#\"><span class=\"ds-linkcard-thumb\"></span><span class=\"ds-linkcard-text\"><span class=\"ds-linkcard-host\">nassville.com</span><strong>Losing Interest Crewneck</strong><span class=\"ds-linkcard-meta\">55 € · Últimas unidades</span></span><svg viewBox=\"0 0 24 24\" width=\"20\" height=\"20\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M5 12h14M13 6l6 6-6 6\"/></svg></a>",
+      "css": ".ds-linkcard { display: grid; grid-template-columns: 56px minmax(0,1fr) 20px; align-items: center; gap: 12px; width: min(100%, 400px); padding: 8px 14px 8px 8px; border-radius: 22px 22px 22px 6px; background: #e4e4e8; color: #181d4a; text-decoration: none; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; box-shadow: 0 1px 2px rgba(5,6,20,0.35), 0 8px 24px -8px rgba(5,6,20,0.55); transition: transform 160ms cubic-bezier(0.23,1,0.32,1), background-color 200ms ease; } .ds-linkcard:hover { background: #f3f3f6; } .ds-linkcard:active { transform: scale(0.98); } .ds-linkcard:focus-visible { outline: 2px solid #7d9dff; outline-offset: 3px; } .ds-linkcard-thumb { width: 56px; height: 56px; border-radius: 15px; background: #20265a; } .ds-linkcard-text { display: grid; line-height: 1.25; min-width: 0; } .ds-linkcard-host { font-size: 0.72rem; color: #4a5290; } .ds-linkcard strong { font-size: 0.95rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; } .ds-linkcard-meta { font-size: 0.82rem; color: #343b72; font-variant-numeric: tabular-nums; }"
+    },
+    {
+      "name": "Composer",
+      "kind": "input",
+      "refersTo": "composer",
+      "description": "Email capture as the chat write bar with a round send button.",
+      "html": "<form class=\"ds-composer\"><input type=\"email\" placeholder=\"tu@email.com\" aria-label=\"Email\"><button type=\"submit\" aria-label=\"Enviar\"><svg viewBox=\"0 0 24 24\" width=\"20\" height=\"20\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2.2\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M12 19V5M5 12l7-7 7 7\"/></svg></button></form>",
+      "css": ".ds-composer { display: flex; align-items: center; gap: 8px; max-width: 760px; padding: 6px 6px 6px 20px; border-radius: 999px; background: #181d4a; box-shadow: inset 0 0 0 1px rgba(228,228,232,0.22); transition: box-shadow 200ms ease; } .ds-composer:focus-within { box-shadow: inset 0 0 0 1px #7d9dff, 0 0 0 4px rgba(58,99,224,0.18); } .ds-composer input { flex: 1; min-width: 0; height: 44px; border: 0; background: transparent; outline: none; color: #e4e4e8; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; font-size: 16px; caret-color: #7d9dff; } .ds-composer input::placeholder { color: #8d93c2; } .ds-composer button { flex: none; width: 44px; height: 44px; border: 0; border-radius: 50%; background: #3a63e0; color: #fff; display: grid; place-items: center; cursor: pointer; transition: transform 160ms cubic-bezier(0.23,1,0.32,1); } .ds-composer button:active { transform: scale(0.92); } .ds-composer button:focus-visible { outline: 2px solid #7d9dff; outline-offset: 3px; }"
+    },
+    {
+      "name": "Chat Bar",
+      "kind": "nav",
+      "refersTo": "chatbar",
+      "description": "Fixed chat header: avatar, name with presence, pill links, round bag.",
+      "html": "<header class=\"ds-chatbar\"><span class=\"ds-avatar\"></span><span class=\"ds-who\"><strong>nassville</strong><small><i class=\"ds-dot\"></i> en línea</small></span><nav class=\"ds-nav\"><a class=\"is-current\" href=\"#\">El hilo</a><a href=\"#\">Tienda</a><a href=\"#\">Vídeos</a></nav></header>",
+      "css": ".ds-chatbar { display: flex; align-items: center; gap: 12px; height: 64px; padding: 0 24px; background: rgba(15,18,51,0.82); backdrop-filter: saturate(140%) blur(18px); box-shadow: 0 1px 0 rgba(228,228,232,0.12); color: #e4e4e8; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; } .ds-avatar { width: 40px; height: 40px; border-radius: 50%; background: #262c57; box-shadow: inset 0 0 0 1px rgba(228,228,232,0.22); } .ds-who { display: grid; line-height: 1.15; } .ds-who strong { font-size: 1rem; font-weight: 700; } .ds-who small { display: flex; align-items: center; gap: 6px; font-size: 0.75rem; color: #b7bbdb; } .ds-dot { width: 7px; height: 7px; border-radius: 50%; background: #7d9dff; box-shadow: 0 0 0 3px rgba(58,99,224,0.22); } .ds-nav { display: flex; gap: 4px; margin-left: auto; } .ds-nav a { padding: 8px 14px; border-radius: 999px; font-size: 0.92rem; font-weight: 500; text-decoration: none; color: #b7bbdb; transition: color 200ms ease; } .ds-nav a:hover { color: #e4e4e8; } .ds-nav a:focus-visible { outline: 2px solid #7d9dff; outline-offset: 3px; } .ds-nav a.is-current { color: #e4e4e8; background: rgba(228,228,232,0.1); }"
+    }
+  ],
+  "narrative": {
+    "northStar": "The Message Thread",
+    "overview": "The whole store is nassville's chat with its followers, laid on the navy of the logo. Every drop arrives as a message with attachments, every garment as a link preview, every sell-out as \"Leído\". Content speaks in two materials only: pearl incoming bubbles with navy text (the brand talking) and a muted electric blue for anything the visitor sends or acts on. Everything else is navy depth.\n\nType carries the streetwear register against that quiet chat material: a heavy condensed display face (Big Shoulders Display, 900, uppercase) for drop and section titles, a condensed italic serif (Instrument Serif) for collection names and asides, and the device's own system stack for body text, because that is what a real chat is set in. Campaign photos and films are the proof and appear as attachments with bubble corners, never as a decorative hero grid.\n\nMotion follows the grammar of messages arriving: a typing indicator, then bubbles that rise, unblur and settle from their bottom-left origin, staggered 70 ms apart. The 3D \"11\" emblem in the hero follows the cursor on springs. Density is low on mobile (one column, generous gaps between drops) and the thread runs down a single vertical axis of dates.",
+    "keyCharacteristics": [
+      "Navy ground (#131740 body, #0f1233 hero) with pearl incoming bubbles and one blue accent.",
+      "Bubble geometry everywhere content lives: 22px corners with one 6px \"tail\" corner, bottom-left for incoming.",
+      "Display 900 uppercase titles against an italic serif for proper names.",
+      "Timestamps, read receipts and \"Entregado\" as the metadata layer, in tabular numerals.",
+      "Arrival motion (typing, then rise-and-unblur) instead of generic fade-ins."
+    ],
+    "rules": [
+      { "name": "The One Blue Rule", "body": "Sent Blue is the only chromatic accent and always means the visitor's side of the conversation or a live state (active, low stock, focus). It is never used for decoration or display type.", "section": "colors" },
+      { "name": "The Two Speakers Rule", "body": "Brand content sits on pearl with navy text; visitor actions sit on blue with white text. A surface that is neither stays navy.", "section": "colors" },
+      { "name": "The Proper Names Rule", "body": "Instrument Serif italic is reserved for names (collections, garment types, films, the handle) and the single punchline word. It is never a body face.", "section": "typography" },
+      { "name": "The Chat Material Rule", "body": "Running text and UI controls use the system stack, not the display face; display caps are for titles, product names, prices, spec values and the mobile menu.", "section": "typography" },
+      { "name": "The Soft Lift Rule", "body": "Shadows are soft, dark-navy and negatively spread so they read as glow-less lift on navy; there are no hard offset shadows.", "section": "elevation" }
+    ],
+    "dos": [
+      "**Do** put new brand content in pearl incoming bubbles with the 22px/6px tail geometry, and new visitor actions in Sent Blue.",
+      "**Do** carry metadata as chat metadata: timestamps, \"Entregado\", \"Leído\" with tabular numerals.",
+      "**Do** name the current drop in Instrument Serif italic and older drops in Big Shoulders Display caps.",
+      "**Do** send sold-out product to the archive list (desaturated thumb, struck price, \"Leído\") rather than leaving it in the live grid.",
+      "**Do** use ease-out (cubic-bezier(0.23, 1, 0.32, 1)) for arrivals and presses, the drawer curve for the toast, and gate hover effects behind fine pointers.",
+      "**Do** keep photos and films as attachments with bubble corners and Attachment lift."
+    ],
+    "donts": [
+      "**Don't** introduce a second accent hue; status, focus and action all share Sent Blue.",
+      "**Don't** set body copy or controls in the display face or the serif.",
+      "**Don't** use hard offset shadows or visible borders where an inset hairline ring is the established edge.",
+      "**Don't** invent dates for drops: a drop without a confirmed date shows no stamp.",
+      "**Don't** treat the current row of equal product cards as the shop pattern; it is an open defect (see below)."
+    ]
+  }
+}
