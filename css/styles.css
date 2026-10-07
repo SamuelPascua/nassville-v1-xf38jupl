@@ -404,7 +404,11 @@ em, .serif {
   height: min(48vw, 400px);
   max-height: 46svh;
   touch-action: pan-y;
+  cursor: grab;
+  -webkit-user-select: none;
+  user-select: none;
 }
+.hero__canvas.is-dragging { cursor: grabbing; }
 .hero__emblem-fallback {
   display: none;
   width: min(48vw, 340px);
