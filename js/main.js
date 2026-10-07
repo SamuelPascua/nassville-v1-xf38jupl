@@ -368,9 +368,9 @@
 
     // archivo: cada color agotado es una línea, como mensajes leídos
     D.products.forEach(function (p) {
-      p.colorways.forEach(function (c) {
+      p.colorways.forEach(function (c, ci) {
         if (stockState(c.stock) !== "out") return;
-        archive.appendChild(el("li", { class: "archive__row" }, [
+        var rowBtn = el("button", { class: "archive__row", type: "button", "aria-label": "Ver " + p.name + " " + c.name + " (agotado)" }, [
           el("img", { src: IMG + c.images[0], alt: "", loading: "lazy" }),
           el("div", { class: "archive__name" }, [
             el("strong", { text: p.name }),
@@ -380,7 +380,9 @@
             el("s", { text: euro(p.price) }),
             el("span", { html: ICON.read + "Leído" })
           ])
-        ]));
+        ]);
+        rowBtn.addEventListener("click", function () { openProductViewer(p, ci, 0); });
+        archive.appendChild(el("li", null, [rowBtn]));
       });
     });
   }
@@ -394,6 +396,13 @@
     var media = el("div", { class: "product__media" });
     var tag = el("span", { class: "product__tag" });
     var editions = el("div", { class: "editions", role: "group", "aria-label": "Fotos de " + p.name });
+    // carrusel deslizable: con el dedo, con el ratón (arrastrando) o con las flechas
+    var track = el("div", { class: "product__track", tabindex: "0", role: "button", "aria-label": "Fotos de " + p.name + ". Desliza para ver más; pulsa para ampliar" });
+    var CHEVRON_L = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg>';
+    var CHEVRON_R = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 5l7 7-7 7"/></svg>';
+    var prevBtn = el("button", { class: "product__nav product__nav--prev", type: "button", "aria-label": "Foto anterior", html: CHEVRON_L });
+    var nextBtn = el("button", { class: "product__nav product__nav--next", type: "button", "aria-label": "Foto siguiente", html: CHEVRON_R });
+    var zoomIcon = el("span", { class: "product__zoom", "aria-hidden": "true", html: '<svg viewBox="0 0 24 24"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/></svg>' });
     var body = el("div", { class: "product__body" });
 
     var top = el("div", { class: "product__top" }, [
@@ -432,33 +441,39 @@
     if (dropInfo) foot.appendChild(el("a", { class: "product__source", href: "#drop-" + dropInfo.id, text: "Ver el drop " + dropInfo.title + " en el hilo" }));
     body.appendChild(foot);
 
+    media.appendChild(track);
     media.appendChild(tag);
+    media.appendChild(zoomIcon);
+    media.appendChild(prevBtn);
+    media.appendChild(nextBtn);
     media.appendChild(editions);
     li.appendChild(media);
     li.appendChild(body);
 
     var imgs = [];
-    var timer = null;
 
     function paint() {
       var c = p.colorways[state.color];
       var st = stockState(c.stock);
 
-      // imágenes
-      imgs.forEach(function (i) { i.remove(); });
+      // imágenes del carrusel
+      track.innerHTML = "";
       imgs = c.images.map(function (src, i) {
-        var im = el("img", { src: IMG + src, alt: i === 0 ? p.name + " " + p.type + ", color " + c.name : "", loading: "lazy", decoding: "async" });
-        media.insertBefore(im, tag);
+        var im = el("img", { src: IMG + src, alt: i === 0 ? p.name + " " + p.type + ", color " + c.name : "", loading: "lazy", decoding: "async", draggable: "false" });
+        track.appendChild(im);
         return im;
       });
+      track.scrollLeft = 0;
+      state.image = 0;
       editions.innerHTML = "";
       c.images.forEach(function (_, i) {
         var b = el("button", { type: "button", "aria-label": "Foto " + (i + 1) });
-        b.addEventListener("click", function () { state.image = i; showImage(); });
-        b.addEventListener("mouseenter", function () { state.image = i; showImage(); });
+        b.addEventListener("click", function () { goImage(i); });
         editions.appendChild(b);
       });
-      editions.hidden = c.images.length < 2;
+      var many = c.images.length > 1;
+      editions.hidden = !many;
+      prevBtn.hidden = nextBtn.hidden = !many;
       showImage();
 
       tag.textContent = st === "out" ? "Agotado en " + c.name : TAG[st];
@@ -517,9 +532,52 @@
     }
 
     function showImage() {
-      imgs.forEach(function (im, i) { im.classList.toggle("is-on", i === state.image); });
       $$("button", editions).forEach(function (b, i) { b.classList.toggle("is-on", i === state.image); });
     }
+    function goImage(i) {
+      var n = imgs.length;
+      i = Math.max(0, Math.min(n - 1, i));
+      track.scrollTo({ left: i * track.clientWidth, behavior: reduceMotion ? "auto" : "smooth" });
+    }
+    track.addEventListener("scroll", function () {
+      var i = Math.round(track.scrollLeft / Math.max(track.clientWidth, 1));
+      if (i !== state.image) { state.image = i; showImage(); }
+    }, { passive: true });
+    prevBtn.addEventListener("click", function () { goImage(state.image - 1); });
+    nextBtn.addEventListener("click", function () { goImage(state.image + 1); });
+    track.addEventListener("keydown", function (e) {
+      if (e.key === "ArrowRight") { e.preventDefault(); goImage(state.image + 1); }
+      if (e.key === "ArrowLeft") { e.preventDefault(); goImage(state.image - 1); }
+      if (e.key === "Enter" || e.key === " ") { e.preventDefault(); openProductViewer(p, state.color, state.image); }
+    });
+    // ratón: arrastrar para deslizar; un clic sin arrastre amplía. En táctil el
+    // deslizamiento es nativo y un toque simple amplía.
+    var tDrag = null;
+    track.addEventListener("pointerdown", function (e) {
+      if (e.button > 0) return;
+      tDrag = { id: e.pointerId, x: e.clientX, sl: track.scrollLeft, moved: false, mouse: e.pointerType === "mouse" };
+    });
+    track.addEventListener("pointermove", function (e) {
+      if (!tDrag || e.pointerId !== tDrag.id) return;
+      var dx = e.clientX - tDrag.x;
+      if (Math.abs(dx) > 6) tDrag.moved = true;
+      if (tDrag.mouse && tDrag.moved) {
+        if (!track.classList.contains("is-dragging")) { track.classList.add("is-dragging"); track.setPointerCapture(e.pointerId); }
+        track.scrollLeft = tDrag.sl - dx;
+      }
+    });
+    track.addEventListener("pointerup", function (e) {
+      if (!tDrag || e.pointerId !== tDrag.id) return;
+      var d = tDrag; tDrag = null;
+      if (track.classList.contains("is-dragging")) {
+        track.classList.remove("is-dragging");
+        var dx = e.clientX - d.x;
+        var from = Math.round(d.sl / Math.max(track.clientWidth, 1));
+        goImage(from + (dx < -40 ? 1 : dx > 40 ? -1 : 0));
+      }
+      if (!d.moved) openProductViewer(p, state.color, state.image);
+    });
+    track.addEventListener("pointercancel", function () { tDrag = null; track.classList.remove("is-dragging"); });
 
     cta.addEventListener("click", function () {
       var c = p.colorways[state.color];
@@ -537,18 +595,6 @@
       updateBag();
       toast("<strong>" + p.name + "</strong> · " + c.name + " · " + state.size + " a tu bolsa.");
     });
-
-    // en táctil y sin hover, las fotos rotan solas mientras la tarjeta se ve
-    if (!reduceMotion && window.matchMedia("(hover: none)").matches && "IntersectionObserver" in window) {
-      new IntersectionObserver(function (entries) {
-        entries.forEach(function (e) {
-          clearInterval(timer);
-          if (e.isIntersecting && imgs.length > 1) {
-            timer = setInterval(function () { state.image = (state.image + 1) % imgs.length; showImage(); }, 2400);
-          }
-        });
-      }, { threshold: 0.6 }).observe(media);
-    }
 
     paint();
     return li;
@@ -785,6 +831,165 @@
     }, 1500);
   }
 
+  /* ---------- Vista ampliada de producto: cartas que se voltean ---------- */
+  // La foto activa es la carta del centro, boca arriba; las de los lados están
+  // boca abajo. Al pasar de foto, la del centro se voltea y se va a un lado y
+  // la siguiente se voltea al llegar al centro.
+  var pv = {
+    dialog: $("[data-pview]"),
+    stage: $("[data-pview-stage]"),
+    deck: $("[data-pview-deck]"),
+    video: $("[data-pview-video]"),
+    name: $("[data-pview-name]"),
+    meta: $("[data-pview-meta]"),
+    count: $("[data-pview-count]"),
+    cta: $("[data-pview-cta]"),
+    stamp: $("[data-pview-stamp]"),
+    prev: $("[data-pview-prev]"),
+    next: $("[data-pview-next]"),
+    product: null, colorway: null, cards: [], i: 0, opener: null
+  };
+
+  function pvOffset(k) {
+    var n = pv.cards.length;
+    var o = ((k - pv.i) % n + n) % n;
+    if (o > n / 2) o -= n;
+    return o;
+  }
+
+  function pvLayout(instant) {
+    var n = pv.cards.length;
+    pv.cards.forEach(function (card, k) {
+      var o = pvOffset(k);
+      var pos = Math.max(-2, Math.min(2, o));
+      // una carta que da la vuelta al mazo (de un extremo al otro) no se anima
+      var jump = card._pos !== undefined && Math.abs(pos - card._pos) > 1;
+      card.classList.toggle("no-anim", !!instant || jump);
+      card.dataset.pos = String(pos);
+      card._pos = pos;
+      card.setAttribute("aria-hidden", o === 0 ? "false" : "true");
+      card.tabIndex = Math.abs(o) === 1 ? 0 : -1;
+    });
+    pv.count.textContent = (pv.i + 1) + " / " + n;
+    pv.prev.disabled = pv.next.disabled = n < 2;
+  }
+
+  function pvGo(step) {
+    var n = pv.cards.length;
+    if (n < 2) return;
+    pv.i = (pv.i + step + n) % n;
+    pvLayout(false);
+  }
+
+  function openProductViewer(p, ci, start) {
+    var c = p.colorways[ci];
+    var st = stockState(c.stock);
+    pv.product = p; pv.colorway = ci; pv.i = start || 0;
+    pv.opener = document.activeElement;
+    pv.dialog.style.setProperty("--tint", c.tint || "#262c57");
+    pv.name.textContent = p.name;
+    pv.meta.textContent = p.type + " · " + c.name + " · " + euro(p.price);
+    pv.stamp.hidden = st !== "out";
+    pv.cta.textContent = st === "out" ? "Avísame si vuelve" : "Elegir talla";
+    pv.cta.className = "btn " + (st === "out" ? "btn--ghost" : "btn--primary");
+
+    // fondo: vídeo de la prenda con el filtro de su color
+    if (c.video) {
+      pv.video.poster = VID + c.video.src + ".jpg";
+      pv.video.src = VID + c.video.src + ".mp4" + (c.video.start ? "#t=" + c.video.start : "");
+      pv.video._start = c.video.start || 0;
+      if (!reduceMotion) { var pr = pv.video.play(); if (pr && pr.catch) pr.catch(function () {}); }
+    }
+
+    pv.deck.innerHTML = "";
+    pv.cards = c.images.map(function (src, k) {
+      var card = el("div", { class: "pcard", role: "group", "aria-roledescription": "carta", "aria-label": "Foto " + (k + 1) + " de " + c.images.length }, [
+        el("div", { class: "pcard__face pcard__front" }, [
+          el("img", { src: IMG + src, alt: k === 0 ? p.name + " " + p.type + ", " + c.name : "", decoding: "async" })
+        ]),
+        el("div", { class: "pcard__face pcard__back", "aria-hidden": "true" }, [
+          el("span", { class: "pcard__emblem", "data-logo": "emblem" }),
+          el("span", { class: "pcard__word", "data-logo": "word" })
+        ])
+      ]);
+      // tocar una carta lateral la trae al centro
+      card.addEventListener("click", function () { var o = pvOffset(k); if (o !== 0 && !pv.dragged) pvGo(o); });
+      card.addEventListener("keydown", function (e) { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); var o = pvOffset(k); if (o) pvGo(o); } });
+      pv.deck.appendChild(card);
+      return card;
+    });
+    paintLogos();
+    pvLayout(true);
+
+    document.documentElement.classList.add("is-locked");
+    if (typeof pv.dialog.showModal === "function") pv.dialog.showModal(); else pv.dialog.setAttribute("open", "");
+    $("[data-pview-close]").focus();
+  }
+
+  function closeProductViewer() {
+    pv.video.pause();
+    pv.video.removeAttribute("src");
+    pv.video.load();
+    document.documentElement.classList.remove("is-locked");
+    if (pv.dialog.open) pv.dialog.close();
+    if (pv.opener) pv.opener.focus({ preventScroll: true });
+  }
+
+  function setupProductViewer() {
+    if (!pv.dialog) return;
+    $("[data-pview-close]").addEventListener("click", closeProductViewer);
+    pv.dialog.addEventListener("cancel", function (e) { e.preventDefault(); closeProductViewer(); });
+    pv.prev.addEventListener("click", function () { pvGo(-1); });
+    pv.next.addEventListener("click", function () { pvGo(1); });
+    pv.dialog.addEventListener("keydown", function (e) {
+      if (e.key === "ArrowRight") { e.preventDefault(); pvGo(1); }
+      if (e.key === "ArrowLeft") { e.preventDefault(); pvGo(-1); }
+    });
+    pv.video.addEventListener("ended", function () { pv.video.currentTime = pv.video._start || 0; pv.video.play(); });
+    pv.cta.addEventListener("click", function () {
+      var p = pv.product, c = p.colorways[pv.colorway];
+      if (stockState(c.stock) === "out") {
+        toast("Te avisamos si vuelve <strong>" + p.name + " · " + c.name + "</strong>. Deja tu email abajo.");
+        return;
+      }
+      closeProductViewer();
+      var card = document.getElementById("product-" + p.id);
+      if (!card) return;
+      card.scrollIntoView({ block: "center", behavior: reduceMotion ? "auto" : "smooth" });
+      var first = $(".sizes input:not(:disabled)", card);
+      setTimeout(function () { if (first) first.focus({ preventScroll: true }); }, 450);
+    });
+
+    // deslizar con dedo o ratón: izquierda = siguiente, derecha = anterior
+    var drag = null;
+    pv.stage.addEventListener("pointerdown", function (e) {
+      if (drag || e.button > 0) return;
+      drag = { id: e.pointerId, x: e.clientX, t: performance.now(), dx: 0 };
+      pv.dragged = false;
+      pv.deck.classList.add("is-dragging");
+    });
+    pv.stage.addEventListener("pointermove", function (e) {
+      if (!drag || e.pointerId !== drag.id) return;
+      drag.dx = e.clientX - drag.x;
+      // se captura el puntero solo al empezar a arrastrar, para que un toque
+      // simple siga llegando a la carta como clic
+      if (!pv.dragged && Math.abs(drag.dx) > 6) { pv.dragged = true; pv.stage.setPointerCapture(e.pointerId); }
+      pv.deck.style.transform = "translateX(" + drag.dx * 0.35 + "px) rotateY(" + drag.dx * 0.012 + "deg)";
+    });
+    function endDrag(e) {
+      if (!drag || e.pointerId !== drag.id) return;
+      var dx = drag.dx, v = dx / Math.max(performance.now() - drag.t, 1); // px/ms
+      drag = null;
+      pv.deck.classList.remove("is-dragging");
+      pv.deck.style.transform = "";
+      if (dx < -60 || v < -0.45) pvGo(1);
+      else if (dx > 60 || v > 0.45) pvGo(-1);
+      setTimeout(function () { pv.dragged = false; }, 0);
+    }
+    pv.stage.addEventListener("pointerup", endDrag);
+    pv.stage.addEventListener("pointercancel", endDrag);
+  }
+
   /* ---------- Arranque ---------- */
   paintLogos();
   renderThread();
@@ -797,5 +1002,6 @@
   setupChrome();
   heroMessage();
   setupChatComposer();
+  setupProductViewer();
   setupReveal($$(".chat__drop").concat($$(".product"), $$("main > section > .reveal, .about .reveal, .social .reveal, .shop__head .reveal")));
 })();

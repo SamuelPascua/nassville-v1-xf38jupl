@@ -5,6 +5,8 @@
  * Sustituirlos por los reales antes de publicar.
  *
  * stock por talla: 0 = agotada, 1-3 = últimas unidades, >3 = disponible.
+ * images: fotos de la prenda (sola o con modelo) para deslizar y ver en grande.
+ * video: fondo de la vista ampliada (start = segundo de inicio); tint: color del filtro.
  */
 window.NASS = {
   products: [
@@ -19,7 +21,9 @@ window.NASS = {
       colorways: [
         {
           name: "Navy",
-          images: ["DQ6ai3OCIwG-2.jpg", "DQ6ai3OCIwG-4.jpg", "DQ6ai3OCIwG-5.jpg", "DQ6ai3OCIwG-3.jpg"],
+          images: ["DQ6ai3OCIwG-2.jpg", "DQ6ai3OCIwG-4.jpg", "DQ6ai3OCIwG-5.jpg", "DQ6ai3OCIwG-3.jpg", "DQ6awDBiDKX-3.jpg", "DQ6ai3OCIwG.jpg", "DQ6awDBiDKX-4.jpg", "DQ6aqPhCNO7-7.jpg", "DQ_jUEKCJ6J-5.jpg", "DQ_jUEKCJ6J-4.jpg", "DQ_jUEKCJ6J.jpg", "DSz7F5_iDeO.jpg"],
+          video: { src: "Dc6hz_ooqou" },
+          tint: "#2a3a8c",
           stock: { S: 0, M: 2, L: 6, XL: 3 }
         }
       ]
@@ -34,12 +38,16 @@ window.NASS = {
       colorways: [
         {
           name: "Brown washed",
-          images: ["DZpqpVXiM4U-2.jpg", "DZpqpVXiM4U.jpg", "DZpqpVXiM4U-3.jpg"],
+          images: ["DZpqpVXiM4U-2.jpg", "DZpqpVXiM4U.jpg", "DZpqpVXiM4U-3.jpg", "DZF4fGhCOD9-3.jpg", "DZF4fGhCOD9.jpg", "DZF4fGhCOD9-2.jpg", "Dbdkoc_CCcC.jpg", "Dbdkoc_CCcC-3.jpg", "DYjpaJziJEB-2.jpg"],
+          video: { src: "DYUDJ-aR84h", start: 30 },
+          tint: "#7a5236",
           stock: { S: 4, M: 5, L: 1, XL: 0 }
         },
         {
           name: "Olive washed",
-          images: ["DYUDHm_CC5l.jpg", "DYUDHQyiAkA-6.jpg", "DYUDHQyiAkA-5.jpg"],
+          images: ["DYUDHm_CC5l.jpg", "DYUDHQyiAkA-5.jpg", "DYUDHQyiAkA.jpg", "DYUDHQyiAkA-2.jpg", "DYUDHQyiAkA-6.jpg", "DYUDHQyiAkA-4.jpg", "DYUDHQyiAkA-3.jpg", "DYUDHm_CC5l-2.jpg"],
+          video: { src: "DYUDJ-aR84h", start: 30 },
+          tint: "#6f6a3c",
           stock: { S: 0, M: 0, L: 0, XL: 0 }
         }
       ]
@@ -55,7 +63,9 @@ window.NASS = {
       colorways: [
         {
           name: "Cream",
-          images: ["DNJDF6FIfKv-2.jpg", "DLfqI2MoGwb-2.jpg", "DNJDF6FIfKv.jpg"],
+          images: ["DNJDF6FIfKv-2.jpg", "DNJDF6FIfKv.jpg", "DLfqI2MoGwb-2.jpg", "DLfqI2MoGwb-3.jpg", "DNBLCdfoB7N.jpg", "DaAwdtOCP5l-3.jpg"],
+          video: { src: "DNBLGHuIDVZ" },
+          tint: "#2e9b55",
           stock: { S: 5, M: 8, L: 7, XL: 2 }
         }
       ]
@@ -70,7 +80,9 @@ window.NASS = {
       colorways: [
         {
           name: "Navy",
-          images: ["DRCKPUsiIOW-4.jpg", "DRCKPUsiIOW-2.jpg", "DRCKPUsiIOW-3.jpg"],
+          images: ["DRCKPUsiIOW-4.jpg", "DRCKPUsiIOW-2.jpg", "DRCKPUsiIOW-3.jpg", "DRCKPUsiIOW.jpg"],
+          video: { src: "DQ6aekxiN1R", start: 20 },
+          tint: "#1e5bd6",
           stock: { S: 3, M: 6, L: 6, XL: 4 }
         }
       ]
@@ -86,6 +98,8 @@ window.NASS = {
         {
           name: "Washed grey",
           images: ["DXjCNpUiHGI-3.jpg"],
+          video: { src: "DXjCNpUiHGI-5" },
+          tint: "#7a7a82",
           stock: { S: 2, M: 3, L: 3, XL: 1 }
         }
       ]
@@ -100,12 +114,16 @@ window.NASS = {
       colorways: [
         {
           name: "Charcoal",
-          images: ["DIlode2oLMI.jpg", "DLfqKT4ILU7.jpg", "DIlode2oLMI-2.jpg"],
+          images: ["DIlode2oLMI.jpg", "DIlode2oLMI-2.jpg", "DLfqKT4ILU7.jpg", "DGqSayZImc2.jpg", "DHJISclIC7f.jpg"],
+          video: { src: "DL7bctRIjTd" },
+          tint: "#4a4a55",
           stock: { S: 0, M: 0, L: 0, XL: 0 }
         },
         {
           name: "Black",
-          images: ["DHJISclIC7f.jpg", "DLfqI2MoGwb.jpg"],
+          images: ["DHJISclIC7f.jpg", "DLfqI2MoGwb.jpg", "DaAwdtOCP5l-2.jpg"],
+          video: { src: "DL7bctRIjTd" },
+          tint: "#26262c",
           stock: { S: 0, M: 0, L: 0, XL: 0 }
         }
       ]
@@ -120,7 +138,9 @@ window.NASS = {
       colorways: [
         {
           name: "Edición limitada",
-          images: ["DRsAAoPiDvX-4.jpg", "DRsAAoPiDvX-5.jpg"],
+          images: ["DRsAAoPiDvX-4.jpg", "DRsAAoPiDvX-3.jpg", "DRsAAoPiDvX-5.jpg"],
+          video: { src: "DXjCCKQiGWc", start: 40 },
+          tint: "#2f6f86",
           stock: { "Única": 0 }
         }
       ]

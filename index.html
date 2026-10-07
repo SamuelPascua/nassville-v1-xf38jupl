@@ -9,7 +9,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@700;800;900&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/styles.css?v=14">
+  <link rel="stylesheet" href="css/styles.css?v=16">
   <script type="importmap">
     { "imports": {
       "three": "https://cdn.jsdelivr.net/npm/three@0.169.0/build/three.module.js",
@@ -276,11 +276,46 @@
     <img data-viewer-img src="assets/video/hero.jpg" alt="">
   </dialog>
 
+  <!-- Vista ampliada de producto: cartas sobre vídeo con el color de la prenda -->
+  <dialog class="pview" data-pview aria-labelledby="pview-name">
+    <div class="pview__bg" aria-hidden="true">
+      <video class="pview__video" data-pview-video muted playsinline preload="none"></video>
+      <div class="pview__tint"></div>
+      <div class="pview__shade"></div>
+    </div>
+
+    <header class="pview__head">
+      <div class="pview__title">
+        <h2 id="pview-name" class="pview__name" data-pview-name>Producto</h2>
+        <p class="pview__meta" data-pview-meta></p>
+      </div>
+      <span class="pview__stamp" data-pview-stamp hidden>Agotado</span>
+      <button class="pview__close" type="button" data-pview-close aria-label="Cerrar">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg>
+      </button>
+    </header>
+
+    <div class="pview__stage" data-pview-stage>
+      <div class="pview__deck" data-pview-deck></div>
+    </div>
+
+    <footer class="pview__foot">
+      <button class="pview__arrow" type="button" data-pview-prev aria-label="Foto anterior">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg>
+      </button>
+      <span class="pview__count" data-pview-count aria-live="polite">1 / 1</span>
+      <button class="pview__arrow" type="button" data-pview-next aria-label="Foto siguiente">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 5l7 7-7 7"/></svg>
+      </button>
+      <button class="btn btn--primary pview__cta" type="button" data-pview-cta>Elegir talla</button>
+    </footer>
+  </dialog>
+
   <div class="toast" data-toast role="status" aria-live="polite"></div>
 
-  <script src="js/data.js?v=14"></script>
-  <script src="js/logo-paths.js?v=14"></script>
-  <script src="js/main.js?v=14"></script>
-  <script src="js/hero3d.js?v=14"></script>
+  <script src="js/data.js?v=16"></script>
+  <script src="js/logo-paths.js?v=16"></script>
+  <script src="js/main.js?v=16"></script>
+  <script src="js/hero3d.js?v=16"></script>
 </body>
 </html>
