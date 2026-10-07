@@ -200,6 +200,91 @@ window.NASS = {
     }
   ],
 
+  /*
+   * Chat del grupo "nassville drops".
+   * IMPORTANTE: las personas, mensajes, horas y reacciones de la comunidad son
+   * DE EJEMPLO. Sustituirlos por reales (con permiso) o ajustarlos antes de publicar.
+   */
+  chat: {
+    name: "nassville drops",
+    members: "nassville, Lucía, Marcos, Irene y 1.247 más",
+    pinned: { drop: "losing-interest", text: "Nuevo drop: Losing Interest. Ya disponible en la tienda." },
+    users: {
+      lucia: { name: "Lucía", color: "#f0a3c4" },
+      marcos: { name: "Marcos", color: "#7fd6b8" },
+      irene: { name: "Irene", color: "#f5c27a" },
+      dani: { name: "Dani", color: "#9fb4ff" },
+      hugo: { name: "Hugo", color: "#c9a6ff" },
+      paula: { name: "Paula", color: "#8fd0f0" }
+    },
+    /* por drop: hora de nassville, reacciones a su mensaje y respuestas.
+       quote: true = cita el último mensaje de nassville del drop; quote: 0, 1… = cita esa frase;
+       reply: "usuario" = nassville responde citando a esa persona. */
+    drops: {
+      "50003": {
+        time: "20:30", reactions: [["🔥", 18], ["🙌", 6]],
+        replies: [
+          { user: "lucia", time: "20:32", quote: true, text: "ese 50003 en gris es una locura" },
+          { from: "nassville", time: "20:35", reply: "lucia", text: "Gracias Lucía 🖤 boxy y 195 GSM, pensada para durar" }
+        ]
+      },
+      "toppings": {
+        time: "19:00", reactions: [["🍋", 11], ["🔥", 9]],
+        replies: [
+          { user: "marcos", time: "19:04", quote: true, text: "¿la Toppings queda en M?" },
+          { from: "nassville", time: "19:06", reply: "marcos", text: "Queda en M, corre 🏃" }
+        ]
+      },
+      "losing-interest": {
+        time: "22:05", reactions: [["🔥", 54], ["😭", 21], ["🖤", 17]],
+        replies: [
+          { user: "irene", time: "22:06", quote: 0, text: "me vas a matar tú a mí 😭 la navy es preciosa" },
+          { user: "dani", time: "22:07", text: "¿el bordado va delante?" },
+          { from: "nassville", time: "22:09", reply: "dani", text: "Sí 🙌 bordado delante y serigrafía gigante detrás" }
+        ]
+      },
+      "almozara": {
+        time: "18:15", reactions: [["⚽", 23], ["💙", 12]],
+        replies: [
+          { user: "hugo", time: "18:20", text: "por fin una equipación del barrio" }
+        ]
+      },
+      "mascu": {
+        time: "21:00", reactions: [["🧸", 15], ["😍", 9]],
+        replies: [
+          { user: "paula", time: "21:12", quote: true, text: "me quedé sin Mascu 😭" },
+          { from: "nassville", time: "21:15", reply: "paula", text: "Se fue volando 🫡 avisaremos si vuelve" }
+        ]
+      },
+      "egipto": {
+        time: "17:40", reactions: [["🐪", 19], ["😂", 14]],
+        replies: [
+          { user: "lucia", time: "17:42", text: "¿esto es real? 😂" }
+        ]
+      },
+      "nass": {
+        time: "20:00", reactions: [["🔥", 31], ["🤎", 13]],
+        replies: [
+          { user: "marcos", time: "20:01", quote: true, text: "el zip marrón 🔥🔥" },
+          { user: "irene", time: "20:03", text: "yo voy a por la olive" }
+        ]
+      },
+      "popup": {
+        time: "12:00", reactions: [["📍", 8], ["🙌", 11]],
+        replies: [
+          { user: "dani", time: "12:10", text: "allí estaremos" }
+        ]
+      },
+      "summer": {
+        time: "13:30", reactions: [["🤝", 16]],
+        replies: [
+          { user: "irene", time: "13:31", quote: true, text: "nunca 🤝" }
+        ]
+      }
+    },
+    autoReply: "¡Te leemos! 🙌 Para enterarte del próximo drop antes que nadie, deja tu email aquí abajo."
+  },
+
   /* Vídeos redondos (notas de vídeo) y películas */
   notes: ["DSz7F5_iDeO-3", "DQ_jUEKCJ6J-8", "DXjCNpUiHGI-2", "DSSpv1FCEN-", "DK2M5QNoEAw", "DSz7F5_iDeO-6"],
   films: [

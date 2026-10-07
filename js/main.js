@@ -36,11 +36,19 @@
   function paintLogos() {
     var L = window.NASS_LOGO;
     if (!L) return;
-    $$("[data-logo]").forEach(function (slot) {
+    // los trazados van una sola vez en un sprite; cada logo los reutiliza con <use>
+    if (!document.getElementById("logo-sprite")) {
+      var sprite = '<svg id="logo-sprite" width="0" height="0" style="position:absolute" aria-hidden="true">';
+      Object.keys(L).forEach(function (k) {
+        sprite += '<symbol id="logo-' + k + '" viewBox="' + L[k].viewBox + '"><path fill-rule="evenodd" d="' + L[k].paths.join(" ") + '"/></symbol>';
+      });
+      document.body.insertAdjacentHTML("afterbegin", sprite + "</svg>");
+    }
+    $$("[data-logo]:not([data-painted])").forEach(function (slot) {
       var key = slot.getAttribute("data-logo");
-      var def = L[key];
-      if (!def) return;
-      slot.innerHTML = '<svg viewBox="' + def.viewBox + '" aria-hidden="true" focusable="false"><path fill-rule="evenodd" d="' + def.paths.join(" ") + '"/></svg>';
+      if (!L[key]) return;
+      slot.innerHTML = '<svg viewBox="' + L[key].viewBox + '" aria-hidden="true" focusable="false"><use href="#logo-' + key + '"/></svg>';
+      slot.setAttribute("data-painted", "");
     });
   }
 
@@ -61,40 +69,108 @@
       // solo esconder lo que está por debajo del viewport: lo visible nunca parpadea
       var r = n.getBoundingClientRect();
       if (r.top < window.innerHeight * 0.9) return;
-      if (n.classList.contains("drop")) $$(".reveal", n).forEach(function (c) { c.classList.add("is-pending"); });
+      if (n.classList.contains("chat__drop")) $$(".reveal", n).forEach(function (c) { c.classList.add("is-pending"); });
       else n.classList.add("is-pending");
       revealObserver.observe(n);
     });
   }
   function arrive(node) {
-    // Un drop entero: primero "escribiendo...", luego sus mensajes en cascada
-    if (node.classList.contains("drop")) {
-      var typing = $(".typing", node);
-      var items = $$(".reveal", node);
-      var start = function () {
-        if (typing) typing.classList.add("is-gone");
-        items.forEach(function (it, i) {
-          it.style.setProperty("--d", Math.min(i * 70, 420) + "ms");
-          it.classList.remove("is-pending");
-        });
-      };
-      if (typing) { typing.hidden = false; setTimeout(start, 650); } else start();
-      return;
-    }
+    // Un drop del chat: separador, y por cada persona "escribiendo…" y sus mensajes
+    if (node.classList.contains("chat__drop")) { playDrop(node); return; }
     node.classList.remove("is-pending");
   }
 
-  /* ---------- Vista previa de enlace (del hilo a la tienda) ---------- */
-  function linkCard(p) {
+  /* ---------- El hilo: grupo de chat "nassville drops" ---------- */
+  var C = D.chat;
+  var NASS_USER = { name: "nassville", color: "#7d9dff", brand: true };
+  var CHECKS = '<svg class="msg__checks" viewBox="0 0 18 12" aria-label="Leído"><path d="M1 6.5 4.5 10 11 2.5M7.5 10l.5.5L16.5 2.5"/></svg>';
+
+  function userOf(id) { return id === "nassville" ? NASS_USER : C.users[id]; }
+
+  function avatar(user) {
+    if (user.brand) return el("span", { class: "msg__avatar msg__avatar--brand", "data-logo": "emblem", "aria-hidden": "true" });
+    return el("span", { class: "msg__avatar", style: "--who:" + user.color, "aria-hidden": "true", text: user.name.charAt(0) });
+  }
+
+  function meta(time, own) {
+    return el("span", { class: "msg__meta", html: time + (own ? CHECKS : "") });
+  }
+
+  // Una fila de mensaje: avatar (solo en el primero de cada tanda) + burbuja
+  function row(user, first, bubbleChildren, opts) {
+    opts = opts || {};
+    var r = el("div", { class: "msg reveal" + (first ? " msg--first" : "") + (user.brand ? " msg--brand" : "") + (opts.cls ? " " + opts.cls : "") });
+    r.appendChild(first ? avatar(user) : el("span", { class: "msg__avatar msg__avatar--gap", "aria-hidden": "true" }));
+    var b = el("div", { class: "msg__bubble" + (opts.media ? " msg__bubble--media" : "") });
+    if (first) b.appendChild(el("span", { class: "msg__name", style: "--who:" + user.color, html: user.name + (user.brand ? ' <i class="msg__admin">admin</i>' : "") }));
+    bubbleChildren.forEach(function (c) { if (c) b.appendChild(c); });
+    r.appendChild(b);
+    if (opts.reactions) {
+      var re = el("span", { class: "msg__reactions", "aria-label": "Reacciones" });
+      opts.reactions.forEach(function (x) { re.appendChild(el("span", { text: x[0] + " " + x[1] })); });
+      b.appendChild(re);
+      r.classList.add("has-reactions");
+    }
+    return r;
+  }
+
+  function quoteBox(user, text) {
+    return el("span", { class: "msg__quote", style: "--who:" + user.color }, [
+      el("strong", { text: user.name }),
+      el("span", { text: text })
+    ]);
+  }
+
+  function typingRow(user) {
+    var r = el("div", { class: "msg msg--first msg--typing", "aria-hidden": "true", hidden: "" });
+    r.appendChild(avatar(user));
+    r.appendChild(el("div", { class: "msg__bubble" }, [el("span", { class: "typing typing--chat", html: "<i></i><i></i><i></i>" })]));
+    r.dataset.who = user.name;
+    return r;
+  }
+
+  // Álbum de fotos estilo WhatsApp: 2×2 con "+N"
+  function album(drop) {
+    var shown = drop.images.slice(0, 4);
+    var extra = drop.images.length - shown.length;
+    var grid = el("div", { class: "msg__album msg__album--" + shown.length });
+    shown.forEach(function (src, i) {
+      var tile = el("button", { class: "msg__photo", type: "button", "aria-label": "Ver foto " + (i + 1) + " de " + drop.title });
+      tile.appendChild(el("img", { src: IMG + src, alt: "", loading: "lazy", decoding: "async" }));
+      if (i === shown.length - 1 && extra > 0) tile.appendChild(el("span", { class: "msg__more", text: "+" + extra }));
+      tile.addEventListener("click", function () { openViewer(drop.images, i, drop.title); });
+      grid.appendChild(tile);
+    });
+    return grid;
+  }
+
+  function videoMsg(drop) {
+    var vb = el("button", { class: "msg__video", type: "button", "aria-label": "Reproducir vídeo de " + drop.title, style: "aspect-ratio:" + drop.video.ratio });
+    var v = el("video", { muted: "", loop: "", playsinline: "", preload: "none", poster: VID + drop.video.src + ".jpg", "data-src": VID + drop.video.src + ".mp4" + (drop.video.start ? "#t=" + drop.video.start : "") });
+    v.muted = true;
+    if (drop.video.start) {
+      // vuelve al inicio elegido en cada vuelta, no al primer fotograma
+      v.loop = false;
+      v.addEventListener("ended", function () { v.currentTime = drop.video.start; v.play(); });
+    }
+    vb.appendChild(v);
+    vb.appendChild(el("span", { class: "msg__play", html: ICON.play }));
+    vb.addEventListener("click", function () { openPlayer(VID + drop.video.src + ".mp4", VID + drop.video.src + ".jpg"); });
+    autoplayInView(v);
+    return vb;
+  }
+
+  // Vista previa de enlace a la prenda (del hilo a la tienda)
+  function linkPreview(p) {
     var st = productState(p);
-    var a = el("a", { class: "linkcard reveal" + (st === "out" ? " is-out" : ""), href: st === "out" ? "#archivo-title" : "#product-" + p.id }, [
+    var href = st === "out" ? "#archivo-title" : "#product-" + p.id;
+    var a = el("a", { class: "msg__link" + (st === "out" ? " is-out" : ""), href: href }, [
       el("img", { src: IMG + p.colorways[0].images[0], alt: "", loading: "lazy" }),
-      el("span", { class: "linkcard__text" }, [
-        el("span", { class: "linkcard__host", text: "nassville.com/tienda" }),
+      el("span", { class: "msg__link-text" }, [
         el("strong", { text: p.name + " · " + p.type }),
-        el("span", { class: "linkcard__meta", text: st === "out" ? "Agotado · en el archivo" : euro(p.price) + " · " + TAG[st] })
-      ]),
-      el("span", { class: "linkcard__go", "aria-hidden": "true", html: '<svg viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"/></svg>' })
+        el("span", { text: st === "out" ? "Agotado · en el archivo" : euro(p.price) + " · " + TAG[st] }),
+        el("small", { text: "nassville.com/tienda" })
+      ])
     ]);
     if (st !== "out") a.addEventListener("click", function () {
       var card = document.getElementById("product-" + p.id);
@@ -104,73 +180,135 @@
     return a;
   }
 
-  /* ---------- El hilo ---------- */
   function renderThread() {
-    var list = $("[data-thread]");
-    if (!list) return;
+    var body = $("[data-thread]");
+    if (!body) return;
+    $("[data-chat-name]").textContent = C.name;
+    $("[data-chat-status]").textContent = C.members;
+    var pin = $("[data-chat-pinned]");
+    pin.href = "#drop-" + C.pinned.drop;
+    $("[data-chat-pinned-text]").textContent = C.pinned.text;
+
+    body.appendChild(el("p", { class: "chat__notice", text: "Conversación de ejemplo: las personas y respuestas de la comunidad se sustituirán por reales." }));
+
     D.drops.forEach(function (drop) {
-      var li = el("li", { class: "drop" + (drop.lead ? " drop--lead" : ""), id: "drop-" + drop.id });
+      var info = C.drops[drop.id] || { time: "", replies: [] };
+      var block = el("div", { class: "chat__drop" + (drop.lead ? " chat__drop--lead" : ""), id: "drop-" + drop.id, "data-drop": "" });
+      block.appendChild(el("div", { class: "chat__sep reveal" }, [
+        el("span", { html: "<strong>" + drop.title + "</strong>" + (drop.stamp ? " · " + drop.stamp : "") })
+      ]));
 
-      var rail = el("div", { class: "drop__rail" }, [
-        el("h3", { class: "drop__title", text: drop.title }),
-        drop.stamp ? el("time", { class: "drop__stamp", text: drop.stamp }) : null
-      ]);
-
-      var body = el("div", { class: "drop__body" });
-      var typing = el("div", { class: "typing", "aria-hidden": "true", html: "<i></i><i></i><i></i>" });
-      typing.hidden = true;
-      body.appendChild(typing);
-
-      var group = el("div", { class: "group" });
+      // Tanda 1: nassville publica el drop
+      var t1 = [typingRow(NASS_USER)];
       drop.lines.forEach(function (line, i) {
-        var b = el("div", { class: "bubble bubble--in reveal" + (i === 0 && drop.lead ? " is-first" : "") }, [el("p", { text: line })]);
-        group.appendChild(b);
+        t1.push(row(NASS_USER, i === 0, [el("p", { text: line }), meta(info.time, false)]));
       });
-      body.appendChild(group);
-
-      // adjuntos
-      // el drop actual factura grande; los anteriores, una fila con "+N"
-      var max = drop.lead ? 8 : 3;
-      var shown = drop.images.slice(0, max);
-      var extra = drop.images.length - shown.length;
-      var cls = drop.lead ? "attach attach--lead" : "attach attach--row attach--" + shown.length;
-      var attach = el("div", { class: cls + " reveal" });
-      shown.forEach(function (src, i) {
-        var tile = el("button", { class: "attach__tile", type: "button", "aria-label": "Ver foto " + (i + 1) + " de " + drop.title });
-        tile.appendChild(el("img", { src: IMG + src, alt: "", loading: "lazy", decoding: "async" }));
-        if (i === shown.length - 1 && extra > 0) tile.appendChild(el("span", { class: "attach__more", text: "+" + extra }));
-        tile.addEventListener("click", function () { openViewer(drop.images, i, drop.title); });
-        attach.appendChild(tile);
-      });
-      body.appendChild(attach);
-
-      if (drop.video) {
-        var wide = drop.video.ratio === "16/9";
-        var vb = el("button", { class: "vbubble reveal" + (wide ? " vbubble--wide" : ""), type: "button", "aria-label": "Reproducir vídeo de " + drop.title, style: "aspect-ratio:" + drop.video.ratio });
-        var v = el("video", { muted: "", loop: "", playsinline: "", preload: "none", poster: VID + drop.video.src + ".jpg", "data-src": VID + drop.video.src + ".mp4" + (drop.video.start ? "#t=" + drop.video.start : "") });
-        v.muted = true;
-        if (drop.video.start) {
-          // vuelve al inicio elegido en cada vuelta, no al primer fotograma
-          v.loop = false;
-          v.addEventListener("ended", function () { v.currentTime = drop.video.start; v.play(); });
-        }
-        vb.appendChild(v);
-        vb.appendChild(el("span", { class: "vbubble__badge", html: ICON.play + "Vídeo" }));
-        vb.addEventListener("click", function () { openPlayer(VID + drop.video.src + ".mp4", VID + drop.video.src + ".jpg"); });
-        body.appendChild(vb);
-        autoplayInView(v);
-      }
-
-      // vista previa de enlace a las prendas de este drop
+      t1.push(row(NASS_USER, false, [album(drop), meta(info.time, false)], { media: true, reactions: info.reactions }));
+      if (drop.video) t1.push(row(NASS_USER, false, [videoMsg(drop), meta(info.time, false)], { media: true }));
       D.products.filter(function (p) { return p.drop === drop.id; }).forEach(function (p) {
-        body.appendChild(linkCard(p));
+        t1.push(row(NASS_USER, false, [linkPreview(p), meta(info.time, false)], { cls: "msg--link" }));
+      });
+      var batches = [t1];
+
+      // Respuestas: cada cambio de persona es una tanda con su "escribiendo…"
+      var prev = "nassville";
+      (info.replies || []).forEach(function (r) {
+        var who = r.from || r.user;
+        var user = userOf(who);
+        var parts = [];
+        // quote: true cita el último mensaje de nassville; un número, esa frase concreta
+        if (r.quote !== undefined && r.quote !== false) parts.push(quoteBox(NASS_USER, drop.lines[r.quote === true ? drop.lines.length - 1 : r.quote]));
+        if (r.reply) {
+          var quoted = (info.replies || []).filter(function (x) { return x.user === r.reply; })[0];
+          if (quoted) parts.push(quoteBox(userOf(r.reply), quoted.text));
+        }
+        parts.push(el("p", { text: r.text }));
+        parts.push(meta(r.time, false));
+        if (who !== prev) batches.push([typingRow(user)]);
+        batches[batches.length - 1].push(row(user, who !== prev, parts));
+        prev = who;
       });
 
-      body.appendChild(el("span", { class: "receipt reveal", text: drop.lead ? "Entregado 22:05" : "Entregado" }));
+      batches.forEach(function (b, i) {
+        var g = el("div", { class: "chat__batch", "data-batch": i });
+        b.forEach(function (n) { g.appendChild(n); });
+        block.appendChild(g);
+      });
+      body.appendChild(block);
+    });
+    paintLogos();
+  }
 
-      li.appendChild(rail);
-      li.appendChild(body);
-      list.appendChild(li);
+  // Llegada de un drop: separador, y por cada tanda "escribiendo…" y sus mensajes
+  var statusTimer = null;
+  function setStatus(text, typing) {
+    var s = $("[data-chat-status]");
+    s.textContent = text;
+    s.classList.toggle("is-typing", !!typing);
+  }
+  function playDrop(block) {
+    var sep = $(".chat__sep", block);
+    if (sep) sep.classList.remove("is-pending");
+    var batches = $$(".chat__batch", block);
+    var i = 0;
+    function next() {
+      if (i >= batches.length) { setStatus(C.members, false); return; }
+      var b = batches[i++];
+      var typing = $(".msg--typing", b);
+      var msgs = $$(".msg.reveal", b);
+      if (typing) {
+        typing.hidden = false;
+        setStatus(typing.dataset.who + " está escribiendo…", true);
+      }
+      setTimeout(function () {
+        if (typing) typing.hidden = true;
+        msgs.forEach(function (m, k) {
+          m.style.setProperty("--d", Math.min(k * 90, 540) + "ms");
+          m.classList.remove("is-pending");
+        });
+        setTimeout(next, Math.min(msgs.length * 90, 540) + 250);
+      }, typing ? 700 : 0);
+    }
+    next();
+  }
+
+  /* ---------- Barra de escribir del chat ---------- */
+  function setupChatComposer() {
+    var form = $("[data-chat-composer]");
+    if (!form) return;
+    var input = $("input", form);
+    var log = $("[data-thread]");
+    form.addEventListener("submit", function (e) {
+      e.preventDefault();
+      var text = input.value.trim();
+      if (!text) { input.focus(); return; }
+      input.value = "";
+      var now = new Date();
+      var hh = String(now.getHours()).padStart(2, "0") + ":" + String(now.getMinutes()).padStart(2, "0");
+      var mine = el("div", { class: "msg msg--own" }, [
+        el("div", { class: "msg__bubble" }, [el("p", { text: text }), meta(hh, true)])
+      ]);
+      log.appendChild(mine);
+      mine.scrollIntoView({ block: "nearest", behavior: reduceMotion ? "auto" : "smooth" });
+      var typing = typingRow(NASS_USER);
+      setTimeout(function () {
+        $(".msg__checks", mine).classList.add("is-read");
+        typing.hidden = false;
+        log.appendChild(typing);
+        setStatus("nassville está escribiendo…", true);
+        typing.scrollIntoView({ block: "nearest", behavior: reduceMotion ? "auto" : "smooth" });
+      }, 600);
+      setTimeout(function () {
+        typing.remove();
+        setStatus(C.members, false);
+        var go = el("a", { class: "btn btn--primary msg__cta", href: "#email", text: "Dejar mi email" });
+        go.addEventListener("click", function () { setTimeout(function () { $("#email").focus({ preventScroll: true }); }, 500); });
+        var reply = row(NASS_USER, true, [el("p", { text: C.autoReply }), go, meta(hh, false)]);
+        reply.classList.remove("reveal");
+        log.appendChild(reply);
+        paintLogos();
+        reply.scrollIntoView({ block: "nearest", behavior: reduceMotion ? "auto" : "smooth" });
+      }, 1700);
     });
   }
 
@@ -658,5 +796,6 @@
   setupComposer();
   setupChrome();
   heroMessage();
-  setupReveal($$(".drop").concat($$(".product"), $$("main > section > .reveal, .about .reveal, .social .reveal, .shop__head .reveal")));
+  setupChatComposer();
+  setupReveal($$(".chat__drop").concat($$(".product"), $$("main > section > .reveal, .about .reveal, .social .reveal, .shop__head .reveal")));
 })();

@@ -9,7 +9,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@700;800;900&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/styles.css?v=10">
+  <link rel="stylesheet" href="css/styles.css?v=14">
   <script type="importmap">
     { "imports": {
       "three": "https://cdn.jsdelivr.net/npm/three@0.169.0/build/three.module.js",
@@ -100,9 +100,45 @@
     <section class="thread" id="hilo" aria-labelledby="hilo-title">
       <div class="thread__head">
         <h2 id="hilo-title" class="display">El hilo</h2>
-        <p class="lede">Cada drop nos llega como un mensaje. Aquí están todos, del primero al último.</p>
+        <p class="lede">El grupo donde soltamos cada drop y donde la gente responde. Del primero al último.</p>
       </div>
-      <ol class="thread__list" data-thread></ol>
+      <div class="chat" aria-label="Grupo de chat nassville drops">
+        <div class="chat__top">
+          <header class="chat__head">
+            <span class="chat__back" aria-hidden="true">
+              <svg viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7"/></svg>
+            </span>
+            <span class="avatar chat__avatar" data-logo="emblem" aria-hidden="true"></span>
+            <div class="chat__title">
+              <strong data-chat-name>nassville drops</strong>
+              <small data-chat-status aria-live="polite"></small>
+            </div>
+            <div class="chat__tools" aria-hidden="true">
+              <svg viewBox="0 0 24 24"><rect x="2.5" y="6" width="13" height="12" rx="3"/><path d="m15.5 10.5 6-3.5v10l-6-3.5"/></svg>
+              <svg viewBox="0 0 24 24"><path d="M6.6 3.5h2.6l1.5 4-2 1.3a12 12 0 0 0 6.5 6.5l1.3-2 4 1.5v2.6a2 2 0 0 1-2.2 2A17 17 0 0 1 4.6 5.7a2 2 0 0 1 2-2.2Z"/></svg>
+              <svg viewBox="0 0 24 24"><circle cx="12" cy="5" r="1.4" class="fill"/><circle cx="12" cy="12" r="1.4" class="fill"/><circle cx="12" cy="19" r="1.4" class="fill"/></svg>
+            </div>
+          </header>
+          <a class="chat__pinned" data-chat-pinned href="#hilo">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 3.5h6l-1 6 3 3v2H7v-2l3-3-1-6ZM12 14.5v6"/></svg>
+            <span><small>Mensaje fijado</small><span data-chat-pinned-text></span></span>
+          </a>
+        </div>
+
+        <div class="chat__body" data-thread role="log" aria-label="Mensajes del grupo"></div>
+
+        <form class="chat__composer" data-chat-composer>
+          <label class="chat__field">
+            <span class="sr-only">Escribe un mensaje al grupo</span>
+            <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M8.5 14.5a4.5 4.5 0 0 0 7 0"/><circle cx="9" cy="10" r="1" class="fill"/><circle cx="15" cy="10" r="1" class="fill"/></svg>
+            <input type="text" name="message" placeholder="Escribe un mensaje" autocomplete="off" maxlength="300">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m20 11.5-8 8a5 5 0 0 1-7-7l8.5-8.5a3.3 3.3 0 0 1 4.7 4.7l-8.5 8.5a1.7 1.7 0 0 1-2.4-2.4l7.5-7.5"/></svg>
+          </label>
+          <button class="chat__send" type="submit" aria-label="Enviar mensaje">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 12 20 4l-4 16-4-7-8-1Z"/></svg>
+          </button>
+        </form>
+      </div>
     </section>
 
     <!-- 3 · TIENDA -->
@@ -242,9 +278,9 @@
 
   <div class="toast" data-toast role="status" aria-live="polite"></div>
 
-  <script src="js/data.js?v=10"></script>
-  <script src="js/logo-paths.js?v=10"></script>
-  <script src="js/main.js?v=10"></script>
-  <script src="js/hero3d.js?v=10"></script>
+  <script src="js/data.js?v=14"></script>
+  <script src="js/logo-paths.js?v=14"></script>
+  <script src="js/main.js?v=14"></script>
+  <script src="js/hero3d.js?v=14"></script>
 </body>
 </html>
