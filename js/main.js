@@ -292,17 +292,48 @@
     onScroll();
     down.addEventListener("click", scrollChatToBottom);
 
-    // el mensaje fijado lleva a su drop dentro de la ventana, sin saltar la página
-    $("[data-chat-pinned]").addEventListener("click", function (e) {
-      var target = document.getElementById("drop-" + C.pinned.drop);
+    // ir a un drop dentro de la pantalla, sin saltar la página
+    function goToDrop(id) {
+      var target = document.getElementById("drop-" + id);
       if (!target) return;
-      e.preventDefault();
+      // la página solo se mueve si la pantalla del chat no está a la vista
+      // (en ordenador la tablet puede ser más alta que la ventana)
       var r = chat.getBoundingClientRect();
-      if (r.top < 0 || r.bottom > window.innerHeight) chat.scrollIntoView({ block: "center", behavior: reduceMotion ? "auto" : "smooth" });
-      var body = chatBody();
+      var barH = 64;
+      if (r.top < barH - 40 || r.top > window.innerHeight * 0.6) {
+        window.scrollTo({ top: r.top + window.scrollY - barH - 16, behavior: reduceMotion ? "auto" : "smooth" });
+      }
       // posición del drop dentro de la ventana (no respecto a la página)
       scrollChatTo(target.getBoundingClientRect().top - body.getBoundingClientRect().top + body.scrollTop - 8);
-    });
+    }
+    $("[data-chat-pinned]").addEventListener("click", function (e) { e.preventDefault(); goToDrop(C.pinned.drop); });
+
+    // índice de drops junto a la tablet (ordenador)
+    var index = $("[data-drop-index]");
+    if (index) {
+      var links = D.drops.map(function (drop) {
+        var b = el("button", { class: "drop-link" + (drop.lead ? " is-lead" : ""), type: "button", "data-drop": drop.id }, [
+          el("img", { src: IMG + drop.images[0], alt: "", loading: "lazy" }),
+          el("span", null, [
+            el("strong", { text: drop.title }),
+            el("small", { text: drop.lead ? "Nuevo drop" + (drop.stamp ? " · " + drop.stamp : "") : (drop.stamp || "Ver en el hilo") })
+          ])
+        ]);
+        b.addEventListener("click", function () { goToDrop(drop.id); });
+        index.appendChild(el("li", null, [b]));
+        return b;
+      });
+      // marca el drop que se está leyendo
+      var blocks = $$(".chat__drop", body);
+      var markCurrent = function () {
+        var top = body.getBoundingClientRect().top + 80;
+        var current = blocks[0];
+        blocks.forEach(function (b) { if (b.getBoundingClientRect().top <= top) current = b; });
+        links.forEach(function (l) { l.setAttribute("aria-current", current && current.id === "drop-" + l.dataset.drop ? "true" : "false"); });
+      };
+      body.addEventListener("scroll", markCurrent, { passive: true });
+      markCurrent();
+    }
   }
 
   /* ---------- Barra de escribir del chat ---------- */
@@ -868,22 +899,73 @@
 
   /* ---------- Hero: "escribiendo..." y llega el mensaje ---------- */
   function heroMessage() {
-    var typing = $("[data-typing]");
+    var hero = $(".hero");
     var bubble = $("[data-hero-bubble]");
     var notif = $("[data-hero-notif]");
-    var hero = $(".hero");
-    // en móvil el mensaje llega como notificación compacta; al tocarla se despliega
-    notif.addEventListener("click", function () {
-      var open = !hero.classList.contains("is-notif-open");
-      hero.classList.toggle("is-notif-open", open);
-      notif.setAttribute("aria-expanded", open ? "true" : "false");
-    });
-    if (reduceMotion) { typing.classList.add("is-gone"); bubble.classList.add("is-in"); notif.classList.add("is-in"); return; }
-    setTimeout(function () {
-      typing.classList.add("is-gone");
-      bubble.classList.add("is-in");
-      notif.classList.add("is-in");
-    }, 1500);
+    var closeBtn = $("[data-hero-close]");
+    var EASE = "cubic-bezier(0.32, 0.72, 0, 1)";
+    var anim = null;
+
+    // recorte que deja visible solo el hueco de la notificación (abajo a la izquierda)
+    function notifInset() {
+      var nb = notif.getBoundingClientRect(), bb = bubble.getBoundingClientRect();
+      return "inset(" + Math.max(bb.height - nb.height, 0) + "px " + Math.max(bb.width - nb.width, 0) + "px 0px 0px round 18px)";
+    }
+    function parts() { return Array.prototype.filter.call(bubble.children, function (c) { return c !== closeBtn; }).concat([closeBtn]); }
+
+    // la notificación crece hasta ser el mensaje: recorte + color, y el contenido en cascada
+    function open() {
+      if (hero.classList.contains("is-notif-open")) return;
+      if (anim) anim.cancel();
+      bubble.hidden = false;
+      hero.classList.add("is-notif-open");
+      notif.setAttribute("aria-expanded", "true");
+      if (!reduceMotion) {
+        anim = bubble.animate([
+          { clipPath: notifInset(), backgroundColor: "rgb(28, 33, 74)" },
+          { clipPath: "inset(0px 0px 0px 0px round 0px)", backgroundColor: "rgb(228, 228, 232)" }
+        ], { duration: 560, easing: EASE });
+        parts().forEach(function (el, i) {
+          el.animate([
+            { opacity: 0, transform: "translateY(10px)" },
+            { opacity: 1, transform: "none" }
+          ], { duration: 380, delay: 170 + i * 60, easing: "cubic-bezier(0.23, 1, 0.32, 1)", fill: "backwards" });
+        });
+      }
+      var first = $("a", bubble);
+      if (first) first.focus({ preventScroll: true });
+    }
+
+    // y al cerrar vuelve a encogerse en la notificación
+    function close(restoreFocus) {
+      if (!hero.classList.contains("is-notif-open")) return;
+      hero.classList.remove("is-notif-open");
+      notif.setAttribute("aria-expanded", "false");
+      var done = function () { bubble.hidden = true; anim = null; };
+      if (reduceMotion) done();
+      else {
+        if (anim) anim.cancel();
+        parts().forEach(function (el) { el.animate([{ opacity: 1 }, { opacity: 0 }], { duration: 120, fill: "forwards" }); });
+        anim = bubble.animate([
+          { clipPath: "inset(0px 0px 0px 0px round 0px)", backgroundColor: "rgb(228, 228, 232)" },
+          { clipPath: notifInset(), backgroundColor: "rgb(28, 33, 74)" }
+        ], { duration: 420, easing: EASE });
+        anim.onfinish = function () {
+          parts().forEach(function (el) { el.getAnimations().forEach(function (a) { a.cancel(); }); });
+          done();
+        };
+      }
+      if (restoreFocus) notif.focus({ preventScroll: true });
+    }
+
+    notif.addEventListener("click", open);
+    closeBtn.addEventListener("click", function () { close(true); });
+    document.addEventListener("keydown", function (e) { if (e.key === "Escape") close(true); });
+    document.addEventListener("pointerdown", function (e) { if (!e.target.closest(".hero__drop")) close(false); });
+
+    // la notificación llega un momento después de cargar
+    if (reduceMotion) notif.classList.add("is-in");
+    else setTimeout(function () { notif.classList.add("is-in"); }, 1200);
   }
 
   /* ---------- Vista ampliada de producto: cartas que se voltean ---------- */
@@ -912,28 +994,53 @@
     return o;
   }
 
-  function pvLayout(instant) {
+  // Pose de una carta según su distancia al centro (o puede ser fraccionaria
+  // mientras se arrastra): se desplaza, se aleja, gira y encoge a la vez, así
+  // que la carta va volteándose con el dedo y al soltar sigue desde ahí.
+  var MOVE_EASE = "transform 760ms cubic-bezier(0.65, 0, 0.35, 1)";   // flechas, teclado, clic
+  var RELEASE_EASE = "transform 640ms cubic-bezier(0.22, 1, 0.36, 1)"; // al soltar: continúa y frena
+  function pvGap() {
+    var w = pv.cards[0] ? pv.cards[0].offsetWidth : 300;
+    return w * (window.innerWidth <= 720 ? 0.86 : 0.8);
+  }
+  function pvPose(card, o, gap) {
+    var a = Math.min(Math.abs(o), 2), s = o < 0 ? -1 : 1;
+    var near = Math.min(a, 1), far = Math.max(a - 1, 0);
+    var x = s * gap * (near + far * 0.7);
+    var z = -180 * near - 180 * far;
+    var rot = -180 * s * near;          // derecha boca abajo hacia un lado, izquierda hacia el otro
+    var scale = 1 - 0.16 * near - 0.14 * far;
+    card.style.transform = "translate(-50%, -50%) translateX(" + x.toFixed(1) + "px) translateZ(" + z.toFixed(1) + "px) rotateY(" + rot.toFixed(2) + "deg) scale(" + scale.toFixed(3) + ")";
+    card.style.setProperty("--face-o", Math.abs(o) <= 1.35 ? 1 : Math.max(0, 1 - (Math.abs(o) - 1.35) / 0.5));
+    card.style.zIndex = String(10 - Math.round(Math.abs(o) * 2));
+  }
+
+  // progress: fracción del paso en curso al arrastrar (positivo = hacia la siguiente)
+  function pvLayout(instant, progress, transition) {
     var n = pv.cards.length;
+    var gap = pvGap();
+    progress = progress || 0;
     pv.cards.forEach(function (card, k) {
-      var o = pvOffset(k);
-      var pos = Math.max(-2, Math.min(2, o));
+      var base = pvOffset(k);
+      var o = base - progress;
       // una carta que da la vuelta al mazo (de un extremo al otro) no se anima
-      var jump = card._pos !== undefined && Math.abs(pos - card._pos) > 1;
-      card.classList.toggle("no-anim", !!instant || jump);
-      card.dataset.pos = String(pos);
-      card._pos = pos;
-      card.setAttribute("aria-hidden", o === 0 ? "false" : "true");
-      card.tabIndex = Math.abs(o) === 1 ? 0 : -1;
+      var jump = card._o !== undefined && Math.abs(o - card._o) > 1.5;
+      card.style.transition = reduceMotion || instant || jump ? "none" : (transition || MOVE_EASE);
+      pvPose(card, o, gap);
+      card._o = o;
+      card.dataset.pos = String(Math.max(-2, Math.min(2, base)));
+      card.setAttribute("aria-hidden", base === 0 ? "false" : "true");
+      card.tabIndex = Math.abs(base) === 1 ? 0 : -1;
     });
     pv.count.textContent = (pv.i + 1) + " / " + n;
     pv.prev.disabled = pv.next.disabled = n < 2;
   }
 
-  function pvGo(step) {
+  function pvGo(step, transition) {
     var n = pv.cards.length;
     if (n < 2) return;
     pv.i = (pv.i + step + n) % n;
-    pvLayout(false);
+    pvLayout(false, 0, transition);
   }
 
   function openProductViewer(p, ci, start) {
@@ -995,6 +1102,7 @@
     $("[data-pview-close]").addEventListener("click", closeProductViewer);
     pv.dialog.addEventListener("cancel", function (e) { e.preventDefault(); closeProductViewer(); });
     pv.prev.addEventListener("click", function () { pvGo(-1); });
+    window.addEventListener("resize", function () { if (pv.dialog.open) pvLayout(true); });
     pv.next.addEventListener("click", function () { pvGo(1); });
     pv.dialog.addEventListener("keydown", function (e) {
       if (e.key === "ArrowRight") { e.preventDefault(); pvGo(1); }
@@ -1015,13 +1123,14 @@
       setTimeout(function () { if (first) first.focus({ preventScroll: true }); }, 450);
     });
 
-    // deslizar con dedo o ratón: izquierda = siguiente, derecha = anterior
+    // deslizar con dedo o ratón: izquierda = siguiente, derecha = anterior.
+    // Las cartas siguen al dedo (se van volteando a medio camino) y al soltar
+    // terminan el movimiento desde donde están, sin volver atrás.
     var drag = null;
     pv.stage.addEventListener("pointerdown", function (e) {
-      if (drag || e.button > 0) return;
-      drag = { id: e.pointerId, x: e.clientX, t: performance.now(), dx: 0 };
+      if (drag || e.button > 0 || pv.cards.length < 2) return;
+      drag = { id: e.pointerId, x: e.clientX, dx: 0, gap: pvGap(), samples: [{ x: e.clientX, t: performance.now() }] };
       pv.dragged = false;
-      pv.deck.classList.add("is-dragging");
     });
     pv.stage.addEventListener("pointermove", function (e) {
       if (!drag || e.pointerId !== drag.id) return;
@@ -1029,20 +1138,43 @@
       // se captura el puntero solo al empezar a arrastrar, para que un toque
       // simple siga llegando a la carta como clic
       if (!pv.dragged && Math.abs(drag.dx) > 6) { pv.dragged = true; pv.stage.setPointerCapture(e.pointerId); }
-      pv.deck.style.transform = "translateX(" + drag.dx * 0.35 + "px) rotateY(" + drag.dx * 0.012 + "deg)";
+      if (!pv.dragged) return;
+      var now = performance.now();
+      drag.samples.push({ x: e.clientX, t: now });
+      while (drag.samples.length > 2 && now - drag.samples[0].t > 100) drag.samples.shift();
+      var p = -drag.dx / drag.gap;
+      if (Math.abs(p) > 1) p = (p < 0 ? -1 : 1) * (1 + (Math.abs(p) - 1) * 0.25); // resistencia pasado un paso
+      pvLayout(true, p);
     });
     function endDrag(e) {
       if (!drag || e.pointerId !== drag.id) return;
-      var dx = drag.dx, v = dx / Math.max(performance.now() - drag.t, 1); // px/ms
-      drag = null;
-      pv.deck.classList.remove("is-dragging");
-      pv.deck.style.transform = "";
-      if (dx < -60 || v < -0.45) pvGo(1);
-      else if (dx > 60 || v > 0.45) pvGo(-1);
+      var d = drag; drag = null;
+      if (!pv.dragged) return;
+      var first = d.samples[0], last = d.samples[d.samples.length - 1];
+      var v = last.t > first.t ? (last.x - first.x) / (last.t - first.t) : 0; // px/ms de los últimos ~100 ms
+      var p = -d.dx / d.gap;
+      var step = 0;
+      if (p > 0.22 || v < -0.4) step = 1;
+      else if (p < -0.22 || v > 0.4) step = -1;
+      if (e.type === "pointercancel") step = 0;
+      if (step) pvGo(step, RELEASE_EASE);
+      else pvLayout(false, 0, RELEASE_EASE);
       setTimeout(function () { pv.dragged = false; }, 0);
     }
     pv.stage.addEventListener("pointerup", endDrag);
     pv.stage.addEventListener("pointercancel", endDrag);
+  }
+
+  /* ---------- Hora de la barra de estado del teléfono ---------- */
+  function setupPhoneClock() {
+    var t = $("[data-phone-time]");
+    if (!t) return;
+    var paint = function () {
+      var d = new Date();
+      t.textContent = d.getHours() + ":" + String(d.getMinutes()).padStart(2, "0");
+    };
+    paint();
+    setInterval(paint, 30000);
   }
 
   /* ---------- Arranque ---------- */
@@ -1058,6 +1190,7 @@
   heroMessage();
   setupChatComposer();
   setupChatWindow();
+  setupPhoneClock();
   setupProductViewer();
   setupReveal($$(".chat__drop").concat($$(".product"), $$("main > section > .reveal, .about .reveal, .social .reveal, .shop__head .reveal")));
 })();

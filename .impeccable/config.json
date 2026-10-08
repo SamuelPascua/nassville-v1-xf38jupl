@@ -8,6 +8,15 @@
         "value": "instrument serif",
         "createdAt": "2026-10-07T08:39:53.546Z",
         "reason": "agent: named in the direction contract to echo the Losing Interest garment lettering; finish reviewer judged it not material"
+      },
+      {
+        "rule": "side-tab",
+        "value": "*",
+        "files": [
+          "css/styles.css"
+        ],
+        "createdAt": "2026-10-08T06:51:27.456Z",
+        "reason": "agent: only side-tab in this file is the WhatsApp quote bar inside chat bubbles (.msg__quote), part of the WhatsApp quoted-reply style the user chose; it re-flags as new on every edit because its line number shifts"
       }
     ]
   }
