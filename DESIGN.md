@@ -64,7 +64,24 @@ typography:
     fontWeight: 600
     lineHeight: 1.3
     fontFeature: "tnum"
+  caption:
+    fontFamily: "-apple-system, BlinkMacSystemFont, SF Pro Text, Segoe UI, Roboto, Helvetica Neue, Arial, sans-serif"
+    fontSize: "0.8rem"
+    fontWeight: 400
+    lineHeight: 1.45
+  meta:
+    fontFamily: "-apple-system, BlinkMacSystemFont, SF Pro Text, Segoe UI, Roboto, Helvetica Neue, Arial, sans-serif"
+    fontSize: "0.85rem"
+    fontWeight: 400
+    lineHeight: 1.4
+  ui:
+    fontFamily: "-apple-system, BlinkMacSystemFont, SF Pro Text, Segoe UI, Roboto, Helvetica Neue, Arial, sans-serif"
+    fontSize: "0.9rem"
+    fontWeight: 500
+    lineHeight: 1.3
 rounded:
+  hairline: "2px"
+  tight: "8px"
   tail: "6px"
   control: "12px"
   thumb: "15px"
@@ -123,6 +140,8 @@ components:
     rounded: "{rounded.pill}"
     padding: "0 16px"
     height: "40px"
+  chip-touch:
+    height: "44px"
   chip-active:
     backgroundColor: "{colors.sent}"
     textColor: "#ffffff"
@@ -132,6 +151,8 @@ components:
     padding: "0 12px"
     height: "42px"
     width: "48px"
+  size-touch:
+    height: "44px"
   size-selected:
     backgroundColor: "{colors.pearl}"
     textColor: "{colors.navy-800}"
@@ -152,6 +173,12 @@ components:
     rounded: "{rounded.pill}"
     padding: "6px 6px 6px 20px"
     height: "56px"
+  notify-popover:
+    backgroundColor: "{colors.navy-900}"
+    textColor: "{colors.pearl}"
+    rounded: "{rounded.bubble}"
+    padding: "16px 16px 18px"
+    width: "440px"
 ---
 
 # Design System: nassville
@@ -210,10 +237,15 @@ A single-hue navy world lit by pearl and one muted electric blue.
 - **Title** (900, 2rem, 0.9, uppercase): product names; prices use 800 at 1.7rem with tabular numerals. Film titles and archive names follow the same face at their own size.
 - **Serif Note** (italic 400, 1.1 to 1.6rem, ink-soft): garment type, film notes, archive aside, the Instagram handle.
 - **Body** (400, 17px desktop / 16px under 720px, 1.45): bubbles at 1rem / 1.4; ledes 1.05rem capped at 42ch.
-- **Label** (600, 0.72 to 0.82rem, tabular numerals): timestamps, receipts, tags, legends.
+- **Label** (600, 0.75rem, tabular numerals; 0.72rem when tracked uppercase): timestamps, receipts, tags, legends.
+- **Caption** (400, 0.8rem): legal footnotes, size legends, the shop's state line under the button.
+- **Meta** (400, 0.85rem, ink-soft): secondary lines under a name (sheet meta, popover meta, link-card host and price), form errors.
+- **UI** (500, 0.9rem): compact controls and nav links: chips, sizes, swatches' bigger siblings, chat bar links.
 
 ### Named Rules
 **The Proper Names Rule.** Instrument Serif italic is reserved for names (collections, garment types, films, the handle) and the single punchline word. It is never a body face.
+
+**The Four Small Steps Rule.** Text under body size uses only Label, Caption, Meta and UI (0.75 / 0.8 / 0.85 / 0.9rem). A new small size is a near-duplicate of one of these, not a fifth step.
 
 **The Chat Material Rule.** Running text and UI controls use the system stack, not the display face; display caps are for titles, product names, prices, spec values and the mobile menu.
 
@@ -241,7 +273,7 @@ Hybrid: depth comes mostly from the navy scale (page 850, cards 700, field 800, 
 
 ## Shapes
 
-The bubble is the silhouette of the system: 22px corners with one 6px tail corner. Incoming content tails bottom-left; outgoing tails bottom-right; a bubble following another in the same group also tightens its top-left corner to 6px so the group reads as one stack. The same tailed shape is applied to photo attachments, video attachments, films, link cards, product cards and the toast. Controls are full pills (999px): buttons, chips, colour swatches, tags, the composer. Size selectors use a firmer 12px, thumbnails 12 to 15px. Circles are reserved for the avatar, icon buttons (bag, menu, send, play, close) and round video notes, which get a 3px navy gap and a 2px hairline ring (blue while playing).
+The bubble is the silhouette of the system: 22px corners with one 6px tail corner. Incoming content tails bottom-left; outgoing tails bottom-right; a bubble following another in the same group also tightens its top-left corner to 6px so the group reads as one stack. The same tailed shape is applied to photo attachments, video attachments, films, link cards, product cards and the toast. Controls are full pills (999px): buttons, chips, colour swatches, tags, the composer. Size selectors use a firmer 12px, thumbnails 12 to 15px; small inner tiles (album photos, link thumbs inside mosaics) use a tight 8 to 10px, and bars and marks (editions segments, menu lines) a 2 to 3px hairline radius. The phone mockup in the thread keeps its own device radii (38px frame, 16 to 18px inner) because it draws real hardware, not system UI. Circles are reserved for the avatar, icon buttons (bag, menu, send, play, close) and round video notes, which get a 3px navy gap and a 2px hairline ring (blue while playing).
 
 ## Components
 
@@ -253,7 +285,7 @@ The bubble is the silhouette of the system: 22px corners with one 6px tail corne
 - **Hover / Focus / Active:** hover only on fine pointers; press scales to 0.97 over 160ms with ease-out; focus is a 2px sent-strong outline offset 3px. Disabled drops to 60% opacity.
 
 ### Chips
-- **Style:** 40px pill, transparent with a hairline ring, pearl text 0.92rem/500.
+- **Style:** 40px pill (44px under a coarse pointer), transparent with a hairline ring, pearl text 0.92rem/500.
 - **State:** active filter is Sent Blue fill, white text, no ring; `aria-pressed` carries state. Colour swatches are a quieter sibling (34px, 7% pearl fill, 16% when selected, struck through when the colourway is sold out).
 
 ### Cards / Containers
@@ -263,7 +295,7 @@ The bubble is the silhouette of the system: 22px corners with one 6px tail corne
 
 ### Inputs / Fields
 - **Composer (email):** a chat "write" bar: navy-800 pill, hairline ring, 20px left padding, borderless 16px input and a 44px blue circular send button. Focus-within turns the ring sent-strong with a 4px blue halo. A successful send appends an outgoing bubble with "Entregado" and an incoming reply. Errors are a small pink line (#ffb4b4) under the bar.
-- **Size selector:** 48 by 42px radio labels, 12px corners, hairline ring; checked is pearl with navy text; sold-out sizes are struck through on a darker well; low stock (1 to 3) shows a 10px blue dot on the corner, explained by an inline legend "quedan pocas".
+- **Size selector:** 48 by 42px radio labels (44px tall under a coarse pointer), 12px corners, hairline ring; checked is pearl with navy text; sold-out sizes are struck through on a darker well; low stock (1 to 3) shows a 10px blue dot on the corner, explained by an inline legend "quedan pocas".
 
 ### Navigation
 - **Chat bar:** fixed 64px, transparent over the hero, turning to 82% navy-900 glass (blur 18px, saturate 140%) with a bottom hairline once scrolled. Left: 40px emblem avatar, "nassville" in 700 with "en línea" and a blue presence dot. Right: pill links in ink-soft, current link pearl on a 10% pearl pill; a 44px circular bag with a blue count badge that pops in and bumps on add.
@@ -278,6 +310,9 @@ A drop's garments appear in the thread as link previews: pearl tailed bubble, 56
 ### Signature: Attachments and Video Notes
 Photo attachments are tailed-bubble mosaics with 3px gutters (2, 3, 4-up and a 4-column dense lead mosaic); "+n" overflow tiles are display caps on a navy veil. Video attachments carry a glass "Vídeo" badge. The videos section uses round video notes in a horizontal snap scroller and 16:9 / 21:9 films with a bottom navy gradient, display title, serif note and a 54px pearl play disc.
 
+### Signature: Back-in-Stock Popover
+On a sold-out colourway, "Avísame si vuelve" behaves by context. In the shop grid it scrolls to the footer composer, focuses it and gives the bar a single blue pulse (scale 1.035, 620ms). Inside the product viewer, where the page is covered, the button grows a popover instead: navy-900 glass at 90% (blur 18px), bubble corners, a tail pointing at the button, a 40px Sent Blue bell, display-caps title, meta line "product · colourway", the composer row, the consent checkbox and an inline error line. It opens with a 560ms spring from the button's centre (scale 0.2 to 1.045 to 0.99 to 1, blur 8px to 0), the button dips to 0.94, the contents arrive staggered 45ms and the bell rings once; it closes in 200ms back toward the button. On send the arrow becomes the check, the body turns into a one-line confirmation, and the popover closes itself after 2.4s. Reduced motion keeps only the show and hide.
+
 ## Do's and Don'ts
 
 ### Do:
@@ -287,6 +322,8 @@ Photo attachments are tailed-bubble mosaics with 3px gutters (2, 3, 4-up and a 4
 - **Do** send sold-out product to the archive list (desaturated thumb, struck price, "Leído") rather than leaving it in the live grid.
 - **Do** use ease-out (cubic-bezier(0.23, 1, 0.32, 1)) for arrivals and presses, the drawer curve for the toast, and gate hover effects behind fine pointers.
 - **Do** keep photos and films as attachments with bubble corners and Attachment lift.
+- **Do** grow every tap target to 44px under `(pointer: coarse)`; underlined text links grow an invisible hit area instead of padding, so the underline stays put.
+- **Do** serve photos as WebP, the 480px version for thumbnails and mosaics, and play the light `-sm` (540px, muted) or `-bg` (14s loop) cut of a video wherever it autoplays; the original only opens on tap.
 
 ### Don't:
 - **Don't** introduce a second accent hue; status, focus and action all share Sent Blue.

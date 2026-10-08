@@ -35,6 +35,12 @@
         ],
         "createdAt": "2026-10-08T12:52:38.510Z",
         "reason": "assistant triage: the only nesting is the temporary yellow mark.todo placeholder highlights inside the legal facts/notice blocks; they disappear once the owner fills in the legal data"
+      },
+      {
+        "rule": "bounce-easing",
+        "value": "cubic-bezier(0.5, -0.1, 0.25, 1.35)",
+        "createdAt": "2026-10-08T15:42:49.818Z",
+        "reason": "agent: literal slot-machine reel that overshoots and settles (js/main.js slotButton, commented 'encaja con un rebote, como un rodillo'); domain-appropriate motion, not decorative bounce"
       }
     ]
   }

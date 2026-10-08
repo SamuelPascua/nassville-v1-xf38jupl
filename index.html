@@ -11,7 +11,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@700;800;900&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/styles.css?v=52">
+  <link rel="stylesheet" href="css/styles.css?v=53">
   <script type="importmap">
     { "imports": {
       "three": "https://cdn.jsdelivr.net/npm/three@0.169.0/build/three.module.js",
@@ -236,7 +236,7 @@
 
       <div class="about__grid">
         <figure class="about__photo reveal">
-          <img src="assets/img/DQ6awDBiDKX-3.jpg" alt="Dos personas con la crewneck Losing Interest navy en el estudio" loading="lazy" width="1120" height="1400">
+          <img src="assets/img/DQ6awDBiDKX-3.webp" srcset="assets/img/DQ6awDBiDKX-3-480.webp 480w, assets/img/DQ6awDBiDKX-3.webp 1055w" sizes="(max-width: 720px) 92vw, 40vw" alt="Dos personas con la crewneck Losing Interest navy en el estudio" loading="lazy" width="1120" height="1400">
         </figure>
         <div class="about__thread">
           <div class="bubble bubble--in reveal">
@@ -246,7 +246,7 @@
             <p>Hacemos camisetas boxy, crewnecks y zip-ups pensadas para durar: algodón pesado, hombro caído y costura doble.</p>
           </div>
           <div class="bubble bubble--in bubble--attach reveal">
-            <img src="assets/img/DNJDF6FIfKv-4.jpg" alt="Ficha técnica de la camiseta boxy de nassville" loading="lazy" width="1120" height="1400">
+            <img src="assets/img/DNJDF6FIfKv-4.webp" srcset="assets/img/DNJDF6FIfKv-4-480.webp 480w, assets/img/DNJDF6FIfKv-4.webp 1178w" sizes="(max-width: 720px) 92vw, 40vw" alt="Ficha técnica de la camiseta boxy de nassville" loading="lazy" width="1120" height="1400">
             <dl class="spec">
               <div><dt>Corte</dt><dd>Boxy fit</dd></div>
               <div><dt>Gramaje</dt><dd>195 GSM</dd></div>
@@ -376,15 +376,46 @@
         <p class="sizes__legend" data-pview-legend><i class="size__low size__low--inline" aria-hidden="true"></i> quedan pocas</p>
         <button class="btn btn--primary pview__add" type="button" data-pview-add>Elige una talla</button>
       </div>
+      <!-- agotado: el aviso se pide aquí mismo, sin salir de las cartas -->
+      <form class="pview__notify" id="pview-notify" data-pview-notify data-open="false" aria-hidden="true" aria-labelledby="pview-notify-title" inert novalidate>
+        <div class="pview__notify-head">
+          <span class="pview__bell" aria-hidden="true">
+            <svg viewBox="0 0 24 24"><path d="M6 16V11a6 6 0 0 1 12 0v5l1.5 2h-15L6 16Z"/><path d="M10 20.5a2 2 0 0 0 4 0"/></svg>
+          </span>
+          <div>
+            <strong id="pview-notify-title">Avísame si vuelve</strong>
+            <span data-pview-notify-meta></span>
+          </div>
+          <button class="pview__notify-close" type="button" data-pview-notify-close aria-label="Cerrar aviso">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg>
+          </button>
+        </div>
+        <div class="pview__notify-body">
+          <div class="composer__row pview__notify-row">
+            <label for="pview-email" class="sr-only">Tu email</label>
+            <input id="pview-email" name="email" type="email" inputmode="email" autocomplete="email" placeholder="Escribe tu email…" required>
+            <button type="submit" class="composer__send" aria-label="Avisarme">
+              <svg class="composer__arrow" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 19V5m0 0-6 6m6-6 6 6"/></svg>
+              <svg class="composer__check" viewBox="0 0 24 24" aria-hidden="true"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg>
+            </button>
+          </div>
+          <label class="composer__consent pview__notify-consent">
+            <input type="checkbox" name="consent" data-pview-notify-consent>
+            <span>Quiero que nassville me escriba cuando vuelva y he leído la <a href="privacidad.html">política de privacidad</a>.</span>
+          </label>
+          <p class="composer__error pview__notify-error" data-pview-notify-error role="alert" hidden></p>
+        </div>
+        <p class="pview__notify-done" data-pview-notify-done aria-live="polite"></p>
+      </form>
     </footer>
   </dialog>
 
   <div class="toast" data-toast role="status" aria-live="polite"></div>
 
-  <script src="js/data.js?v=52"></script>
-  <script src="js/logo-paths.js?v=52"></script>
-  <script src="js/main.js?v=52"></script>
-  <script src="js/hero3d.js?v=52"></script>
-  <script src="js/consent.js?v=52"></script>
+  <script src="js/data.js?v=53"></script>
+  <script src="js/logo-paths.js?v=53"></script>
+  <script src="js/main.js?v=53"></script>
+  <script src="js/hero3d.js?v=53"></script>
+  <script src="js/consent.js?v=53"></script>
 </body>
 </html>

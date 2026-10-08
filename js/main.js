@@ -7,6 +7,10 @@
   var D = window.NASS;
   var IMG = "assets/img/";
   var VID = "assets/video/";
+  // fotos en WebP: la entera para carrusel y vistas ampliadas, la de 480 px
+  // para miniaturas (álbum del hilo, índice de drops, feed, la que vuela a la bolsa)
+  function photo(src) { return IMG + src.replace(/\.jpg$/, ".webp"); }
+  function thumb(src) { return IMG + src.replace(/\.jpg$/, "-480.webp"); }
   var reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
   var $ = function (sel, root) { return (root || document).querySelector(sel); };
   var $$ = function (sel, root) { return Array.prototype.slice.call((root || document).querySelectorAll(sel)); };
@@ -164,7 +168,7 @@
     whenNear(grid, function () { wake(grid); }, chatBody());
     shown.forEach(function (src, i) {
       var tile = el("button", { class: "msg__photo", type: "button", "aria-label": "Ver foto " + (i + 1) + " de " + drop.title });
-      tile.appendChild(el("img", { "data-src": IMG + src, alt: "", decoding: "async" }));
+      tile.appendChild(el("img", { "data-src": thumb(src), alt: "", decoding: "async" }));
       if (i === shown.length - 1 && extra > 0) tile.appendChild(el("span", { class: "msg__more", text: "+" + extra }));
       tile.addEventListener("click", function () { openViewer(drop.images, i, drop.title); });
       grid.appendChild(tile);
@@ -174,7 +178,7 @@
 
   function videoMsg(drop) {
     var vb = el("button", { class: "msg__video", type: "button", "aria-label": "Reproducir vídeo de " + drop.title, style: "aspect-ratio:" + drop.video.ratio });
-    var v = el("video", { muted: "", loop: "", playsinline: "", preload: "none", "data-poster": VID + drop.video.src + ".jpg", "data-src": VID + drop.video.src + ".mp4" + (drop.video.start ? "#t=" + drop.video.start : "") });
+    var v = el("video", { muted: "", loop: "", playsinline: "", preload: "none", "data-poster": VID + drop.video.src + ".jpg", "data-src": VID + drop.video.src + "-sm.mp4" + (drop.video.start ? "#t=" + drop.video.start : "") });
     whenNear(vb, function () { wake(vb); }, chatBody());
     v.muted = true;
     if (drop.video.start) {
@@ -194,7 +198,7 @@
     var st = productState(p);
     var href = st === "out" ? "#archivo-title" : "#product-" + p.id;
     var a = el("a", { class: "msg__link" + (st === "out" ? " is-out" : ""), href: href }, [
-      el("img", { "data-src": IMG + p.colorways[0].images[0], alt: "" }),
+      el("img", { "data-src": thumb(p.colorways[0].images[0]), alt: "" }),
       el("span", { class: "msg__link-text" }, [
         el("strong", { text: p.name + " · " + p.type }),
         el("span", { text: st === "out" ? "Agotado · en el archivo" : euro(p.price) + " · " + TAG[st] }),
@@ -343,7 +347,7 @@
     if (index) {
       var links = D.drops.map(function (drop) {
         var b = el("button", { class: "drop-link" + (drop.lead ? " is-lead" : ""), type: "button", "data-drop": drop.id }, [
-          el("img", { src: IMG + drop.images[0], alt: "", loading: "lazy" }),
+          el("img", { src: thumb(drop.images[0]), alt: "", loading: "lazy" }),
           el("span", null, [
             el("strong", { text: drop.title }),
             el("small", { text: drop.lead ? "Nuevo drop" + (drop.stamp ? " · " + drop.stamp : "") : (drop.stamp || "Ver en el hilo") })
@@ -406,7 +410,9 @@
     });
   }
 
-  /* ---------- Vídeos: cargar y reproducir solo cuando se ven ---------- */
+  /* ---------- Vídeos: cargar y reproducir solo cuando se ven ----------
+     Lo que se reproduce solo (hilo y notas) es la versión ligera «-sm» (540 px,
+     sin audio, misma duración); al tocar, el reproductor abre el original. */
   var videoObserver = null;
   function autoplayInView(video) {
     if (reduceMotion) return; // con movimiento reducido se quedan en su póster
@@ -716,7 +722,7 @@
         if (stockState(c.stock) !== "out") return;
         var card = el("button", { class: "soldcard", type: "button", "aria-label": "Ver " + p.name + " " + c.name + ", agotado", style: "--d:" + (stampIndex++ % 4) * 160 + "ms" }, [
           el("span", { class: "soldcard__media" }, [
-            el("img", { src: IMG + c.images[0], alt: "", loading: "lazy" }),
+            el("img", { src: photo(c.images[0]), alt: "", loading: "lazy" }),
             el("span", { class: "sold-stamp", "aria-hidden": "true", text: "Agotado" })
           ]),
           el("span", { class: "soldcard__body" }, [
@@ -729,7 +735,7 @@
         card.addEventListener("click", function () {
           openProductViewer(p, ci, card._i || 0, $("img", card), function (i) {
             var im = $("img", card);
-            if (card._i !== i && c.images[i]) { im.src = IMG + c.images[i]; card._i = i; }
+            if (card._i !== i && c.images[i]) { im.src = photo(c.images[i]); card._i = i; }
             return im;
           });
         });
@@ -823,7 +829,7 @@
       track.innerHTML = "";
       imgs = c.images.map(function (src, i) {
         var now = i === 0 || li._near;
-        var im = el("img", { src: now ? IMG + src : null, "data-src": now ? null : IMG + src, alt: i === 0 ? p.name + " " + p.type + ", color " + c.name : "", loading: "lazy", decoding: "async", draggable: "false" });
+        var im = el("img", { src: now ? photo(src) : null, "data-src": now ? null : photo(src), alt: i === 0 ? p.name + " " + p.type + ", color " + c.name : "", loading: "lazy", decoding: "async", draggable: "false" });
         track.appendChild(im);
         return im;
       });
@@ -879,6 +885,7 @@
         swapText(cta, "Avísame si vuelve");
         cta.className = "btn btn--ghost";
         cta.disabled = false;
+        cta.removeAttribute("aria-disabled");
         cta.dataset.mode = "notify";
         swapText(note, "Este color se ha agotado.");
         return;
@@ -958,14 +965,11 @@
 
     cta.addEventListener("click", function () {
       var c = p.colorways[state.color];
-      if (cta.dataset.mode === "notify") {
-        toast("Te avisamos si vuelve <strong>" + p.name + " · " + c.name + "</strong>. Deja tu email abajo.");
-        return;
-      }
+      if (cta.dataset.mode === "notify") { goToComposer(); return; }
       if (!state.size) { nudgeSizes(sizes, note); return; }
       bag.push({ id: p.id, color: c.name, size: state.size });
       // la prenda vuela a la bolsa y el botón confirma en el sitio
-      flyToBag(cta, IMG + c.images[state.image || 0], updateBag);
+      flyToBag(cta, thumb(c.images[state.image || 0]), updateBag);
       confirmOn(cta, paintCta);
       toast("<strong>" + p.name + "</strong> · " + c.name + " · " + state.size + " a tu bolsa.");
     });
@@ -1089,7 +1093,7 @@
     var films = $("[data-films]");
     D.notes.forEach(function (src) {
       var b = el("button", { class: "note", type: "button", "aria-label": "Reproducir nota de vídeo con sonido" });
-      var v = el("video", { muted: "", loop: "", playsinline: "", preload: "none", "data-poster": VID + src + ".jpg", "data-src": VID + src + ".mp4" });
+      var v = el("video", { muted: "", loop: "", playsinline: "", preload: "none", "data-poster": VID + src + ".jpg", "data-src": VID + src + "-sm.mp4" });
       whenNear(b, function () { wake(b); });
       v.muted = true;
       v.addEventListener("loadedmetadata", function () {
@@ -1153,7 +1157,7 @@
     if (typeof viewer.showModal === "function") viewer.showModal(); else viewer.setAttribute("open", "");
   }
   function showInViewer() {
-    viewerImg.src = IMG + gallery.list[gallery.i];
+    viewerImg.src = photo(gallery.list[gallery.i]);
     viewerImg.alt = gallery.title + ", foto " + (gallery.i + 1) + " de " + gallery.list.length;
   }
   function closeViewer() { if (viewer.open) viewer.close(); if (lastFocus) lastFocus.focus(); }
@@ -1183,13 +1187,40 @@
     D.social.feed.forEach(function (src) {
       feed.appendChild(el("li", null, [
         el("a", { href: D.social.instagram, target: "_blank", rel: "noopener", "aria-label": "Abrir Instagram de nassville" }, [
-          el("img", { src: IMG + src, alt: "", loading: "lazy", decoding: "async" })
+          el("img", { src: thumb(src), alt: "", loading: "lazy", decoding: "async" })
         ])
       ]));
     });
   }
 
   /* ---------- Barra de escribir (email) ---------- */
+  var EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
+
+  // «Avísame si vuelve» en la tienda: baja hasta la barra de email del pie,
+  // la enfoca cuando termina el viaje y la barra da un latido para señalarse
+  function goToComposer() {
+    var form = $("[data-composer]");
+    var input = $("#email", form);
+    var row = $(".composer__row", form);
+    var done = false;
+    function arrive() {
+      if (done) return;
+      done = true;
+      window.removeEventListener("scrollend", arrive);
+      input.focus({ preventScroll: true });
+      if (!reduceMotion && row.animate) {
+        row.animate([
+          { transform: "scale(1)", boxShadow: "inset 0 0 0 1px rgba(58, 99, 224, 1), 0 0 0 0 rgba(58, 99, 224, 0.45)" },
+          { transform: "scale(1.035)", boxShadow: "inset 0 0 0 1px rgba(58, 99, 224, 1), 0 0 0 10px rgba(58, 99, 224, 0)", offset: 0.4 },
+          { transform: "scale(1)", boxShadow: "inset 0 0 0 1px rgba(58, 99, 224, 1), 0 0 0 0 rgba(58, 99, 224, 0)" }
+        ], { duration: 620, easing: "cubic-bezier(0.22, 1, 0.36, 1)" });
+      }
+    }
+    form.scrollIntoView({ behavior: reduceMotion ? "auto" : "smooth", block: "center" });
+    if (reduceMotion || !("onscrollend" in window)) setTimeout(arrive, reduceMotion ? 0 : 700);
+    else { window.addEventListener("scrollend", arrive); setTimeout(arrive, 1600); }
+  }
+
   function setupComposer() {
     var form = $("[data-composer]");
     var input = $("#email", form);
@@ -1207,7 +1238,7 @@
     form.addEventListener("submit", function (e) {
       e.preventDefault();
       var v = input.value.trim();
-      if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(v)) {
+      if (!EMAIL_RE.test(v)) {
         err.textContent = v ? "Ese email no parece correcto. Revisa que tenga @ y dominio." : "Escribe tu email para que te avisemos.";
         err.hidden = false;
         input.setAttribute("aria-invalid", "true");
@@ -1538,15 +1569,20 @@
     pv.stamp.hidden = st !== "out";
     pv.cta.textContent = st === "out" ? "Avísame si vuelve" : "Elegir talla";
     pv.cta.className = "btn pview__cta " + (st === "out" ? "btn--ghost" : "btn--primary");
+    pv.cta.dataset.mode = st === "out" ? "notify" : "sizes";
+    pv.cta.setAttribute("aria-controls", st === "out" ? "pview-notify" : "pview-sheet");
+    pvNotify(false, true);
     pvSheet(false);
     pv.size = null;
     pvRenderSizes();
 
-    // fondo: vídeo de la prenda con el filtro de su color
+    // fondo: vídeo de la prenda con el filtro de su color. Es un clip propio
+    // («-bg»: 14 s desde «start», sin audio, 960 px) y no la película entera:
+    // detrás del tinte no se nota y pesa una fracción (el corto: 19 MB → 0,6 MB)
     if (c.video) {
-      pv.video.poster = VID + c.video.src + ".jpg";
-      pv.video.dataset.src = VID + c.video.src + ".mp4" + (c.video.start ? "#t=" + c.video.start : "");
-      pv.video._start = c.video.start || 0;
+      pv.video.poster = VID + c.video.src + "-bg.jpg";
+      pv.video.dataset.src = VID + c.video.src + "-bg.mp4";
+      pv.video._start = 0;
     }
 
     pv.deck.innerHTML = "";
@@ -1557,7 +1593,7 @@
       var near = Math.abs(o) <= 1;
       var card = el("div", { class: "pcard", role: "group", "aria-roledescription": "carta", "aria-label": "Foto " + (k + 1) + " de " + n }, [
         el("div", { class: "pcard__face pcard__front" }, [
-          el("img", { src: near ? IMG + src : null, "data-src": near ? null : IMG + src, alt: k === 0 ? p.name + " " + p.type + ", " + c.name : "", decoding: "async" })
+          el("img", { src: near ? photo(src) : null, "data-src": near ? null : photo(src), alt: k === 0 ? p.name + " " + p.type + ", " + c.name : "", decoding: "async" })
         ]),
         el("div", { class: "pcard__face pcard__back", "aria-hidden": "true" }, [
           el("span", { class: "pcard__emblem", "data-logo": "emblem" }),
@@ -1636,6 +1672,132 @@
     }
   }
 
+  /* Agotado: el aviso por email brota del botón, dentro de la vista ampliada
+     (el toast y el pie de la página quedan tapados por el diálogo) */
+  pv.notify = $("[data-pview-notify]");
+  pv.notifyMeta = $("[data-pview-notify-meta]");
+  pv.notifyEmail = $("#pview-email");
+  pv.notifyConsent = $("[data-pview-notify-consent]");
+  pv.notifyError = $("[data-pview-notify-error]");
+  pv.notifyDone = $("[data-pview-notify-done]");
+  pv.notifySend = $(".composer__send", pv.notify);
+
+  function pvNotifyOpen() { return pv.notify.dataset.open === "true"; }
+  function pvNotifyReset() {
+    pv.notify.classList.remove("is-done");
+    pv.notifyDone.textContent = "";
+    pv.notifyError.hidden = true;
+    pv.notifyError.dataset.kind = "";
+    pv.notifyEmail.removeAttribute("aria-invalid");
+    pv.notifySend.classList.remove("is-sent");
+    pv.notifySend.setAttribute("aria-label", "Avisarme");
+  }
+  function pvNotifySet(open) {
+    pv.notify.dataset.open = open ? "true" : "false";
+    pv.notify.setAttribute("aria-hidden", open ? "false" : "true");
+    pv.notify.inert = !open;
+    pv.cta.setAttribute("aria-expanded", open ? "true" : "false");
+  }
+  // abrir: la burbuja sale del botón con un rebote (escala desde el punto del
+  // botón, la cola apuntándole), el contenido llega en cascada y suena la campana
+  function pvNotify(open, instant) {
+    clearTimeout(pv.notifyTimer);
+    (pv.notifyAnims || []).forEach(function (a) { a.cancel(); });
+    pv.notifyAnims = [];
+    if (!open) {
+      if (!pvNotifyOpen()) return;
+      if (instant || reduceMotion || !pv.notify.animate) { pvNotifySet(false); return; }
+      pv.cta.setAttribute("aria-expanded", "false");
+      var out = pv.notify.animate([
+        { transform: "translateX(-50%)", opacity: 1, filter: "blur(0)" },
+        { transform: "translateX(-50%) translateY(10px) scale(0.55)", opacity: 0, filter: "blur(4px)" }
+      ], { duration: 200, easing: "cubic-bezier(0.4, 0, 1, 1)" });
+      pv.notifyAnims.push(out);
+      out.onfinish = function () { pvNotifySet(false); };
+      return;
+    }
+    var p = pv.product, c = p.colorways[pv.colorway];
+    pv.notifyMeta.textContent = p.name + " · " + c.name;
+    pvNotifyReset();
+    pvSheet(false);
+    pvNotifySet(true);
+    // la escala nace en el centro del botón (en móvil el botón ocupa todo el
+    // ancho y la burbuja sale de su centro; en escritorio, de su lado)
+    var box = pv.notify.getBoundingClientRect(), b = pv.cta.getBoundingClientRect();
+    var ox = Math.max(28, Math.min(box.width - 28, b.left + b.width / 2 - box.left));
+    pv.notify.style.setProperty("--ox", ox + "px");
+    setTimeout(function () { if (pvNotifyOpen()) pv.notifyEmail.focus({ preventScroll: true }); }, reduceMotion ? 0 : 260);
+    if (reduceMotion || !pv.notify.animate) return;
+    var T = "translateX(-50%) ";
+    pv.notifyAnims.push(pv.notify.animate([
+      { transform: T + "translateY(18px) scale(0.2)", opacity: 0, filter: "blur(8px)", easing: "cubic-bezier(0.2, 0.9, 0.3, 1)" },
+      { transform: T + "translateY(-4px) scale(1.045)", opacity: 1, filter: "blur(0)", offset: 0.5, easing: "cubic-bezier(0.4, 0, 0.6, 1)" },
+      { transform: T + "translateY(1px) scale(0.99)", offset: 0.75, easing: "cubic-bezier(0.4, 0, 0.6, 1)" },
+      { transform: T + "translateY(0) scale(1)", opacity: 1, filter: "blur(0)" }
+    ], { duration: 560 }));
+    // el botón acusa el golpe, como si empujara la burbuja hacia arriba
+    pv.notifyAnims.push(pv.cta.animate([
+      { transform: "scale(1)" }, { transform: "scale(0.94)", offset: 0.3 }, { transform: "scale(1.02)", offset: 0.65 }, { transform: "scale(1)" }
+    ], { duration: 420, easing: "ease-out" }));
+    $$(".pview__notify-head > div, .pview__notify-close, .pview__notify-row, .pview__notify-consent", pv.notify).forEach(function (n, k) {
+      pv.notifyAnims.push(n.animate([
+        { transform: "translateY(10px)", opacity: 0 }, { transform: "none", opacity: 1 }
+      ], { duration: 360, delay: 110 + k * 45, easing: ENTER, fill: "backwards" }));
+    });
+    var bell = $(".pview__bell", pv.notify);
+    pv.notifyAnims.push(bell.animate([
+      { transform: "scale(0) rotate(0)" }, { transform: "scale(1.15) rotate(0)", offset: 0.22 },
+      { transform: "scale(1) rotate(-18deg)", offset: 0.38 }, { transform: "rotate(14deg)", offset: 0.52 },
+      { transform: "rotate(-9deg)", offset: 0.66 }, { transform: "rotate(5deg)", offset: 0.8 }, { transform: "scale(1) rotate(0)" }
+    ], { duration: 900, delay: 90, easing: "ease-out", fill: "backwards" }));
+  }
+
+  function pvNotifySubmit(e) {
+    e.preventDefault();
+    var v = pv.notifyEmail.value.trim();
+    var err = pv.notifyError;
+    if (!EMAIL_RE.test(v)) {
+      err.textContent = v ? "Ese email no parece correcto. Revisa que tenga @ y dominio." : "Escribe tu email para que te avisemos.";
+      err.dataset.kind = "email";
+      err.hidden = false;
+      pv.notifyEmail.setAttribute("aria-invalid", "true");
+      pv.notifyEmail.focus({ preventScroll: true });
+      if (!reduceMotion) $(".pview__notify-row", pv.notify).animate([
+        { transform: "translateX(0)" }, { transform: "translateX(-6px)" }, { transform: "translateX(6px)" },
+        { transform: "translateX(-4px)" }, { transform: "translateX(4px)" }, { transform: "translateX(0)" }
+      ], { duration: 320, easing: "ease-out" });
+      return;
+    }
+    // el consentimiento tiene que ser expreso, igual que en la barra del pie
+    if (!pv.notifyConsent.checked) {
+      err.textContent = "Marca la casilla para que podamos escribirte.";
+      err.dataset.kind = "consent";
+      err.hidden = false;
+      pv.notifyEmail.removeAttribute("aria-invalid");
+      pv.notifyConsent.focus({ preventScroll: true });
+      return;
+    }
+    var p = pv.product, c = p.colorways[pv.colorway];
+    err.hidden = true;
+    pv.notifyEmail.removeAttribute("aria-invalid");
+    pv.notifySend.classList.add("is-sent");
+    pv.notifySend.setAttribute("aria-label", "Enviado");
+    pv.notifyEmail.value = "";
+    pv.notifyConsent.checked = false; // cada aviso necesita su propio consentimiento
+    // la flecha pasa a check y la burbuja se convierte en la confirmación
+    pv.notifyTimer = setTimeout(function () {
+      pv.notify.classList.add("is-done");
+      pv.notifyDone.textContent = "Apuntado. Te escribimos en cuanto vuelva " + p.name + " · " + c.name + ".";
+      if (!reduceMotion) pv.notifyDone.animate([
+        { transform: "translateY(8px) scale(0.96)", opacity: 0 }, { transform: "none", opacity: 1 }
+      ], { duration: 340, easing: ENTER });
+      pv.notifyTimer = setTimeout(function () {
+        pvNotify(false);
+        pv.cta.focus({ preventScroll: true });
+      }, 2400);
+    }, reduceMotion ? 0 : 420);
+  }
+
   // Al cerrar, todo ocurre dentro de la vista ampliada (que va dejando ver la
   // página) y solo al final se cierra de verdad: así no hay un corte seco.
   function closeProductViewer() {
@@ -1686,6 +1848,7 @@
     pv.closeFades = null;
     pv.cards.forEach(function (card) { card.style.visibility = ""; card.getAnimations({ subtree: true }).forEach(function (a) { a.cancel(); }); });
     pv.closing = false;
+    pvNotify(false, true);
     if (pv.opener) pv.opener.focus({ preventScroll: true });
     // el vídeo se suelta después, sin bloquear la animación
     setTimeout(function () {
@@ -1701,8 +1864,13 @@
     pv.dialog.addEventListener("cancel", function (e) {
       e.preventDefault();
       if (pvSheetOpen()) { pvSheet(false); pv.cta.focus({ preventScroll: true }); return; }
+      if (pvNotifyOpen()) { pvNotify(false); pv.cta.focus({ preventScroll: true }); return; }
       closeProductViewer();
     });
+    pv.notify.addEventListener("submit", pvNotifySubmit);
+    $("[data-pview-notify-close]").addEventListener("click", function () { pvNotify(false); pv.cta.focus({ preventScroll: true }); });
+    pv.notifyConsent.addEventListener("change", function () { if (pv.notifyConsent.checked && pv.notifyError.dataset.kind === "consent") pv.notifyError.hidden = true; });
+    pv.notifyEmail.addEventListener("input", function () { if (pv.notifyError.dataset.kind === "email") { pv.notifyError.hidden = true; pv.notifyEmail.removeAttribute("aria-invalid"); } });
     pv.prev.addEventListener("click", function () { pvGo(-1); });
     window.addEventListener("resize", function () { if (pv.dialog.open) pvLayout(true); });
     pv.next.addEventListener("click", function () { pvGo(1); });
@@ -1713,10 +1881,7 @@
     pv.video.addEventListener("ended", function () { pv.video.currentTime = pv.video._start || 0; pv.video.play(); });
     pv.cta.addEventListener("click", function () {
       var p = pv.product, c = p.colorways[pv.colorway];
-      if (stockState(c.stock) === "out") {
-        toast("Te avisamos si vuelve <strong>" + p.name + " · " + c.name + "</strong>. Deja tu email abajo.");
-        return;
-      }
+      if (stockState(c.stock) === "out") { pvNotify(!pvNotifyOpen()); return; }
       // las tallas se eligen aquí mismo, sin salir de la vista ampliada
       pvSheet(!pvSheetOpen());
     });
@@ -1726,7 +1891,7 @@
       bag.push({ id: p.id, color: c.name, size: pv.size });
       // la foto de la carta vuela a la bolsa de la vista; el botón confirma y
       // el panel se recoge cuando la prenda ya ha llegado
-      flyToBag(pv.add, IMG + c.images[pv.i], updateBag);
+      flyToBag(pv.add, thumb(c.images[pv.i]), updateBag);
       confirmOn(pv.add, pvPaintAdd);
       toast("<strong>" + p.name + "</strong> · " + c.name + " · " + pv.size + " a tu bolsa.");
       setTimeout(function () {
