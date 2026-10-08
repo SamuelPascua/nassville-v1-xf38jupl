@@ -11,13 +11,18 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@700;800;900&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/styles.css?v=30">
+  <link rel="stylesheet" href="css/styles.css?v=39">
   <script type="importmap">
     { "imports": {
       "three": "https://cdn.jsdelivr.net/npm/three@0.169.0/build/three.module.js",
       "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.169.0/examples/jsm/"
     } }
   </script>
+  <!-- el logo 3D: Three.js empieza a bajar ya, a la vez que la página
+       (siempre después del importmap, o el navegador lo ignora) -->
+  <link rel="modulepreload" href="https://cdn.jsdelivr.net/npm/three@0.169.0/build/three.module.js" crossorigin>
+  <link rel="modulepreload" href="https://cdn.jsdelivr.net/npm/three@0.169.0/examples/jsm/loaders/SVGLoader.js" crossorigin>
+  <link rel="modulepreload" href="https://cdn.jsdelivr.net/npm/three@0.169.0/examples/jsm/environments/RoomEnvironment.js" crossorigin>
 </head>
 <body>
   <a class="skip" href="#tienda">Saltar a la tienda</a>
@@ -61,10 +66,10 @@
     <!-- 1 · HERO: logo 3D sobre vídeo -->
     <section class="hero" aria-label="nassville">
       <div class="hero__media" aria-hidden="true">
-        <video class="hero__video hero__video--wide" autoplay muted loop playsinline preload="auto" poster="assets/video/hero.jpg">
+        <video class="hero__video hero__video--wide" muted loop playsinline preload="none" poster="assets/video/hero.jpg">
           <source src="assets/video/hero.mp4" type="video/mp4">
         </video>
-        <video class="hero__video hero__video--tall" autoplay muted loop playsinline preload="auto" poster="assets/video/hero-mobile.jpg">
+        <video class="hero__video hero__video--tall" muted loop playsinline preload="none" poster="assets/video/hero-mobile.jpg">
           <source src="assets/video/hero-mobile.mp4" type="video/mp4">
         </video>
         <div class="hero__veil"></div>
@@ -112,7 +117,7 @@
 
     <!-- 2 · EL HILO: drops como conversación -->
     <section class="thread" id="hilo" aria-labelledby="hilo-title">
-      <div class="thread__head">
+      <div class="thread__head reveal reveal--title">
         <h2 id="hilo-title" class="display">El hilo</h2>
         <p class="lede">El grupo donde soltamos cada drop y donde la gente responde. Del primero al último.</p>
         <p class="thread__hint">
@@ -201,7 +206,7 @@
       <p class="products__empty" data-products-empty hidden>Nada por aquí con ese filtro. Prueba con <button type="button" class="linklike" data-filter-reset>todo</button>.</p>
 
       <div class="archive" aria-labelledby="archivo-title">
-        <div class="archive__head">
+        <div class="archive__head reveal reveal--title">
           <h3 id="archivo-title" class="display">Agotado</h3>
           <p>Ya volaron. Tócalas para verlas en grande o pide que te avisemos si vuelven.</p>
         </div>
@@ -211,7 +216,7 @@
 
     <!-- 4 · VÍDEOS -->
     <section class="videos" id="videos" aria-labelledby="videos-title">
-      <div class="videos__head">
+      <div class="videos__head reveal reveal--title">
         <h2 id="videos-title" class="display display--xl">Notas de vídeo</h2>
         <p class="lede">Lo que grabamos mientras lo hacemos. Toca para verlo con sonido.</p>
       </div>
@@ -282,7 +287,8 @@
       <div class="composer__row">
         <input id="email" name="email" type="email" inputmode="email" autocomplete="email" placeholder="Escribe tu email…" required>
         <button type="submit" class="composer__send" aria-label="Enviar">
-          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 19V5m0 0-6 6m6-6 6 6"/></svg>
+          <svg class="composer__arrow" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 19V5m0 0-6 6m6-6 6 6"/></svg>
+          <svg class="composer__check" viewBox="0 0 24 24" aria-hidden="true"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg>
         </button>
       </div>
       <p class="composer__error" data-composer-error role="alert" hidden></p>
@@ -331,6 +337,10 @@
         <p class="pview__meta" data-pview-meta></p>
       </div>
       <span class="pview__stamp" data-pview-stamp hidden>Agotado</span>
+      <button class="bag pview__bag" type="button" data-bag-button aria-label="Bolsa, 0 prendas">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 8h12l-1 12H7L6 8Z"/><path d="M9 8V6a3 3 0 0 1 6 0v2"/></svg>
+        <span class="bag__count" data-bag-count>0</span>
+      </button>
       <button class="pview__close" type="button" data-pview-close aria-label="Cerrar">
         <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg>
       </button>
@@ -349,7 +359,7 @@
         <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 5l7 7-7 7"/></svg>
       </button>
       <button class="btn btn--primary pview__cta" type="button" data-pview-cta aria-expanded="false" aria-controls="pview-sheet">Elegir talla</button>
-      <div class="pview__sheet" id="pview-sheet" data-pview-sheet hidden>
+      <div class="pview__sheet" id="pview-sheet" data-pview-sheet data-open="false" aria-hidden="true" inert>
         <div class="pview__sheet-head">
           <strong>Elige tu talla</strong>
           <span data-pview-sheet-meta></span>
@@ -363,9 +373,9 @@
 
   <div class="toast" data-toast role="status" aria-live="polite"></div>
 
-  <script src="js/data.js?v=30"></script>
-  <script src="js/logo-paths.js?v=30"></script>
-  <script src="js/main.js?v=30"></script>
-  <script src="js/hero3d.js?v=30"></script>
+  <script src="js/data.js?v=39"></script>
+  <script src="js/logo-paths.js?v=39"></script>
+  <script src="js/main.js?v=39"></script>
+  <script src="js/hero3d.js?v=39"></script>
 </body>
 </html>

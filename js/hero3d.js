@@ -98,10 +98,12 @@
       bevelSegments: 5,
       curveSegments: 10
     });
-    geometry.center();
+    // centrado moviendo la malla y no la geometría: geometry.center() recorría
+    // todos los vértices otra vez y era de lo más lento al cargar
     geometry.computeBoundingBox();
-    var size = new THREE.Vector3();
+    var size = new THREE.Vector3(), mid = new THREE.Vector3();
     geometry.boundingBox.getSize(size);
+    geometry.boundingBox.getCenter(mid);
 
     var material = new THREE.MeshPhysicalMaterial({
       color: 0xe4e4e8,
@@ -115,6 +117,7 @@
     var mesh = new THREE.Mesh(geometry, material);
     var fit = 4.2 / size.x;
     mesh.scale.set(fit, -fit, fit); // el eje Y del SVG va hacia abajo
+    mesh.position.set(-mid.x * fit, mid.y * fit, -mid.z * fit);
     var group = new THREE.Group();
     group.add(mesh);
     scene.add(group);
@@ -208,10 +211,10 @@
     }
 
     // --- Bucle (solo mientras el hero se ve) ---
-    var visible = true, raf = 0, last = performance.now(), t0 = last;
+    var visible = true, raf = 0, last = performance.now(), t0 = last, started = false;
     new IntersectionObserver(function (entries) {
       visible = entries[0].isIntersecting;
-      if (visible && !raf) { last = performance.now(); raf = requestAnimationFrame(loop); }
+      if (started && visible && !raf) { last = performance.now(); raf = requestAnimationFrame(loop); }
     }).observe(hero);
 
     function loop(now) {
@@ -242,6 +245,7 @@
       var face = showFace(angle);
       group.rotation.y = face.rotation;
       mesh.scale.x = fit * face.squash;
+      mesh.position.x = -mid.x * mesh.scale.x;
       group.rotation.x = p * 0.9;
       group.position.y = (reduceMotion ? 0 : Math.sin(t * 0.9) * 0.05) + p * 0.6;
       group.scale.setScalar(scale * (1 - p * 0.35));
@@ -250,6 +254,16 @@
       renderer.render(scene, camera);
       raf = requestAnimationFrame(loop);
     }
-    raf = requestAnimationFrame(loop);
+    // Los shaders del metal se compilan sin bloquear la página (si el navegador
+    // lo permite) y el emblema aparece con su entrada ya lista, en vez de
+    // congelar todo un instante en el primer fotograma.
+    var ready = renderer.compileAsync ? renderer.compileAsync(scene, camera) : Promise.resolve();
+    ready.catch(function () {}).then(function () {
+      started = true;
+      renderer.render(scene, camera);
+      canvas.classList.add("is-ready");
+      last = t0 = performance.now();
+      if (visible && !raf) raf = requestAnimationFrame(loop);
+    });
   }
 })();

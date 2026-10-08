@@ -53,6 +53,31 @@
   }
 
   /* ---------- Llegada de mensajes ---------- */
+  /* ---------- Carga diferida: fotos y pósters solo cuando se acercan ---------- */
+  // root: la ventana del chat (sus fotos están dentro de un scroll propio) o la página
+  var nearObservers = [];
+  function whenNear(node, fn, root) {
+    if (!("IntersectionObserver" in window)) { fn(); return; }
+    var entry = nearObservers.filter(function (o) { return o.root === (root || null); })[0];
+    if (!entry) {
+      entry = { root: root || null, io: new IntersectionObserver(function (list, io) {
+        list.forEach(function (e) {
+          if (!e.isIntersecting) return;
+          io.unobserve(e.target);
+          var f = e.target._near; e.target._near = null;
+          if (f) f();
+        });
+      }, { root: root || null, rootMargin: root ? "100% 0px" : "600px 0px" }) };
+      nearObservers.push(entry);
+    }
+    node._near = fn;
+    entry.io.observe(node);
+  }
+  function wake(scope) {
+    $$("[data-src]:not(video)", scope).forEach(function (im) { im.src = im.dataset.src; im.removeAttribute("data-src"); });
+    $$("video[data-poster]", scope).forEach(function (v) { v.poster = v.dataset.poster; v.removeAttribute("data-poster"); });
+  }
+
   var revealObserver = null;
   function setupReveal(nodes) {
     if (reduceMotion || !("IntersectionObserver" in window)) return;
@@ -65,10 +90,12 @@
         });
       }, { rootMargin: "0px 0px -12% 0px", threshold: 0.08 });
     }
-    nodes.forEach(function (n) {
-      // solo esconder lo que está por debajo del viewport: lo visible nunca parpadea
-      var r = n.getBoundingClientRect();
-      if (r.top < window.innerHeight * 0.9) return;
+    // solo esconder lo que está por debajo del viewport: lo visible nunca parpadea.
+    // Se mide todo de una vez y después se marca: medir y escribir alternando
+    // obligaba a recolocar la página entera por cada elemento al cargar.
+    var limit = window.innerHeight * 0.9;
+    var below = nodes.filter(function (n) { return n.getBoundingClientRect().top >= limit; });
+    below.forEach(function (n) {
       if (n.classList.contains("chat__drop")) $$(".reveal", n).forEach(function (c) { c.classList.add("is-pending"); });
       else n.classList.add("is-pending");
       revealObserver.observe(n);
@@ -134,9 +161,10 @@
     var shown = drop.images.slice(0, 4);
     var extra = drop.images.length - shown.length;
     var grid = el("div", { class: "msg__album msg__album--" + shown.length });
+    whenNear(grid, function () { wake(grid); }, chatBody());
     shown.forEach(function (src, i) {
       var tile = el("button", { class: "msg__photo", type: "button", "aria-label": "Ver foto " + (i + 1) + " de " + drop.title });
-      tile.appendChild(el("img", { src: IMG + src, alt: "", loading: "lazy", decoding: "async" }));
+      tile.appendChild(el("img", { "data-src": IMG + src, alt: "", decoding: "async" }));
       if (i === shown.length - 1 && extra > 0) tile.appendChild(el("span", { class: "msg__more", text: "+" + extra }));
       tile.addEventListener("click", function () { openViewer(drop.images, i, drop.title); });
       grid.appendChild(tile);
@@ -146,7 +174,8 @@
 
   function videoMsg(drop) {
     var vb = el("button", { class: "msg__video", type: "button", "aria-label": "Reproducir vídeo de " + drop.title, style: "aspect-ratio:" + drop.video.ratio });
-    var v = el("video", { muted: "", loop: "", playsinline: "", preload: "none", poster: VID + drop.video.src + ".jpg", "data-src": VID + drop.video.src + ".mp4" + (drop.video.start ? "#t=" + drop.video.start : "") });
+    var v = el("video", { muted: "", loop: "", playsinline: "", preload: "none", "data-poster": VID + drop.video.src + ".jpg", "data-src": VID + drop.video.src + ".mp4" + (drop.video.start ? "#t=" + drop.video.start : "") });
+    whenNear(vb, function () { wake(vb); }, chatBody());
     v.muted = true;
     if (drop.video.start) {
       // vuelve al inicio elegido en cada vuelta, no al primer fotograma
@@ -165,13 +194,14 @@
     var st = productState(p);
     var href = st === "out" ? "#archivo-title" : "#product-" + p.id;
     var a = el("a", { class: "msg__link" + (st === "out" ? " is-out" : ""), href: href }, [
-      el("img", { src: IMG + p.colorways[0].images[0], alt: "", loading: "lazy" }),
+      el("img", { "data-src": IMG + p.colorways[0].images[0], alt: "" }),
       el("span", { class: "msg__link-text" }, [
         el("strong", { text: p.name + " · " + p.type }),
         el("span", { text: st === "out" ? "Agotado · en el archivo" : euro(p.price) + " · " + TAG[st] }),
         el("small", { text: "nassville.com/tienda" })
       ])
     ]);
+    whenNear(a, function () { wake(a); }, chatBody());
     if (st !== "out") a.addEventListener("click", function () {
       var card = document.getElementById("product-" + p.id);
       if (!card) return;
@@ -420,6 +450,189 @@
 
   var TAG = { in: "Disponible", low: "Últimas unidades", out: "Agotado" };
 
+  /* ---------- Movimiento compartido: texto que cambia, marca de talla, vuelo a la bolsa ---------- */
+  var ENTER = "cubic-bezier(0.22, 1, 0.36, 1)";
+
+  // Cambia el texto en el sitio: sale hacia arriba con un leve desenfoque y el
+  // nuevo entra desde abajo (receta "text state swap"). Interrumpible.
+  function swapText(node, text) {
+    if (node && node._slot) node._slot();
+    if (!node || node.textContent === text) return;
+    if (reduceMotion || !node.animate || !node.isConnected) { node.textContent = text; return; }
+    var token = (node._swap || 0) + 1;
+    node._swap = token;
+    var out = node.animate([
+      { opacity: 1, transform: "translateY(0)", filter: "blur(0)" },
+      { opacity: 0, transform: "translateY(-6px)", filter: "blur(3px)" }
+    ], { duration: 110, easing: "ease-in", fill: "forwards" });
+    out.onfinish = function () {
+      if (node._swap !== token) return;
+      node.textContent = text;
+      out.cancel();
+      node.animate([
+        { opacity: 0, transform: "translateY(6px)", filter: "blur(3px)" },
+        { opacity: 1, transform: "translateY(0)", filter: "blur(0)" }
+      ], { duration: 200, easing: ENTER });
+    };
+  }
+
+  // Cambio de talla: el botón entero gira como el rodillo de una tragaperras.
+  // Dos copias del botón giran juntas sobre un mismo eje situado detrás de
+  // ellas (un cubo): la cara actual sube y se va hacia atrás y la nueva llega
+  // siempre desde abajo, con un pequeño golpe al encajar. El botón real cambia
+  // su texto al instante (lectores de pantalla) y solo se oculta durante el giro.
+  var SLOT_MS = 560;
+  function slotButton(button, text) {
+    if (!button) return;
+    if (button._slot) button._slot();
+    if (button.textContent === text) return;
+    button._swap = (button._swap || 0) + 1; // anula un cambio de texto suave a medias
+    button.getAnimations().forEach(function (a) { a.cancel(); });
+    if (reduceMotion || !button.animate || !button.offsetParent) { button.textContent = text; return; }
+    var h = button.offsetHeight;
+    var place = "position:absolute;margin:0;z-index:2;pointer-events:none;" +
+      "left:" + button.offsetLeft + "px;top:" + button.offsetTop + "px;width:" + button.offsetWidth + "px;height:" + h + "px;" +
+      "transform-origin:50% 50% " + (-h / 2) + "px;-webkit-backface-visibility:hidden;backface-visibility:hidden;";
+    function face(label) {
+      var f = button.cloneNode(true);
+      Array.prototype.slice.call(f.attributes).forEach(function (a) { if (/^(id|data-|aria-)/.test(a.name)) f.removeAttribute(a.name); });
+      f.setAttribute("aria-hidden", "true");
+      f.tabIndex = -1;
+      f.textContent = label;
+      f.classList.add("slot-face");
+      f.style.cssText += place;
+      button.parentNode.insertBefore(f, button.nextSibling);
+      return f;
+    }
+    var old = face(button.textContent), next = face(text);
+    button.textContent = text;
+    button.style.opacity = "0";
+    // coge un poco de impulso, gira y encaja con un rebote, como un rodillo
+    var opt = { duration: SLOT_MS, easing: "cubic-bezier(0.5, -0.1, 0.25, 1.35)", fill: "both" };
+    old.animate([
+      { transform: "perspective(500px) rotateX(0deg)", filter: "brightness(1)" },
+      { transform: "perspective(500px) rotateX(90deg)", filter: "brightness(0.55)" }
+    ], opt);
+    var spin = next.animate([
+      { transform: "perspective(500px) rotateX(-90deg)", filter: "brightness(0.55)" },
+      { transform: "perspective(500px) rotateX(0deg)", filter: "brightness(1)" }
+    ], opt);
+    button._slot = function () {
+      button._slot = null;
+      old.remove(); next.remove();
+      button.style.opacity = "";
+    };
+    spin.onfinish = function () { if (button._slot) button._slot(); };
+  }
+
+  // Marca de la talla elegida que se desliza entre tallas (como un selector segmentado)
+  function sizeThumb(fieldset) {
+    var thumb = el("span", { class: "sizes__thumb no-anim", "aria-hidden": "true" });
+    // al final: el <legend> tiene que seguir siendo el primer hijo del <fieldset>
+    fieldset.appendChild(thumb);
+    // origen real de la marca en pantalla (en un <fieldset> con <legend> su
+    // offsetTop no coincide con donde se pinta), medido una vez sin transform
+    var origin = null;
+    function measureOrigin() {
+      var f = fieldset.getBoundingClientRect(), t = thumb.getBoundingClientRect();
+      origin = { x: t.left - f.left, y: t.top - f.top };
+    }
+    function move(instant) {
+      var input = $("input:checked", fieldset);
+      if (!input) { thumb.classList.remove("is-on"); return; }
+      var label = input.closest(".size");
+      var first = !thumb.classList.contains("is-on");
+      thumb.classList.toggle("no-anim", !!instant || first || reduceMotion);
+      thumb.style.width = label.offsetWidth + "px";
+      thumb.style.height = label.offsetHeight + "px";
+      if (!origin) measureOrigin();
+      var f = fieldset.getBoundingClientRect(), l = label.getBoundingClientRect();
+      thumb.style.transform = "translate(" + (l.left - f.left - origin.x) + "px, " + (l.top - f.top - origin.y) + "px)";
+      void thumb.offsetWidth;
+      thumb.classList.remove("no-anim");
+      thumb.classList.add("is-on");
+      // la primera vez aparece con un pequeño crecimiento en su sitio
+      if (first && !instant && !reduceMotion && thumb.animate) {
+        thumb.animate([{ opacity: 0 }, { opacity: 1 }], { duration: 200, easing: "ease-out" });
+      }
+    }
+    fieldset.addEventListener("change", function () { move(false); });
+    move(true);
+    return move;
+  }
+
+  // La prenda vuela en arco desde el botón hasta la bolsa; al llegar, la bolsa
+  // "la recoge" y el número sube. Dos ejes con curvas distintas dibujan el arco.
+  function flyToBag(fromEl, imgSrc, done) {
+    var inViewer = pv.dialog && pv.dialog.open;
+    var target = inViewer ? $(".pview__bag", pv.dialog) : $(".chatbar [data-bag-button]");
+    if (reduceMotion || !fromEl || !target || !document.body.animate) { done(); return; }
+    var a = fromEl.getBoundingClientRect(), b = target.getBoundingClientRect();
+    var x0 = a.left + a.width / 2, y0 = a.top + a.height / 2;
+    var dx = b.left + b.width / 2 - x0, dy = b.top + b.height / 2 - y0;
+    var img = el("span", { class: "fly__img" }, [el("img", { src: imgSrc, alt: "" })]);
+    var yAxis = el("span", { class: "fly__y" }, [img]);
+    var fly = el("div", { class: "fly", "aria-hidden": "true", style: "transform: translate(" + x0 + "px, " + y0 + "px)" }, [yAxis]);
+    (inViewer ? pv.dialog : document.body).appendChild(fly);
+    var D = 720;
+    // horizontal: arranca despacio y acelera; vertical: sube rápido y se asienta → arco
+    fly.animate([{ transform: "translate(" + x0 + "px, " + y0 + "px)" }, { transform: "translate(" + (x0 + dx) + "px, " + y0 + "px)" }],
+      { duration: D, easing: "cubic-bezier(0.5, 0, 0.9, 1)", fill: "forwards" });
+    yAxis.animate([{ transform: "translateY(0)" }, { transform: "translateY(" + dy + "px)" }],
+      { duration: D, easing: "cubic-bezier(0.1, 0.65, 0.3, 1)", fill: "forwards" });
+    var last = img.animate([
+      { transform: "scale(0.6)", opacity: 0 },
+      { transform: "scale(1.08)", opacity: 1, offset: 0.16 },
+      { transform: "scale(0.9)", opacity: 1, offset: 0.55 },
+      { transform: "scale(0.3)", opacity: 0.85 }
+    ], { duration: D, easing: "linear", fill: "forwards" });
+    last.onfinish = function () { fly.remove(); done(); };
+  }
+
+  // Confirmación en el propio botón ("Añadido ✓") y vuelta a su texto
+  function confirmOn(button, restore) {
+    swapText(button, "Añadido ✓");
+    button.classList.add("is-done");
+    clearTimeout(button._confirm);
+    button._confirm = setTimeout(function () { button.classList.remove("is-done"); restore(); }, 1300);
+  }
+
+  // Falta la talla: las tallas se sacuden en el sitio, se marcan un instante y
+  // el aviso aparece junto a ellas (receta "error state shake"), sin toast
+  function nudgeSizes(fieldset, note) {
+    if (note) swapText(note, "Elige una talla primero.");
+    if (!reduceMotion && fieldset.animate) {
+      fieldset.animate([
+        { transform: "translateX(0)" }, { transform: "translateX(-6px)" }, { transform: "translateX(6px)" },
+        { transform: "translateX(-4px)" }, { transform: "translateX(4px)" }, { transform: "translateX(0)" }
+      ], { duration: 320, easing: "ease-out" });
+    }
+    fieldset.classList.add("is-nudged");
+    clearTimeout(fieldset._nudge);
+    fieldset._nudge = setTimeout(function () { fieldset.classList.remove("is-nudged"); }, 900);
+    var first = $("input:not(:disabled)", fieldset);
+    if (first) first.focus({ preventScroll: true });
+  }
+
+  // Marca del filtro activo que se desliza entre botones
+  function chipsPill(bar) {
+    var pill = el("span", { class: "chips__pill no-anim", "aria-hidden": "true" });
+    bar.insertBefore(pill, bar.firstChild);
+    function move(instant) {
+      var active = $(".chip.is-active", bar);
+      if (!active) return;
+      pill.classList.toggle("no-anim", !!instant || reduceMotion);
+      pill.style.width = active.offsetWidth + "px";
+      pill.style.height = active.offsetHeight + "px";
+      pill.style.transform = "translate(" + (active.offsetLeft - pill.offsetLeft) + "px, " + (active.offsetTop - pill.offsetTop) + "px)";
+      void pill.offsetWidth;
+      pill.classList.remove("no-anim");
+    }
+    window.addEventListener("resize", function () { move(true); });
+    requestAnimationFrame(function () { move(true); });
+    return move;
+  }
+
   function renderShop() {
     var grid = $("[data-products]");
     var archive = $("[data-archive]");
@@ -446,7 +659,7 @@
             el("s", { text: euro(p.price) })
           ])
         ]);
-        card.addEventListener("click", function () { openProductViewer(p, ci, 0); });
+        card.addEventListener("click", function () { openProductViewer(p, ci, 0, $("img", card)); });
         archive.appendChild(el("li", null, [card]));
       });
     });
@@ -536,7 +749,8 @@
       // imágenes del carrusel
       track.innerHTML = "";
       imgs = c.images.map(function (src, i) {
-        var im = el("img", { src: IMG + src, alt: i === 0 ? p.name + " " + p.type + ", color " + c.name : "", loading: "lazy", decoding: "async", draggable: "false" });
+        var now = i === 0 || li._near;
+        var im = el("img", { src: now ? IMG + src : null, "data-src": now ? null : IMG + src, alt: i === 0 ? p.name + " " + p.type + ", color " + c.name : "", loading: "lazy", decoding: "async", draggable: "false" });
         track.appendChild(im);
         return im;
       });
@@ -569,7 +783,8 @@
         var n = c.stock[s];
         var input = el("input", { type: "radio", name: name, value: s, disabled: n === 0 ? "" : null });
         if (state.size === s) input.checked = true;
-        input.addEventListener("change", function () { state.size = s; paintCta(); });
+        // de una talla a otra el botón gira como una tragaperras
+        input.addEventListener("change", function () { var was = state.size; state.size = s; paintCta(!!was && was !== s); });
         var label = el("label", { class: "size", title: n === 0 ? "Agotada" : n <= 3 ? "Quedan " + n : "" }, [
           input,
           el("span", { text: s })
@@ -580,31 +795,32 @@
         sizes.appendChild(label);
       });
       legend.hidden = !Object.keys(c.stock).some(function (k) { return c.stock[k] > 0 && c.stock[k] <= 3; });
+      sizeThumb(sizes);
       paintCta();
     }
 
-    function paintCta() {
+    function paintCta(slot) {
       var c = p.colorways[state.color];
       var st = stockState(c.stock);
       if (st === "out") {
-        cta.textContent = "Avísame si vuelve";
+        swapText(cta, "Avísame si vuelve");
         cta.className = "btn btn--ghost";
         cta.disabled = false;
         cta.dataset.mode = "notify";
-        note.textContent = "Este color se ha agotado.";
+        swapText(note, "Este color se ha agotado.");
         return;
       }
       cta.className = "btn btn--primary";
       cta.dataset.mode = "add";
       if (!state.size) {
-        cta.textContent = "Elige tu talla";
+        swapText(cta, "Elige tu talla");
         cta.setAttribute("aria-disabled", "true");
-        note.textContent = st === "low" ? "Pocas unidades en algunas tallas." : "";
+        swapText(note, st === "low" ? "Pocas unidades en algunas tallas." : "");
       } else {
         var left = c.stock[state.size];
-        cta.textContent = "Lo quiero · " + state.size;
+        (slot ? slotButton : swapText)(cta, "Lo quiero · " + state.size);
         cta.removeAttribute("aria-disabled");
-        note.textContent = left <= 3 ? "Quedan " + left + " en " + state.size + "." : "Disponible en " + state.size + ".";
+        swapText(note, left <= 3 ? "Quedan " + left + " en " + state.size + "." : "Disponible en " + state.size + ".");
       }
     }
 
@@ -625,7 +841,7 @@
     track.addEventListener("keydown", function (e) {
       if (e.key === "ArrowRight") { e.preventDefault(); goImage(state.image + 1); }
       if (e.key === "ArrowLeft") { e.preventDefault(); goImage(state.image - 1); }
-      if (e.key === "Enter" || e.key === " ") { e.preventDefault(); openProductViewer(p, state.color, state.image); }
+      if (e.key === "Enter" || e.key === " ") { e.preventDefault(); openProductViewer(p, state.color, state.image, imgs[state.image]); }
     });
     // ratón: arrastrar para deslizar; un clic sin arrastre amplía. En táctil el
     // deslizamiento es nativo y un toque simple amplía.
@@ -652,7 +868,7 @@
         var from = Math.round(d.sl / Math.max(track.clientWidth, 1));
         goImage(from + (dx < -40 ? 1 : dx > 40 ? -1 : 0));
       }
-      if (!d.moved) openProductViewer(p, state.color, state.image);
+      if (!d.moved) openProductViewer(p, state.color, state.image, imgs[state.image]);
     });
     track.addEventListener("pointercancel", function () { tDrag = null; track.classList.remove("is-dragging"); });
 
@@ -662,44 +878,66 @@
         toast("Te avisamos si vuelve <strong>" + p.name + " · " + c.name + "</strong>. Deja tu email abajo.");
         return;
       }
-      if (!state.size) {
-        toast("Primero elige una talla.");
-        var first = $("input:not(:disabled)", sizes);
-        if (first) first.focus();
-        return;
-      }
+      if (!state.size) { nudgeSizes(sizes, note); return; }
       bag.push({ id: p.id, color: c.name, size: state.size });
-      updateBag();
+      // la prenda vuela a la bolsa y el botón confirma en el sitio
+      flyToBag(cta, IMG + c.images[state.image || 0], updateBag);
+      confirmOn(cta, paintCta);
       toast("<strong>" + p.name + "</strong> · " + c.name + " · " + state.size + " a tu bolsa.");
     });
 
     paint();
+    whenNear(li, function () { li._near = true; wake(track); });
     return li;
   }
 
   function updateBag() {
-    var btn = $("[data-bag-button]");
-    var count = $("[data-bag-count]");
-    count.textContent = bag.length;
-    btn.classList.toggle("has-items", bag.length > 0);
-    btn.setAttribute("aria-label", "Bolsa, " + bag.length + (bag.length === 1 ? " prenda" : " prendas"));
-    btn.classList.remove("bump");
-    void btn.offsetWidth;
-    btn.classList.add("bump");
-  }
-
-  function setupBagButton() {
-    $("[data-bag-button]").addEventListener("click", function () {
-      if (!bag.length) toast("Tu bolsa está vacía. Mira <a href=\"#tienda\">lo que queda</a>.");
-      else toast("Llevas " + bag.length + (bag.length === 1 ? " prenda" : " prendas") + ". El pago llega muy pronto.");
+    var n = bag.length;
+    $$("[data-bag-button]").forEach(function (btn) {
+      btn.classList.toggle("has-items", n > 0);
+      btn.setAttribute("aria-label", "Bolsa, " + n + (n === 1 ? " prenda" : " prendas"));
+      btn.classList.remove("bump");
+      void btn.offsetWidth;
+      btn.classList.add("bump");
+    });
+    // el número sube rodando (o baja, si algún día se quitan prendas)
+    $$("[data-bag-count]").forEach(function (count) {
+      var prev = +count.dataset.n || 0;
+      count.dataset.n = n;
+      count.innerHTML = '<span class="bag__digit" style="--dir:' + (n >= prev ? 1 : -1) + '">' + n + "</span>";
     });
   }
 
+  function setupBagButton() {
+    $$("[data-bag-button]").forEach(function (b) { b.addEventListener("click", function () {
+      if (!bag.length) toast("Tu bolsa está vacía. Mira <a href=\"#tienda\">lo que queda</a>.");
+      else toast("Llevas " + bag.length + (bag.length === 1 ? " prenda" : " prendas") + ". El pago llega muy pronto.");
+    }); });
+  }
+
   /* ---------- Filtros ---------- */
+  /* ---------- Vídeo del inicio: solo se descarga el que toca a esta pantalla ---------- */
+  function setupHeroVideo() {
+    var wide = $(".hero__video--wide"), tall = $(".hero__video--tall");
+    if (!wide || !tall) return;
+    var mq = window.matchMedia("(max-width: 720px)");
+    function pick() {
+      var on = mq.matches ? tall : wide, off = mq.matches ? wide : tall;
+      off.pause();
+      on.preload = "auto";
+      var p = on.play(); if (p && p.catch) p.catch(function () {});
+    }
+    if (mq.addEventListener) mq.addEventListener("change", pick);
+    pick();
+  }
+
   function setupFilters() {
     var bar = $("[data-filters]");
     if (!bar) return;
     var empty = $("[data-products-empty]");
+
+    var movePill = chipsPill(bar);
+    var MOVE = "cubic-bezier(0.25, 1, 0.5, 1)";
 
     function apply(filter) {
       $$(".chip", bar).forEach(function (c) {
@@ -707,13 +945,48 @@
         c.classList.toggle("is-active", on);
         c.setAttribute("aria-pressed", on ? "true" : "false");
       });
-      var visible = 0;
-      $$(".product").forEach(function (card) {
-        var show = filter === "todo" || card.dataset.category === filter;
-        card.classList.toggle("is-hidden", !show);
-        if (show) visible++;
+      movePill(false);
+
+      var cards = $$(".product");
+      var show = function (c) { return filter === "todo" || c.dataset.category === filter; };
+      // un clic rápido interrumpe el cambio anterior y parte del estado actual
+      cards.forEach(function (c) { (c.getAnimations ? c.getAnimations() : []).forEach(function (a) { if (a.id === "flt") a.cancel(); }); });
+      var visible = function (c) { return !c.classList.contains("is-hidden"); };
+      var leaving = cards.filter(function (c) { return visible(c) && !show(c); });
+      var entering = cards.filter(function (c) { return !visible(c) && show(c); });
+      var staying = cards.filter(function (c) { return visible(c) && show(c); });
+
+      function commit() {
+        var before = staying.map(function (c) { return c.getBoundingClientRect(); });
+        cards.forEach(function (c) { c.classList.toggle("is-hidden", !show(c)); });
+        leaving.forEach(function (c) { (c.getAnimations ? c.getAnimations() : []).forEach(function (a) { if (a.id === "flt") a.cancel(); }); });
+        empty.hidden = cards.some(show);
+        if (reduceMotion || !document.body.animate) return;
+        // las que se quedan se deslizan desde donde estaban (FLIP)
+        staying.forEach(function (c, i) {
+          var a = before[i], b = c.getBoundingClientRect();
+          var dx = a.left - b.left, dy = a.top - b.top;
+          if (Math.abs(a.width - b.width) > 4) {
+            c.animate([{ opacity: 0.4 }, { opacity: 1 }], { duration: 300, easing: "ease-out", id: "flt" });
+          } else if (Math.abs(dx) > 1 || Math.abs(dy) > 1) {
+            c.animate([{ transform: "translate(" + dx + "px, " + dy + "px)" }, { transform: "none" }], { duration: 420, easing: MOVE, id: "flt" });
+          }
+        });
+        // las nuevas entran en cascada, sin aparecer de la nada
+        entering.forEach(function (c, i) {
+          c.animate([
+            { opacity: 0, transform: "translateY(16px) scale(0.97)" },
+            { opacity: 1, transform: "none" }
+          ], { duration: 380, delay: 60 + i * 50, easing: ENTER, fill: "backwards", id: "flt" });
+        });
+      }
+
+      if (reduceMotion || !leaving.length || !document.body.animate) { commit(); return; }
+      // las que se van salen rápido (la salida es más corta que la entrada)
+      var outs = leaving.map(function (c) {
+        return c.animate([{ opacity: 1, transform: "none" }, { opacity: 0, transform: "scale(0.96)" }], { duration: 160, easing: "ease-in", fill: "forwards", id: "flt" });
       });
-      empty.hidden = visible > 0;
+      outs[0].onfinish = commit;
     }
 
     bar.addEventListener("click", function (e) {
@@ -732,7 +1005,8 @@
     var films = $("[data-films]");
     D.notes.forEach(function (src) {
       var b = el("button", { class: "note", type: "button", "aria-label": "Reproducir nota de vídeo con sonido" });
-      var v = el("video", { muted: "", loop: "", playsinline: "", preload: "none", poster: VID + src + ".jpg", "data-src": VID + src + ".mp4" });
+      var v = el("video", { muted: "", loop: "", playsinline: "", preload: "none", "data-poster": VID + src + ".jpg", "data-src": VID + src + ".mp4" });
+      whenNear(b, function () { wake(b); });
       v.muted = true;
       v.addEventListener("loadedmetadata", function () {
         var s = Math.round(v.duration);
@@ -837,6 +1111,13 @@
     var input = $("#email", form);
     var err = $("[data-composer-error]");
     var sent = $("[data-composer-sent]");
+    var send = $(".composer__send", form);
+    // al volver a escribir, el check vuelve a ser la flecha de enviar
+    input.addEventListener("input", function () {
+      if (!send.classList.contains("is-sent")) return;
+      send.classList.remove("is-sent");
+      send.setAttribute("aria-label", "Enviar");
+    });
     form.addEventListener("submit", function (e) {
       e.preventDefault();
       var v = input.value.trim();
@@ -854,6 +1135,8 @@
       sent.appendChild(out);
       sent.appendChild(el("span", { class: "stamp stamp--out", text: "Entregado" }));
       input.value = "";
+      send.classList.add("is-sent");
+      send.setAttribute("aria-label", "Enviado");
       setTimeout(function () {
         sent.appendChild(el("div", { class: "bubble bubble--in" }, [el("p", { text: "Apuntado. Te escribimos antes del próximo drop." })]));
       }, reduceMotion ? 0 : 900);
@@ -1040,17 +1323,117 @@
   }
 
   function pvGo(step, transition) {
+    pvEndEmerge(); // si se mueve el mazo mientras aún llega, la llegada termina ya
     var n = pv.cards.length;
     if (n < 2) return;
     pv.i = (pv.i + step + n) % n;
     pvLayout(false, 0, transition);
   }
 
-  function openProductViewer(p, ci, start) {
+  // La foto tocada crece hasta ser la carta central y las demás cartas se
+  // abren en abanico desde detrás de ella; al cerrar, la carta vuelve a
+  // encogerse sobre su foto. Solo se animan transform y opacity (van en la
+  // GPU), así que el vídeo o las fotos que se cargan no lo entrecortan.
+  var FLY_EASE = "cubic-bezier(0.3, 0, 0.1, 1)"; // arranca suave, frena largo y sin quedarse colgado
+  var FLY_MS = 480;
+  function pvVisible(node) {
+    if (!node || !node.isConnected) return null;
+    var r = node.getBoundingClientRect();
+    if (r.width < 8 || r.bottom < 0 || r.top > window.innerHeight || r.right < 0 || r.left > window.innerWidth) return null;
+    return r;
+  }
+  // Marco con la esquina y la sombra de la carta, colocado en "box" y que
+  // arranca transformado sobre "far". La foto de dentro se recalcula a cada
+  // 10 % del viaje para cubrir siempre el marco sin deformarse, aunque la foto
+  // de origen tenga otra proporción que la carta.
+  function pvGhost(src, natural, filter, box, far) {
+    var sx = far.width / box.width, sy = far.height / box.height;
+    var W = natural.w || box.width, H = natural.h || box.height;
+    var base = Math.max(box.width / W, box.height / H); // la foto cubriendo el marco sin escalar
+    // la foto a su proporción real, centrada y cubriendo el marco
+    var fit = "left:" + (box.width - W * base) / 2 + "px;top:" + (box.height - H * base) / 2 + "px;width:" + W * base + "px;height:" + H * base + "px";
+    var colour = el("img", { src: src, alt: "", style: fit });
+    var grey = filter ? el("img", { src: src, alt: "", style: fit + ";filter:" + filter }) : null;
+    var ghost = el("div", { class: "pv-ghost", "aria-hidden": "true",
+      style: "left:" + box.left + "px;top:" + box.top + "px;width:" + box.width + "px;height:" + box.height + "px" }, grey ? [grey, colour] : [colour]);
+    var dx = (far.left + far.width / 2) - (box.left + box.width / 2), dy = (far.top + far.height / 2) - (box.top + box.height / 2);
+    // p = 0 en "far", 1 en "box"
+    var boxK = [], imgK = [];
+    for (var i = 0; i <= 10; i++) {
+      var p = i / 10;
+      var bx = sx + (1 - sx) * p, by = sy + (1 - sy) * p;
+      var cover = Math.max(bx * box.width / W, by * box.height / H) / base;
+      boxK.push({ offset: p, transform: "translate(" + (dx * (1 - p)) + "px, " + (dy * (1 - p)) + "px) scale(" + bx + ", " + by + ")" });
+      imgK.push({ offset: p, transform: "scale(" + (cover / bx) + ", " + (cover / by) + ")" });
+    }
+    return { el: ghost, imgs: grey ? [grey, colour] : [colour], colour: colour, grey: grey, boxK: boxK, imgK: imgK };
+  }
+  function pvFly(g, toFar, opt) {
+    function flip(k) { return k.map(function (f) { return { offset: 1 - f.offset, transform: f.transform }; }).reverse(); }
+    g.imgs.forEach(function (im) { im.animate(toFar ? flip(g.imgK) : g.imgK, opt); });
+    return g.el.animate(toFar ? flip(g.boxK) : g.boxK, opt);
+  }
+  function natural(img) { return { w: img.naturalWidth, h: img.naturalHeight }; }
+  function greyOf(img) { var f = getComputedStyle(img).filter; return f && f !== "none" ? f : ""; }
+
+  function pvEmerge(origin) {
+    var from = pvVisible(origin);
+    var center = pv.cards[pv.i];
+    if (!from || !center || reduceMotion || !center.animate) return false;
+    var to = center.getBoundingClientRect();
+    var g = pvGhost(origin.currentSrc || origin.src, natural(origin), greyOf(origin), to, from);
+    pv.dialog.appendChild(g.el);
+    pv.dialog.classList.add("is-emerging");
+    var opt = { duration: FLY_MS, easing: FLY_EASE, fill: "both" };
+    var fly = pvFly(g, false, opt);
+    if (g.grey) g.colour.animate([{ opacity: 0 }, { opacity: 1 }], { duration: FLY_MS, easing: "ease-in-out", fill: "both" });
+    // mesa vacía mientras la foto viaja; las demás salen de detrás cuando ya la tapa
+    var centerT = center.style.transform;
+    pv.cards.forEach(function (card) { card.style.visibility = "hidden"; });
+    pv.emerge = { ghost: g.el, timer: setTimeout(function () {
+      pv.cards.forEach(function (card, k) {
+        var o = pvOffset(k);
+        if (o === 0) return;
+        card.style.visibility = "";
+        card.animate([{ transform: centerT + " scale(0.92)" }, { transform: card.style.transform }],
+          { duration: 420, delay: (Math.abs(o) - 1) * 50, easing: ENTER, fill: "backwards", id: "emerge" });
+      });
+    }, FLY_MS * 0.45) };
+    fly.onfinish = pvEndEmerge;
+    return true;
+  }
+  // termina la llegada (al aterrizar, o antes si se mueve el mazo o se cierra)
+  function pvEndEmerge() {
+    var e = pv.emerge;
+    if (!e) return;
+    pv.emerge = null;
+    clearTimeout(e.timer);
+    pv.cards.forEach(function (card) {
+      card.style.visibility = "";
+      card.getAnimations().forEach(function (a) { if (a.id === "emerge") a.finish(); });
+    });
+    e.ghost.remove();
+    // "is-emerging" se queda hasta cerrar: quitarlo reiniciaba el fundido
+    // general de la ventana y se veía un parpadeo en negro al terminar
+    if (!pv.closing) pvAfterOpen();
+  }
+  // lo pesado (vídeo de fondo y el resto de fotos) espera a que la carta aterrice
+  function pvAfterOpen() {
+    $$("img[data-src]", pv.deck).forEach(function (im) { im.src = im.dataset.src; im.removeAttribute("data-src"); });
+    var v = pv.video;
+    if (v.dataset.src && !reduceMotion) {
+      v.src = v.dataset.src;
+      v.removeAttribute("data-src");
+      var pr = v.play(); if (pr && pr.catch) pr.catch(function () {});
+    }
+  }
+
+  function openProductViewer(p, ci, start, origin) {
     var c = p.colorways[ci];
     var st = stockState(c.stock);
     pv.product = p; pv.colorway = ci; pv.i = start || 0;
     pv.opener = document.activeElement;
+    pv.origin = origin || null;
     pv.dialog.style.setProperty("--tint", c.tint || "#262c57");
     pv.name.textContent = p.name;
     pv.meta.textContent = p.type + " · " + c.name + " · " + euro(p.price);
@@ -1064,16 +1447,19 @@
     // fondo: vídeo de la prenda con el filtro de su color
     if (c.video) {
       pv.video.poster = VID + c.video.src + ".jpg";
-      pv.video.src = VID + c.video.src + ".mp4" + (c.video.start ? "#t=" + c.video.start : "");
+      pv.video.dataset.src = VID + c.video.src + ".mp4" + (c.video.start ? "#t=" + c.video.start : "");
       pv.video._start = c.video.start || 0;
-      if (!reduceMotion) { var pr = pv.video.play(); if (pr && pr.catch) pr.catch(function () {}); }
     }
 
     pv.deck.innerHTML = "";
+    var n = c.images.length;
     pv.cards = c.images.map(function (src, k) {
-      var card = el("div", { class: "pcard", role: "group", "aria-roledescription": "carta", "aria-label": "Foto " + (k + 1) + " de " + c.images.length }, [
+      // la central y sus vecinas ya; las de reserva cuando la carta aterriza
+      var o = ((k - pv.i) % n + n) % n; if (o > n / 2) o -= n;
+      var near = Math.abs(o) <= 1;
+      var card = el("div", { class: "pcard", role: "group", "aria-roledescription": "carta", "aria-label": "Foto " + (k + 1) + " de " + n }, [
         el("div", { class: "pcard__face pcard__front" }, [
-          el("img", { src: IMG + src, alt: k === 0 ? p.name + " " + p.type + ", " + c.name : "", decoding: "async" })
+          el("img", { src: near ? IMG + src : null, "data-src": near ? null : IMG + src, alt: k === 0 ? p.name + " " + p.type + ", " + c.name : "", decoding: "async" })
         ]),
         el("div", { class: "pcard__face pcard__back", "aria-hidden": "true" }, [
           el("span", { class: "pcard__emblem", "data-logo": "emblem" }),
@@ -1088,11 +1474,16 @@
     });
     paintLogos();
 
+    // al bloquear el scroll desaparece la barra: se compensa su ancho para que
+    // la página no se recoloque (la foto de origen sigue en su sitio al cerrar)
+    var bar = window.innerWidth - document.documentElement.clientWidth;
+    document.documentElement.style.paddingRight = bar > 0 ? bar + "px" : "";
     document.documentElement.classList.add("is-locked");
     if (typeof pv.dialog.showModal === "function") pv.dialog.showModal(); else pv.dialog.setAttribute("open", "");
     // colocar las cartas con la ventana ya visible: con ella oculta las cartas
     // miden 0 px y los dorsos laterales quedaban escondidos tras la central
     pvLayout(true);
+    if (!pvEmerge(pv.origin)) pvAfterOpen();
     $("[data-pview-close]").focus();
   }
 
@@ -1103,8 +1494,11 @@
   pv.legend = $("[data-pview-legend]");
   pv.sheetMeta = $("[data-pview-sheet-meta]");
 
+  function pvSheetOpen() { return pv.sheet.dataset.open === "true"; }
   function pvSheet(open) {
-    pv.sheet.hidden = !open;
+    pv.sheet.dataset.open = open ? "true" : "false";
+    pv.sheet.setAttribute("aria-hidden", open ? "false" : "true");
+    pv.sheet.inert = !open;
     pv.cta.setAttribute("aria-expanded", open ? "true" : "false");
     if (open) {
       var first = $("input:not(:disabled)", pv.sizes);
@@ -1120,7 +1514,7 @@
     Object.keys(c.stock).forEach(function (s) {
       var n = c.stock[s];
       var input = el("input", { type: "radio", name: "pview-size", value: s, disabled: n === 0 ? "" : null });
-      input.addEventListener("change", function () { pv.size = s; pvPaintAdd(); });
+      input.addEventListener("change", function () { var was = pv.size; pv.size = s; pvPaintAdd(!!was && was !== s); });
       var label = el("label", { class: "size", title: n === 0 ? "Agotada" : n <= 3 ? "Quedan " + n : "" }, [input, el("span", { text: s })]);
       if (n > 0 && n <= 3) label.appendChild(el("i", { class: "size__low", "aria-hidden": "true" }));
       if (n === 0) label.appendChild(el("span", { class: "sr-only", text: " agotada" }));
@@ -1128,28 +1522,68 @@
       pv.sizes.appendChild(label);
     });
     pv.legend.hidden = !Object.keys(c.stock).some(function (k) { return c.stock[k] > 0 && c.stock[k] <= 3; });
+    sizeThumb(pv.sizes);
     pvPaintAdd();
   }
 
-  function pvPaintAdd() {
+  function pvPaintAdd(slot) {
     var c = pv.product.colorways[pv.colorway];
     if (!pv.size) {
-      pv.add.textContent = "Elige una talla";
+      swapText(pv.add, "Elige una talla");
       pv.add.setAttribute("aria-disabled", "true");
     } else {
       var left = c.stock[pv.size];
-      pv.add.textContent = "Añadir a la bolsa · " + pv.size + (left <= 3 ? " (quedan " + left + ")" : "");
+      (slot ? slotButton : swapText)(pv.add, "Añadir a la bolsa · " + pv.size + (left <= 3 ? " (quedan " + left + ")" : ""));
       pv.add.removeAttribute("aria-disabled");
     }
   }
 
+  // Al cerrar, todo ocurre dentro de la vista ampliada (que va dejando ver la
+  // página) y solo al final se cierra de verdad: así no hay un corte seco.
   function closeProductViewer() {
-    pv.video.pause();
-    pv.video.removeAttribute("src");
-    pv.video.load();
+    if (!pv.dialog.open || pv.closing) return;
+    pv.closing = true;
+    pvEndEmerge();
+    var center = pv.cards[pv.i];
+    var to = pvVisible(pv.origin);
+    var img = center && $(".pcard__front img", center);
+    if (reduceMotion || !to || !img || !img.src || !center.animate) { pvFinishClose(); return; }
+    var from = center.getBoundingClientRect();
+    var src = img.currentSrc || img.src;
+    var g = pvGhost(src, natural(img), greyOf(pv.origin), to, from);
+    pv.dialog.appendChild(g.el);
+    center.style.visibility = "hidden";
+    pv.dialog.classList.add("is-closing");
+    var ms = 380, opt = { duration: ms, easing: "cubic-bezier(0.4, 0, 0.1, 1)", fill: "both" };
+    var fly = pvFly(g, false, opt);
+    if (g.grey) g.colour.animate([{ opacity: 1 }, { opacity: 0 }], { duration: ms, easing: "ease-in-out", fill: "both" });
+    // si la carta es otra foto que la del carrusel, se funde con ella al llegar
+    var same = pv.origin.src === img.src;
+    if (!same) g.el.animate([{ opacity: 1, offset: 0.55 }, { opacity: 0 }], { duration: ms, easing: "ease-in", fill: "both" });
+    // las otras cartas se recogen hacia el centro mientras se desvanecen (en
+    // sus caras: la opacidad en la carta aplanaría el 3D y se vería en espejo)
+    var centerT = center.style.transform + " scale(0.92)";
+    pv.cards.forEach(function (card, k) {
+      if (k === pv.i) return;
+      card.animate([{ transform: card.style.transform }, { transform: centerT }], { duration: 260, easing: "cubic-bezier(0.4, 0, 1, 1)", fill: "forwards" });
+      $$(".pcard__face", card).forEach(function (f) { f.animate([{ opacity: 0 }], { duration: 180, easing: "ease-out", fill: "forwards" }); });
+    });
+    fly.onfinish = function () { pvFinishClose(); g.el.remove(); };
+  }
+  function pvFinishClose() {
     document.documentElement.classList.remove("is-locked");
+    document.documentElement.style.paddingRight = "";
     if (pv.dialog.open) pv.dialog.close();
+    pv.dialog.classList.remove("is-closing", "is-emerging");
+    pv.cards.forEach(function (card) { card.style.visibility = ""; card.getAnimations({ subtree: true }).forEach(function (a) { a.cancel(); }); });
+    pv.closing = false;
     if (pv.opener) pv.opener.focus({ preventScroll: true });
+    // el vídeo se suelta después, sin bloquear la animación
+    setTimeout(function () {
+      pv.video.pause();
+      pv.video.removeAttribute("src");
+      pv.video.load();
+    }, 0);
   }
 
   function setupProductViewer() {
@@ -1157,7 +1591,7 @@
     $("[data-pview-close]").addEventListener("click", closeProductViewer);
     pv.dialog.addEventListener("cancel", function (e) {
       e.preventDefault();
-      if (!pv.sheet.hidden) { pvSheet(false); pv.cta.focus({ preventScroll: true }); return; }
+      if (pvSheetOpen()) { pvSheet(false); pv.cta.focus({ preventScroll: true }); return; }
       closeProductViewer();
     });
     pv.prev.addEventListener("click", function () { pvGo(-1); });
@@ -1175,21 +1609,22 @@
         return;
       }
       // las tallas se eligen aquí mismo, sin salir de la vista ampliada
-      pvSheet(pv.sheet.hidden);
+      pvSheet(!pvSheetOpen());
     });
     pv.add.addEventListener("click", function () {
       var p = pv.product, c = p.colorways[pv.colorway];
-      if (!pv.size) {
-        toast("Primero elige una talla.");
-        var first = $("input:not(:disabled)", pv.sizes);
-        if (first) first.focus();
-        return;
-      }
+      if (!pv.size) { nudgeSizes(pv.sizes, null); return; }
       bag.push({ id: p.id, color: c.name, size: pv.size });
-      updateBag();
+      // la foto de la carta vuela a la bolsa de la vista; el botón confirma y
+      // el panel se recoge cuando la prenda ya ha llegado
+      flyToBag(pv.add, IMG + c.images[pv.i], updateBag);
+      confirmOn(pv.add, pvPaintAdd);
       toast("<strong>" + p.name + "</strong> · " + c.name + " · " + pv.size + " a tu bolsa.");
-      pvSheet(false);
-      pv.cta.focus({ preventScroll: true });
+      setTimeout(function () {
+        if (!pvSheetOpen()) return;
+        pvSheet(false);
+        pv.cta.focus({ preventScroll: true });
+      }, 900);
     });
 
     // deslizar con dedo o ratón: izquierda = siguiente, derecha = anterior.
@@ -1247,6 +1682,7 @@
   }
 
   /* ---------- Arranque ---------- */
+  setupHeroVideo();
   paintLogos();
   renderThread();
   renderShop();
@@ -1261,5 +1697,5 @@
   setupChatWindow();
   setupPhoneClock();
   setupProductViewer();
-  setupReveal($$(".chat__drop").concat($$(".product"), $$("main > section > .reveal, .about .reveal, .social .reveal, .shop__head .reveal")));
+  setupReveal($$(".chat__drop").concat($$(".product"), $$("main > section > .reveal, .about .reveal, .social .reveal, .shop__head .reveal, .reveal--title")));
 })();

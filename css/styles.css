@@ -2091,7 +2091,6 @@ html.is-locked { overflow: hidden; }
   transform-origin: bottom center;
   transition: opacity 260ms var(--ease-out), transform 380ms var(--ease-drawer);
 }
-.pview__sheet[hidden] { display: grid; visibility: hidden; opacity: 0; pointer-events: none; transform: translateX(-50%) translateY(16px) scale(0.98); }
 .pview__sheet-head { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; }
 .pview__sheet-head strong { font-family: var(--f-display); font-weight: 900; text-transform: uppercase; font-size: 1.6rem; line-height: 1; }
 .pview__sheet-head span { font-size: 0.85rem; color: var(--ink-soft); text-align: right; }
@@ -2108,5 +2107,208 @@ html.is-locked { overflow: hidden; }
 }
 @media (prefers-reduced-motion: reduce) {
   .pview__sheet { transition: opacity 200ms ease; }
-  .pview__sheet[hidden] { transform: translateX(-50%); }
 }
+
+/* ==========================================================================
+   Movimiento: transiciones suaves en tallas, bolsa, filtros y textos.
+   Criterios (skills ui-animation / animation-designer / hyperframes-animation):
+   solo transform y opacity (más un desenfoque leve), entrar con la curva de
+   entrada y salir más rápido, nada aparece de la nada y todo nace de su origen.
+   ========================================================================== */
+
+:root {
+  --ease-enter: cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-move: cubic-bezier(0.25, 1, 0.5, 1);
+}
+
+/* ---------- Panel de tallas de la vista ampliada: nace del botón ---------- */
+.pview__sheet {
+  visibility: hidden;
+  opacity: 0;
+  pointer-events: none;
+  transform: translateX(-50%) translateY(14px) scale(0.96);
+  transform-origin: bottom center;
+  filter: blur(6px);
+  /* al cerrar: rápido (180 ms) y la visibilidad cambia al final */
+  transition:
+    opacity 160ms ease,
+    transform 180ms var(--ease-enter),
+    filter 160ms ease,
+    visibility 0s linear 180ms;
+}
+.pview__sheet[data-open="true"] {
+  visibility: visible;
+  opacity: 1;
+  pointer-events: auto;
+  transform: translateX(-50%);
+  filter: blur(0);
+  /* al abrir: algo más lento y con la curva de entrada */
+  transition:
+    opacity 240ms ease,
+    transform 340ms var(--ease-enter),
+    filter 240ms ease,
+    visibility 0s;
+}
+
+/* ---------- Tallas: la marca se desliza a la talla elegida ---------- */
+.sizes { position: relative; }
+.size { z-index: 1; transition: color 220ms ease, box-shadow 220ms ease, transform 140ms var(--ease-out); }
+.size:has(input:checked) { background: transparent; color: var(--navy-800); box-shadow: inset 0 0 0 1px transparent; }
+.sizes__thumb {
+  position: absolute; left: 0; top: 0; z-index: 0;
+  border-radius: 12px;
+  background: var(--pearl);
+  opacity: 0;
+  pointer-events: none;
+  transform-origin: center;
+  transition:
+    transform 280ms var(--ease-move),
+    width 280ms var(--ease-move),
+    height 280ms var(--ease-move),
+    opacity 180ms ease;
+}
+.sizes__thumb.is-on { opacity: 1; }
+.sizes__thumb.no-anim { transition: none; }
+
+/* ---------- Filtros: la marca azul se desliza entre botones ---------- */
+.chips { position: relative; isolation: isolate; }
+.chip { position: relative; z-index: 1; }
+.chip.is-active { background: transparent; color: #fff; box-shadow: inset 0 0 0 1px transparent; }
+.chips__pill {
+  position: absolute; left: 0; top: 0; z-index: 0;
+  border-radius: 999px;
+  background: var(--sent);
+  pointer-events: none;
+  transition:
+    transform 320ms var(--ease-move),
+    width 320ms var(--ease-move),
+    height 320ms var(--ease-move);
+}
+.chips__pill.no-anim { transition: none; }
+
+/* ---------- Bolsa: contador que rueda y la prenda que vuela ---------- */
+.bag__count { overflow: hidden; line-height: 18px; }
+.bag__digit { display: block; animation: odo-roll 300ms var(--ease-enter) both; }
+@keyframes odo-roll {
+  from { transform: translateY(calc(var(--dir, 1) * 1em)); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+/* golpe de la bolsa al recibir la prenda (keyframe de duración finita) */
+.bag.bump { animation: bag-catch 460ms var(--ease-enter) both; }
+@keyframes bag-catch {
+  0% { transform: scale(1); }
+  28% { transform: scale(1.18) rotate(-6deg); }
+  55% { transform: scale(0.96) rotate(2deg); }
+  100% { transform: scale(1) rotate(0); }
+}
+
+.fly {
+  position: fixed; left: 0; top: 0; z-index: 2147483000;
+  width: 0; height: 0;
+  pointer-events: none;
+}
+.fly__y,
+.fly__img { position: absolute; left: 0; top: 0; }
+.fly__img {
+  width: 64px; height: 64px; margin: -32px 0 0 -32px;
+  border-radius: 50%;
+  overflow: hidden;
+  box-shadow: 0 0 0 3px var(--pearl), 0 12px 30px rgba(0, 0, 0, 0.45);
+  background: var(--navy-700);
+}
+.fly__img img { width: 100%; height: 100%; object-fit: cover; }
+
+/* bolsa dentro de la vista ampliada (la de la barra queda tapada) */
+.pview__bag { flex: none; background: rgba(228, 228, 232, 0.14); -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px); }
+
+/* ---------- Texto que cambia en el sitio ---------- */
+.swap-text { display: inline-block; }
+
+@media (prefers-reduced-motion: reduce) {
+  .pview__sheet,
+  .pview__sheet[data-open="true"] { transform: translateX(-50%); filter: none; transition: opacity 160ms ease, visibility 0s linear 160ms; }
+  .pview__sheet[data-open="true"] { transition: opacity 160ms ease, visibility 0s; }
+  .sizes__thumb,
+  .chips__pill { transition: opacity 120ms ease; }
+  .bag__digit,
+  .bag.bump { animation: none; }
+}
+
+/* ---------- Cartas que salen de la foto ---------- */
+.pv-ghost {
+  position: fixed; z-index: 2147482000;
+  overflow: hidden;
+  border-radius: 20px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.35), 0 30px 60px -20px rgba(0, 0, 0, 0.7);
+  background: var(--navy-800);
+  pointer-events: none;
+  will-change: transform;
+}
+.pv-ghost img {
+  position: absolute; max-width: none;
+  will-change: transform;
+}
+/* al abrir, la ventana no se funde entera (el ghost va dentro): se funde el
+   fondo y aparecen cabecera y pie */
+.pview.is-emerging[open] { animation: pview-fill 420ms var(--ease-out); }
+.pview.is-emerging::backdrop { animation: pview-in 420ms var(--ease-out); }
+.pview.is-emerging .pview__bg,
+.pview.is-emerging .pview__head,
+.pview.is-emerging .pview__foot { animation: pview-in 420ms var(--ease-out) both; }
+@keyframes pview-fill { from { background-color: transparent; } }
+/* al cerrar: la ventana se vuelve transparente y deja ver la página */
+.pview.is-closing { pointer-events: none; background-color: transparent; transition: background-color 300ms ease; }
+.pview.is-closing::backdrop { opacity: 0; transition: opacity 300ms ease; }
+.pview.is-closing .pview__bg,
+.pview.is-closing .pview__head,
+.pview.is-closing .pview__foot { opacity: 0; transition: opacity 200ms ease; }
+
+/* ---------- Aviso de talla en el sitio ---------- */
+.sizes .size { transition: color 220ms ease, box-shadow 260ms ease, transform 140ms var(--ease-out); }
+.sizes.is-nudged .size:not(:has(input:disabled)) { box-shadow: inset 0 0 0 1px var(--sent-strong); }
+
+/* ---------- Títulos que se revelan (una vez, al llegar a ellos) ---------- */
+/* se observa la cabecera (un elemento recortado entero no cuenta como visible)
+   y se recorta solo el título; el texto de debajo llega justo después */
+.js .reveal--title.is-pending { opacity: 1; transform: none; filter: none; }
+.reveal--title > .display {
+  clip-path: inset(-0.3em -0.3em -0.3em -0.3em);
+  transition:
+    clip-path 760ms cubic-bezier(0.19, 1, 0.22, 1),
+    transform 760ms cubic-bezier(0.19, 1, 0.22, 1);
+}
+.js .reveal--title.is-pending > .display { clip-path: inset(-0.3em -0.3em 100% -0.3em); transform: translateY(0.35em); }
+.reveal--title > :not(.display) { transition: opacity 500ms ease 220ms; }
+.js .reveal--title.is-pending > :not(.display) { opacity: 0; transition: none; }
+/* el manifiesto entra línea a línea en lugar de en bloque */
+.js .manifesto.reveal.is-pending { opacity: 1; transform: none; filter: none; }
+.manifesto span {
+  clip-path: inset(-0.3em -0.3em -0.3em -0.3em);
+  transition:
+    clip-path 800ms cubic-bezier(0.19, 1, 0.22, 1),
+    transform 800ms cubic-bezier(0.19, 1, 0.22, 1);
+}
+.manifesto span:nth-child(2) { transition-delay: 90ms; }
+.manifesto span:nth-child(3) { transition-delay: 180ms; }
+.manifesto span:nth-child(4) { transition-delay: 300ms; }
+.js .manifesto.is-pending span { clip-path: inset(-0.3em -0.3em 100% -0.3em); transform: translateY(0.4em); }
+
+/* ---------- Email enviado: la flecha se convierte en check ---------- */
+.composer__send svg {
+  grid-area: 1 / 1;
+  transition: transform 220ms var(--ease-enter), opacity 160ms ease, filter 160ms ease;
+}
+.composer__check { opacity: 0; transform: scale(0.5); filter: blur(2px); }
+.composer__send.is-sent { background: var(--sent-strong); }
+.composer__send.is-sent .composer__arrow { opacity: 0; transform: translateY(-6px) scale(0.5); filter: blur(2px); }
+.composer__send.is-sent .composer__check { opacity: 1; transform: none; filter: none; }
+
+@media (prefers-reduced-motion: reduce) {
+  .reveal--title > *,
+  .manifesto span { transition: none; }
+  .composer__send svg { transition: opacity 120ms ease; }
+}
+
+/* ---------- Logo 3D: aparece cuando ya está listo para girar ---------- */
+.hero__canvas { opacity: 0; transition: opacity 600ms ease; }
+.hero__canvas.is-ready { opacity: 1; }
