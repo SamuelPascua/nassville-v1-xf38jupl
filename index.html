@@ -14,7 +14,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@700;800;900&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/styles.css?v=53">
+  <link rel="stylesheet" href="css/styles.css?v=54">
   <script type="importmap">
     { "imports": {
       "three": "https://cdn.jsdelivr.net/npm/three@0.169.0/build/three.module.js",
@@ -46,10 +46,10 @@
       <a href="#conocenos">Conócenos</a>
       <a href="#redes">Redes</a>
     </nav>
-    <button class="bag" type="button" data-bag-button aria-label="Bolsa, 0 prendas">
+    <a class="bag" href="carrito.html" data-bag-button aria-label="Bolsa, 0 prendas">
       <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 8h12l-1 12H7L6 8Z"/><path d="M9 8V6a3 3 0 0 1 6 0v2"/></svg>
       <span class="bag__count" data-bag-count>0</span>
-    </button>
+    </a>
     <button class="menu" type="button" data-menu-button aria-expanded="false" aria-controls="menu" aria-label="Abrir menú">
       <span></span><span></span>
     </button>
@@ -348,10 +348,10 @@
         <p class="pview__meta" data-pview-meta></p>
       </div>
       <span class="pview__stamp" data-pview-stamp hidden>Agotado</span>
-      <button class="bag pview__bag" type="button" data-bag-button aria-label="Bolsa, 0 prendas">
+      <a class="bag pview__bag" href="carrito.html" data-bag-button aria-label="Bolsa, 0 prendas">
         <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 8h12l-1 12H7L6 8Z"/><path d="M9 8V6a3 3 0 0 1 6 0v2"/></svg>
         <span class="bag__count" data-bag-count>0</span>
-      </button>
+      </a>
       <button class="pview__close" type="button" data-pview-close aria-label="Cerrar">
         <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg>
       </button>
@@ -415,10 +415,11 @@
 
   <div class="toast" data-toast role="status" aria-live="polite"></div>
 
-  <script src="js/data.js?v=53"></script>
-  <script src="js/logo-paths.js?v=53"></script>
-  <script src="js/main.js?v=53"></script>
-  <script src="js/hero3d.js?v=53"></script>
-  <script src="js/consent.js?v=53"></script>
+  <script src="js/data.js?v=54"></script>
+  <script src="js/logo-paths.js?v=54"></script>
+  <script src="js/bag-store.js?v=54"></script>
+  <script src="js/main.js?v=54"></script>
+  <script src="js/hero3d.js?v=54"></script>
+  <script src="js/consent.js?v=54"></script>
 </body>
 </html>

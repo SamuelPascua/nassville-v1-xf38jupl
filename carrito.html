@@ -1,0 +1,220 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Tu bolsa — nassville®</title>
+  <meta name="description" content="Las prendas que has añadido en nassville: marca las que te llevas y paga solo esas.">
+  <meta name="theme-color" content="#151a40">
+  <link rel="icon" href="favicon.ico" sizes="48x48">
+  <link rel="icon" href="favicon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="apple-touch-icon.png">
+  <!-- versión de prueba: fuera de buscadores, solo se entra con el enlace -->
+  <meta name="robots" content="noindex, nofollow, noarchive">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@700;800;900&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/styles.css?v=54">
+</head>
+<body class="cart-page">
+  <a class="skip" href="#bolsa">Saltar a la bolsa</a>
+
+  <!-- Barra superior: la misma cabecera de conversación que la tienda -->
+  <header class="chatbar is-solid" data-chatbar>
+    <a class="chatbar__who" href="./" aria-label="nassville, volver a la tienda">
+      <span class="avatar" data-logo="emblem" aria-hidden="true"></span>
+      <span class="chatbar__name">
+        <strong>nassville<sup>®</sup></strong>
+        <small><span class="dot" aria-hidden="true"></span> en línea</small>
+      </span>
+    </a>
+    <nav class="chatbar__nav" aria-label="Secciones">
+      <a href="./#hilo">Drops</a>
+      <a href="./#tienda">Tienda</a>
+      <a href="./#videos">Vídeos</a>
+      <a href="./#conocenos">Conócenos</a>
+      <a href="./#redes">Redes</a>
+    </nav>
+    <a class="bag" href="carrito.html" data-bag-button aria-current="page" aria-label="Bolsa, 0 prendas">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 8h12l-1 12H7L6 8Z"/><path d="M9 8V6a3 3 0 0 1 6 0v2"/></svg>
+      <span class="bag__count" data-bag-count>0</span>
+    </a>
+    <button class="menu" type="button" data-menu-button aria-expanded="false" aria-controls="menu" aria-label="Abrir menú">
+      <span></span><span></span>
+    </button>
+  </header>
+
+  <div class="sheet" id="menu" data-menu hidden>
+    <nav aria-label="Menú">
+      <a href="./#hilo">Drops</a>
+      <a href="./#tienda">Tienda</a>
+      <a href="./#videos">Vídeos</a>
+      <a href="./#conocenos">Conócenos</a>
+      <a href="./#redes">Redes</a>
+    </nav>
+  </div>
+
+  <main id="bolsa" class="cart">
+    <!-- 1. La bolsa: el probador -->
+    <section class="cart__view" data-view="bag" aria-labelledby="bag-title">
+      <div class="cart__head">
+        <div class="bubble bubble--in bubble--wide cart__title">
+          <h1 id="bag-title" class="display display--xl">Tu bolsa</h1>
+          <p data-bag-lede>Marca lo que te llevas. Lo que no marques se queda aquí guardado.</p>
+        </div>
+        <div class="cart__tools" data-bag-tools hidden>
+          <button class="chip" type="button" data-select-all aria-pressed="false">Marcar todo</button>
+          <p class="cart__marked" data-marked aria-live="polite"></p>
+        </div>
+      </div>
+
+      <div class="fitting" data-fitting-wrap hidden>
+        <ul class="fitting__rail" data-fitting aria-label="Prendas en tu bolsa"></ul>
+        <button class="fitting__arrow fitting__arrow--prev" type="button" data-rail-prev aria-label="Prendas anteriores" hidden>
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg>
+        </button>
+        <button class="fitting__arrow fitting__arrow--next" type="button" data-rail-next aria-label="Más prendas" hidden>
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 5l7 7-7 7"/></svg>
+        </button>
+      </div>
+
+      <div class="cart__empty" data-bag-empty hidden>
+        <div class="bubble bubble--in">
+          <p>Aún no hay nada en tu bolsa. Elige prenda y talla en la tienda y aparecerá aquí.</p>
+        </div>
+        <a class="btn btn--sent" href="./#tienda">Ir a la tienda</a>
+      </div>
+    </section>
+
+    <!-- 2. El pago: resumen, datos de envío y la pasarela (pendiente de conectar) -->
+    <section class="cart__view checkout" data-view="checkout" aria-labelledby="checkout-title" hidden>
+      <a class="checkout__back" href="#bolsa" data-back>
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg>
+        Volver a la bolsa
+      </a>
+      <div class="bubble bubble--in bubble--wide cart__title checkout__head">
+        <h1 id="checkout-title" class="display display--xl checkout__title" tabindex="-1">Pago</h1>
+        <p>Solo van las prendas que marcaste. Las demás siguen en tu bolsa.</p>
+      </div>
+
+      <div class="checkout__grid">
+        <form class="checkout__form" data-checkout-form novalidate>
+          <fieldset class="checkout__group">
+            <legend>Contacto</legend>
+            <div class="field">
+              <label for="co-email">Email</label>
+              <input id="co-email" name="email" type="email" inputmode="email" autocomplete="email" required>
+              <p class="field__error" data-error-for="co-email" hidden></p>
+            </div>
+            <div class="field">
+              <label for="co-tel">Teléfono <span>para el transportista</span></label>
+              <input id="co-tel" name="tel" type="tel" inputmode="tel" autocomplete="tel" required>
+              <p class="field__error" data-error-for="co-tel" hidden></p>
+            </div>
+          </fieldset>
+
+          <fieldset class="checkout__group">
+            <legend>Envío</legend>
+            <div class="field field--half">
+              <label for="co-name">Nombre</label>
+              <input id="co-name" name="nombre" autocomplete="given-name" required>
+              <p class="field__error" data-error-for="co-name" hidden></p>
+            </div>
+            <div class="field field--half">
+              <label for="co-last">Apellidos</label>
+              <input id="co-last" name="apellidos" autocomplete="family-name" required>
+              <p class="field__error" data-error-for="co-last" hidden></p>
+            </div>
+            <div class="field">
+              <label for="co-addr">Dirección</label>
+              <input id="co-addr" name="direccion" autocomplete="address-line1" required>
+              <p class="field__error" data-error-for="co-addr" hidden></p>
+            </div>
+            <div class="field">
+              <label for="co-addr2">Piso, puerta… <span>opcional</span></label>
+              <input id="co-addr2" name="direccion2" autocomplete="address-line2">
+            </div>
+            <div class="field field--third">
+              <label for="co-zip">Código postal</label>
+              <input id="co-zip" name="cp" inputmode="numeric" autocomplete="postal-code" maxlength="5" required>
+              <p class="field__error" data-error-for="co-zip" hidden></p>
+            </div>
+            <div class="field field--twothirds">
+              <label for="co-city">Ciudad</label>
+              <input id="co-city" name="ciudad" autocomplete="address-level2" required>
+              <p class="field__error" data-error-for="co-city" hidden></p>
+            </div>
+            <div class="field field--half">
+              <label for="co-prov">Provincia</label>
+              <input id="co-prov" name="provincia" autocomplete="address-level1" required>
+              <p class="field__error" data-error-for="co-prov" hidden></p>
+            </div>
+            <div class="field field--half">
+              <label for="co-country">País</label>
+              <select id="co-country" name="pais" autocomplete="country">
+                <option value="ES" selected>España</option>
+              </select>
+            </div>
+          </fieldset>
+
+          <fieldset class="checkout__group">
+            <legend>Método de pago</legend>
+            <div class="paygate" data-paygate>
+              <p class="paygate__state"><span class="paygate__dot" aria-hidden="true"></span> Pasarela de pago pendiente de conectar</p>
+              <p class="paygate__text">Aquí aparecerá el pago con tarjeta en cuanto la conectemos. Hasta entonces no se cobra nada.</p>
+            </div>
+            <label class="composer__consent checkout__terms">
+              <input type="checkbox" name="terminos" data-terms required>
+              <span>He leído y acepto los <a href="terminos.html">términos y condiciones</a> y la <a href="privacidad.html">política de privacidad</a>.</span>
+            </label>
+            <p class="field__error" data-error-for="terms" hidden></p>
+          </fieldset>
+
+          <button class="btn btn--sent checkout__pay" type="submit" data-checkout-pay>Pagar</button>
+          <p class="checkout__result" data-checkout-result role="status" hidden></p>
+        </form>
+
+        <aside class="checkout__summary" aria-labelledby="summary-title">
+          <div class="receipt">
+            <h2 id="summary-title" class="receipt__title">Tu pedido</h2>
+            <ul class="receipt__lines" data-receipt-lines></ul>
+            <dl class="receipt__totals">
+              <div><dt>Subtotal</dt><dd data-receipt-subtotal></dd></div>
+              <div><dt>Envío</dt><dd>Se calcula al pagar</dd></div>
+              <div class="receipt__total"><dt>Total</dt><dd data-receipt-total></dd></div>
+            </dl>
+            <p class="receipt__note">IVA incluido. El envío se suma cuando conectemos las tarifas.</p>
+          </div>
+        </aside>
+      </div>
+    </section>
+  </main>
+
+  <!-- Barra de pago: la barra de escribir del chat, convertida en caja -->
+  <div class="paybar" data-paybar hidden>
+    <div class="paybar__sum">
+      <strong data-pay-count></strong>
+      <span>Envío: se calcula al pagar</span>
+    </div>
+    <button class="btn btn--sent paybar__go" type="button" data-pay-go>Pagar</button>
+  </div>
+
+  <footer class="cart__foot">
+    <nav class="footer__legal" aria-label="Información legal">
+      <a href="terminos.html#envios">Envíos y devoluciones</a>
+      <a href="terminos.html">Términos y condiciones</a>
+      <a href="privacidad.html">Privacidad</a>
+      <a href="cookies.html">Cookies</a>
+    </nav>
+    <p class="footer__note">v1 · precios y stock de ejemplo · pagos aún no activos</p>
+  </footer>
+
+  <div class="toast" data-toast role="status" aria-live="polite"></div>
+
+  <script src="js/data.js?v=54"></script>
+  <script src="js/logo-paths.js?v=54"></script>
+  <script src="js/bag-store.js?v=54"></script>
+  <script src="js/checkout.js?v=54"></script>
+  <script src="js/cart.js?v=54"></script>
+</body>
+</html>

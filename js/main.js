@@ -437,7 +437,8 @@
   }
 
   /* ---------- Tienda ---------- */
-  var bag = [];
+  // la bolsa vive en js/bag-store.js (compartida con carrito.html)
+  var Bag = window.NassBag;
 
   function stockState(stock) {
     var vals = Object.keys(stock).map(function (k) { return stock[k]; });
@@ -967,11 +968,15 @@
       var c = p.colorways[state.color];
       if (cta.dataset.mode === "notify") { goToComposer(); return; }
       if (!state.size) { nudgeSizes(sizes, note); return; }
-      bag.push({ id: p.id, color: c.name, size: state.size });
+      var left = c.stock[state.size];
+      if (Bag.add({ id: p.id, color: c.name, size: state.size }, left).capped) {
+        swapText(note, "Ya tienes en la bolsa " + (left === 1 ? "la única" : "las " + left) + " que " + (left === 1 ? "queda" : "quedan") + " en " + state.size + ".");
+        return;
+      }
       // la prenda vuela a la bolsa y el botón confirma en el sitio
       flyToBag(cta, thumb(c.images[state.image || 0]), updateBag);
       confirmOn(cta, paintCta);
-      toast("<strong>" + p.name + "</strong> · " + c.name + " · " + state.size + " a tu bolsa.");
+      toast("<strong>" + p.name + "</strong> · " + c.name + " · " + state.size + " a tu bolsa. <a href=\"carrito.html\">Ver bolsa</a>");
     });
 
     paint();
@@ -979,11 +984,14 @@
     return li;
   }
 
-  function updateBag() {
-    var n = bag.length;
+  // quiet: al cargar la página (o si cambia en otra pestaña) el número se
+  // pone sin el golpe de «la bolsa recoge la prenda»
+  function updateBag(quiet) {
+    var n = Bag.count();
     $$("[data-bag-button]").forEach(function (btn) {
       btn.classList.toggle("has-items", n > 0);
       btn.setAttribute("aria-label", "Bolsa, " + n + (n === 1 ? " prenda" : " prendas"));
+      if (quiet === true) return;
       btn.classList.remove("bump");
       void btn.offsetWidth;
       btn.classList.add("bump");
@@ -992,15 +1000,15 @@
     $$("[data-bag-count]").forEach(function (count) {
       var prev = +count.dataset.n || 0;
       count.dataset.n = n;
+      if (quiet === true) { count.textContent = n; return; }
       count.innerHTML = '<span class="bag__digit" style="--dir:' + (n >= prev ? 1 : -1) + '">' + n + "</span>";
     });
   }
 
+  // la bolsa es un enlace a carrito.html; aquí solo se pinta su número
   function setupBagButton() {
-    $$("[data-bag-button]").forEach(function (b) { b.addEventListener("click", function () {
-      if (!bag.length) toast("Tu bolsa está vacía. Mira <a href=\"#tienda\">lo que queda</a>.");
-      else toast("Llevas " + bag.length + (bag.length === 1 ? " prenda" : " prendas") + ". El pago llega muy pronto.");
-    }); });
+    updateBag(true);
+    Bag.onExternalChange(function () { updateBag(true); });
   }
 
   /* ---------- Filtros ---------- */
@@ -1888,7 +1896,12 @@
     pv.add.addEventListener("click", function () {
       var p = pv.product, c = p.colorways[pv.colorway];
       if (!pv.size) { nudgeSizes(pv.sizes, null); return; }
-      bag.push({ id: p.id, color: c.name, size: pv.size });
+      if (Bag.add({ id: p.id, color: c.name, size: pv.size }, c.stock[pv.size]).capped) {
+        swapText(pv.add, "Ya tienes todas las de la " + pv.size + " en la bolsa");
+        clearTimeout(pv.add._capped);
+        pv.add._capped = setTimeout(pvPaintAdd, 1800);
+        return;
+      }
       // la foto de la carta vuela a la bolsa de la vista; el botón confirma y
       // el panel se recoge cuando la prenda ya ha llegado
       flyToBag(pv.add, thumb(c.images[pv.i]), updateBag);

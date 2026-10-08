@@ -1,6 +1,6 @@
 {
   "schemaVersion": 2,
-  "generatedAt": "2026-10-08T00:00:00Z",
+  "generatedAt": "2026-10-08T12:00:00Z",
   "title": "Design System: nassville",
   "extensions": {
     "colorMeta": {
@@ -223,6 +223,21 @@
         "role": "neutral",
         "displayName": "Hairline Strong",
         "canonical": "rgba(228, 228, 232, 0.22)"
+      },
+      "error": {
+        "role": "neutral",
+        "displayName": "Error Pink",
+        "canonical": "#ffb4b4",
+        "tonalRamp": [
+          "#4a1414",
+          "#6e2020",
+          "#933030",
+          "#b84848",
+          "#d86a6a",
+          "#ee8f8f",
+          "#ffb4b4",
+          "#ffe0e0"
+        ]
       }
     },
     "typographyMeta": {
@@ -240,7 +255,7 @@
       },
       "title": {
         "displayName": "Product Title",
-        "purpose": "Product names; prices use 800 at 1.7rem with tabular numerals."
+        "purpose": "Product names (fitting-room cards included); prices and line prices use 800 at 1.7rem with tabular numerals."
       },
       "serif-name": {
         "displayName": "Serif Name",
@@ -264,7 +279,7 @@
       },
       "meta": {
         "displayName": "Meta",
-        "purpose": "Secondary lines under a name, form errors."
+        "purpose": "Secondary lines under a name, field labels, form errors."
       },
       "ui": {
         "displayName": "UI",
@@ -285,12 +300,17 @@
       {
         "name": "hairline-ring",
         "value": "inset 0 0 0 1px rgba(228, 228, 232, 0.22)",
-        "purpose": "Edge for ghost buttons, chips, sizes, composer; 12% variant on product cards."
+        "purpose": "Edge for ghost buttons, chips, sizes, composer, checkout fields, stepper; 12% variant on product and fitting-room cards."
       },
       {
         "name": "focus-halo",
         "value": "inset 0 0 0 1px #7d9dff, 0 0 0 4px rgba(58, 99, 224, 0.18)",
-        "purpose": "Composer focus-within."
+        "purpose": "Composer focus-within and focused checkout fields."
+      },
+      {
+        "name": "floating-bar",
+        "value": "inset 0 0 0 1px rgba(228, 228, 232, 0.22), 0 18px 40px -16px rgba(5, 6, 20, 0.8)",
+        "purpose": "The pay bar floating over the bag."
       }
     ],
     "motion": [
@@ -338,9 +358,33 @@
         "name": "popover-spring",
         "value": "560ms: scale 0.2 → 1.045 → 0.99 → 1, cubic-bezier(0.2, 0.9, 0.3, 1) then cubic-bezier(0.4, 0, 0.6, 1)",
         "purpose": "Back-in-stock popover growing out of its button in the product viewer."
+      },
+      {
+        "name": "ease-enter",
+        "value": "cubic-bezier(0.22, 1, 0.36, 1)",
+        "purpose": "Fitting-room step-back, tick draw, counter and total roll."
+      },
+      {
+        "name": "step-back",
+        "value": "transform scale(1 to 0.955) 340ms ease-enter, origin bottom centre; photo filter 340ms",
+        "purpose": "An unticked fitting-room card steps back onto the rail."
+      },
+      {
+        "name": "tick-draw",
+        "value": "fill 200ms ease; stroke-dashoffset 24 to 0 over 260ms ease-enter, 60ms delay",
+        "purpose": "Round selection check filling Sent Blue and drawing its tick."
+      },
+      {
+        "name": "odo-roll",
+        "value": "300ms ease-enter, translateY(1em * direction) and opacity 0 to rest",
+        "purpose": "Bag counter and pay-bar total rolling when they change."
       }
     ],
     "breakpoints": [
+      {
+        "name": "checkout-stack",
+        "value": "520px"
+      },
       {
         "name": "mobile",
         "value": "720px"
@@ -360,6 +404,10 @@
       {
         "name": "drop-rail",
         "value": "960px"
+      },
+      {
+        "name": "short-screen",
+        "value": "max-height 800px"
       }
     ]
   },
@@ -400,9 +448,9 @@
       "name": "Sent Button",
       "kind": "button",
       "refersTo": "button-sent",
-      "description": "Sent Blue pill for the visitor's commit action (add to bag).",
+      "description": "Sent Blue pill for the visitor's commit actions (add to bag, pay); hover lifts to Sent Blue Light with navy text.",
       "html": "<button class=\"ds-btn-sent\">Añadir a la bolsa</button>",
-      "css": ".ds-btn-sent { display: inline-flex; align-items: center; justify-content: center; min-height: 46px; padding: 0 22px; border: 0; border-radius: 999px; background: var(--sent, #3a63e0); color: #fff; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; font-weight: 600; font-size: 0.98rem; cursor: pointer; transition: background-color 200ms ease, transform 160ms cubic-bezier(0.23,1,0.32,1); } .ds-btn-sent:hover { background: var(--sent-strong, #7d9dff); } .ds-btn-sent:active { transform: scale(0.97); } .ds-btn-sent:focus-visible { outline: 2px solid #7d9dff; outline-offset: 3px; } .ds-btn-sent[disabled] { opacity: 0.6; cursor: not-allowed; }"
+      "css": ".ds-btn-sent { display: inline-flex; align-items: center; justify-content: center; min-height: 46px; padding: 0 22px; border: 0; border-radius: 999px; background: var(--sent, #3a63e0); color: #fff; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; font-weight: 600; font-size: 0.98rem; cursor: pointer; transition: background-color 200ms ease, transform 160ms cubic-bezier(0.23,1,0.32,1); } .ds-btn-sent:hover { background: var(--sent-strong, #7d9dff); color: var(--navy-900, #0f1233); } .ds-btn-sent:active { transform: scale(0.97); } .ds-btn-sent:focus-visible { outline: 2px solid #7d9dff; outline-offset: 3px; } .ds-btn-sent[disabled] { opacity: 0.6; cursor: not-allowed; }"
     },
     {
       "name": "Filter Chip",
@@ -451,6 +499,54 @@
       "description": "Sold-out email capture that grows out of the \"Avísame si vuelve\" button inside the product viewer.",
       "html": "<form class=\"ds-notify\"><div class=\"ds-notify-head\"><span class=\"ds-bell\"><svg viewBox=\"0 0 24 24\"><path d=\"M6 16V11a6 6 0 0 1 12 0v5l1.5 2h-15L6 16Z\"/><path d=\"M10 20.5a2 2 0 0 0 4 0\"/></svg></span><div><strong>Avísame si vuelve</strong><span>NASS Zip-Up · Olive washed</span></div></div><div class=\"ds-notify-row\"><input type=\"email\" placeholder=\"Escribe tu email…\"><button type=\"submit\" aria-label=\"Avisarme\"><svg viewBox=\"0 0 24 24\"><path d=\"M12 19V5m0 0-6 6m6-6 6 6\"/></svg></button></div></form>",
       "css": ".ds-notify{position:relative;width:min(440px,100%);display:grid;gap:14px;padding:16px 16px 18px;border-radius:22px;background:rgba(15,18,51,.9);backdrop-filter:saturate(140%) blur(18px);box-shadow:inset 0 0 0 1px rgba(228,228,232,.22),0 24px 60px -20px rgba(0,0,0,.8);color:#e4e4e8;font-family:-apple-system,Segoe UI,Roboto,sans-serif}.ds-notify::after{content:\"\";position:absolute;top:100%;left:50%;width:14px;height:8px;margin-left:-7px;background:inherit;clip-path:polygon(0 0,100% 0,50% 100%)}.ds-notify-head{display:flex;align-items:center;gap:12px}.ds-notify-head div{display:grid;gap:2px}.ds-notify-head strong{font-family:\"Big Shoulders Display\",\"Arial Narrow\",sans-serif;font-weight:900;text-transform:uppercase;font-size:1.35rem;line-height:1}.ds-notify-head span:not(.ds-bell){font-size:.85rem;color:#b7bbdb}.ds-bell{width:40px;height:40px;border-radius:50%;display:grid;place-items:center;background:#3a63e0;color:#fff}.ds-bell svg,.ds-notify-row svg{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}.ds-notify-row{display:flex;align-items:center;gap:8px;padding:6px 6px 6px 16px;border-radius:999px;background:rgba(9,11,33,.7);box-shadow:inset 0 0 0 1px rgba(228,228,232,.22)}.ds-notify-row:focus-within{box-shadow:inset 0 0 0 1px #7d9dff,0 0 0 4px rgba(58,99,224,.18)}.ds-notify-row input{flex:1;min-width:0;height:44px;border:0;background:transparent;outline:none;color:#e4e4e8;font:inherit;font-size:16px}.ds-notify-row button{width:44px;height:44px;border:0;border-radius:50%;display:grid;place-items:center;background:#3a63e0;color:#fff;cursor:pointer;transition:transform 160ms cubic-bezier(.23,1,.32,1)}.ds-notify-row button:active{transform:scale(.92)}"
+    },
+    {
+      "name": "Fitting-room Card",
+      "kind": "card",
+      "refersTo": "fit-card",
+      "description": "A bag line at photo scale: round select check, remove disc, name, serif type, meta with stock suffix, line price and stepper. Unticked cards step back.",
+      "html": "<div class=\"ds-fit\"><div class=\"ds-fit-media\"><label class=\"ds-fit-check\"><input type=\"checkbox\" checked aria-label=\"Llevar\"><span class=\"ds-fit-tick\"><svg viewBox=\"0 0 24 24\"><path d=\"m5 12.5 4.5 4.5L19 7.5\"/></svg></span></label><button class=\"ds-fit-remove\" aria-label=\"Quitar\"><svg viewBox=\"0 0 24 24\"><path d=\"M6 6l12 12M18 6 6 18\"/></svg></button></div><div class=\"ds-fit-body\"><strong class=\"ds-fit-name\">NASS Zip-Up</strong><span class=\"ds-fit-type\">sudadera con cremallera</span><span class=\"ds-fit-meta\">Olive washed · M · <b>quedan 2</b></span><div class=\"ds-fit-row\"><span class=\"ds-fit-price\">65 €</span><span class=\"ds-stepper\"><button aria-label=\"Menos\" disabled><svg viewBox=\"0 0 24 24\"><path d=\"M6 12h12\"/></svg></button><span>1</span><button aria-label=\"Más\"><svg viewBox=\"0 0 24 24\"><path d=\"M12 6v12M6 12h12\"/></svg></button></span></div></div></div>",
+      "css": ".ds-fit { width: 280px; border-radius: 22px 22px 22px 6px; overflow: hidden; background: var(--navy-700, #20265a); color: #e4e4e8; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; box-shadow: 0 1px 2px rgba(5,6,20,0.35), 0 8px 24px -8px rgba(5,6,20,0.55), inset 0 0 0 1px rgba(228,228,232,0.12); transform-origin: 50% 100%; transition: transform 340ms cubic-bezier(0.22,1,0.36,1); } .ds-fit:has(.ds-fit-check input:not(:checked)) { transform: scale(0.955); } .ds-fit:has(.ds-fit-check input:not(:checked)) .ds-fit-media { filter: grayscale(0.85) brightness(0.6); } .ds-fit-media { position: relative; aspect-ratio: 4 / 5; background: linear-gradient(160deg, #343b72, #181d4a); transition: filter 340ms ease; } .ds-fit-check { position: absolute; top: 10px; left: 10px; width: 44px; height: 44px; display: grid; place-items: center; cursor: pointer; } .ds-fit-check input { position: absolute; inset: 0; margin: 0; opacity: 0; cursor: pointer; } .ds-fit-tick { width: 30px; height: 30px; border-radius: 50%; display: grid; place-items: center; background: rgba(10,12,36,0.5); backdrop-filter: blur(6px); box-shadow: inset 0 0 0 2px #e4e4e8; color: #fff; transition: background-color 200ms ease, box-shadow 200ms ease; } .ds-fit-tick svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 2.6; stroke-linecap: round; stroke-linejoin: round; stroke-dasharray: 24; stroke-dashoffset: 24; transition: stroke-dashoffset 260ms cubic-bezier(0.22,1,0.36,1) 60ms; } .ds-fit-check input:checked + .ds-fit-tick { background: #3a63e0; box-shadow: inset 0 0 0 2px #3a63e0, 0 4px 12px rgba(5,6,20,0.5); } .ds-fit-check input:checked + .ds-fit-tick svg { stroke-dashoffset: 0; } .ds-fit-check input:focus-visible + .ds-fit-tick { outline: 2px solid #7d9dff; outline-offset: 3px; } .ds-fit-remove { position: absolute; top: 10px; right: 10px; width: 44px; height: 44px; border: 0; border-radius: 50%; display: grid; place-items: center; background: transparent; color: #e4e4e8; cursor: pointer; } .ds-fit-remove svg { box-sizing: content-box; width: 16px; height: 16px; padding: 7px; border-radius: 50%; background: rgba(10,12,36,0.5); backdrop-filter: blur(6px); fill: none; stroke: currentColor; stroke-width: 2.2; stroke-linecap: round; } .ds-fit-remove:hover svg { background: rgba(10,12,36,0.78); } .ds-fit-remove:focus-visible { outline: 2px solid #7d9dff; outline-offset: 3px; } .ds-fit-body { display: grid; gap: 4px; padding: 16px 18px 18px; } .ds-fit-name { font-family: 'Big Shoulders Display', 'Arial Narrow', sans-serif; font-weight: 900; text-transform: uppercase; font-size: 1.7rem; line-height: 0.95; } .ds-fit-type { font-family: 'Instrument Serif', 'Times New Roman', serif; font-style: italic; font-size: 1.1rem; color: #b7bbdb; } .ds-fit-meta { margin-top: 4px; font-size: 0.85rem; color: #b7bbdb; } .ds-fit-meta b { color: #7d9dff; font-weight: 600; } .ds-fit-row { margin-top: 12px; display: flex; align-items: center; justify-content: space-between; gap: 12px; } .ds-fit-price { font-family: 'Big Shoulders Display', 'Arial Narrow', sans-serif; font-weight: 800; font-size: 1.7rem; line-height: 1.05; font-variant-numeric: tabular-nums; } .ds-stepper { display: inline-flex; align-items: center; border-radius: 999px; box-shadow: inset 0 0 0 1px rgba(228,228,232,0.22); } .ds-stepper button { width: 44px; height: 44px; border: 0; border-radius: 50%; display: grid; place-items: center; background: transparent; color: #e4e4e8; cursor: pointer; transition: background-color 160ms ease, transform 140ms cubic-bezier(0.23,1,0.32,1); } .ds-stepper button:hover:not(:disabled) { background: rgba(228,228,232,0.1); } .ds-stepper button:active:not(:disabled) { transform: scale(0.9); } .ds-stepper button:disabled { opacity: 0.32; cursor: default; } .ds-stepper button:focus-visible { outline: 2px solid #7d9dff; outline-offset: 2px; } .ds-stepper svg { width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 2.2; stroke-linecap: round; } .ds-stepper span { min-width: 2ch; text-align: center; font-weight: 600; font-variant-numeric: tabular-nums; }"
+    },
+    {
+      "name": "Pay Bar",
+      "kind": "custom",
+      "refersTo": "paybar",
+      "description": "The composer pill reborn as the till: marked count and total, shipping note, Sent Blue pay button with the amount.",
+      "html": "<div class=\"ds-paybar\"><div class=\"ds-paybar-sum\"><strong>2 prendas · 130 €</strong><span>Envío: se calcula al pagar</span></div><button class=\"ds-paybar-go\">Pagar 130 €</button></div>",
+      "css": ".ds-paybar { width: min(640px, 100%); display: flex; align-items: center; gap: 12px; padding: 8px 8px 8px 22px; border-radius: 999px; background: rgba(24,29,74,0.92); backdrop-filter: saturate(140%) blur(18px); box-shadow: inset 0 0 0 1px rgba(228,228,232,0.22), 0 18px 40px -16px rgba(5,6,20,0.8); color: #e4e4e8; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; } .ds-paybar-sum { flex: 1; min-width: 0; display: grid; gap: 1px; } .ds-paybar-sum strong { font-size: 1rem; font-variant-numeric: tabular-nums; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; } .ds-paybar-sum span { font-size: 0.8rem; color: #b7bbdb; } .ds-paybar-go { flex: none; min-height: 52px; padding: 0 24px; border: 0; border-radius: 999px; background: #3a63e0; color: #fff; font: inherit; font-weight: 600; font-size: 0.98rem; font-variant-numeric: tabular-nums; cursor: pointer; transition: background-color 200ms ease, color 200ms ease, transform 160ms cubic-bezier(0.23,1,0.32,1); } .ds-paybar-go:hover { background: #7d9dff; color: #0f1233; } .ds-paybar-go:active { transform: scale(0.97); } .ds-paybar-go:focus-visible { outline: 2px solid #7d9dff; outline-offset: 3px; } .ds-paybar-go[aria-disabled=\"true\"] { background: rgba(228,228,232,0.1); color: #b7bbdb; }"
+    },
+    {
+      "name": "Receipt",
+      "kind": "card",
+      "refersTo": "receipt",
+      "description": "The order summary as a pearl brand message with lines, totals and an honest shipping line.",
+      "html": "<div class=\"ds-receipt\"><strong class=\"ds-receipt-title\">Tu pedido</strong><div class=\"ds-receipt-line\"><span class=\"ds-receipt-thumb\"></span><span class=\"ds-receipt-what\"><b>NASS Zip-Up</b><span>Olive washed · M · ×1</span></span><span class=\"ds-receipt-price\">65 €</span></div><dl class=\"ds-receipt-totals\"><div><dt>Subtotal</dt><dd>130 €</dd></div><div><dt>Envío</dt><dd>Se calcula al pagar</dd></div><div class=\"ds-receipt-total\"><dt>Total</dt><dd>130 €</dd></div></dl></div>",
+      "css": ".ds-receipt { max-width: 380px; padding: 20px 22px 18px; border-radius: 22px 22px 22px 6px; background: #e4e4e8; color: #181d4a; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; box-shadow: 0 1px 2px rgba(5,6,20,0.35), 0 8px 24px -8px rgba(5,6,20,0.55); } .ds-receipt-title { display: block; margin-bottom: 16px; font-family: 'Big Shoulders Display', 'Arial Narrow', sans-serif; font-weight: 900; text-transform: uppercase; font-size: 1.6rem; line-height: 1; } .ds-receipt-line { display: grid; grid-template-columns: 52px minmax(0,1fr) auto; align-items: center; gap: 12px; } .ds-receipt-thumb { width: 52px; height: 65px; border-radius: 10px; background: #20265a; } .ds-receipt-what { display: grid; gap: 2px; } .ds-receipt-what b { font-family: 'Big Shoulders Display', 'Arial Narrow', sans-serif; font-weight: 900; text-transform: uppercase; font-size: 1.15rem; line-height: 1; } .ds-receipt-what span { font-size: 0.85rem; color: #343b72; } .ds-receipt-price { font-weight: 700; font-variant-numeric: tabular-nums; } .ds-receipt-totals { margin: 16px 0 0; padding-top: 14px; border-top: 1px solid rgba(32,38,90,0.16); display: grid; gap: 6px; } .ds-receipt-totals div { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; font-size: 0.9rem; } .ds-receipt-totals dt, .ds-receipt-totals dd { margin: 0; } .ds-receipt-totals dd { font-variant-numeric: tabular-nums; } .ds-receipt-total { margin-top: 6px; font-weight: 600; font-size: 1rem; } .ds-receipt-total dd { font-family: 'Big Shoulders Display', 'Arial Narrow', sans-serif; font-weight: 800; font-size: 1.7rem; line-height: 1; }"
+    },
+    {
+      "name": "Checkout Field",
+      "kind": "input",
+      "refersTo": "field",
+      "description": "52px navy field with hairline ring, focus halo and Error Pink invalid state.",
+      "html": "<div class=\"ds-fields\"><label class=\"ds-field\"><span>Email</span><input type=\"email\" placeholder=\"tu@email.com\"></label><label class=\"ds-field\"><span>Código postal</span><input aria-invalid=\"true\" value=\"280\"><em>Escribe los 5 dígitos.</em></label></div>",
+      "css": ".ds-fields { display: grid; gap: 14px; max-width: 420px; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; } .ds-field { display: grid; gap: 6px; } .ds-field span { font-size: 0.85rem; font-weight: 500; color: #b7bbdb; } .ds-field input { width: 100%; height: 52px; padding: 0 18px; border: 0; border-radius: 14px; background: #181d4a; color: #e4e4e8; font: inherit; font-size: 16px; box-shadow: inset 0 0 0 1px rgba(228,228,232,0.22); outline: none; transition: box-shadow 200ms ease; } .ds-field input::placeholder { color: #8d93c2; } .ds-field input:focus { box-shadow: inset 0 0 0 1px #7d9dff, 0 0 0 4px rgba(58,99,224,0.18); } .ds-field input[aria-invalid=\"true\"] { box-shadow: inset 0 0 0 1px #ffb4b4; } .ds-field em { font-style: normal; font-size: 0.85rem; color: #ffb4b4; }"
+    },
+    {
+      "name": "Consent Checkbox",
+      "kind": "input",
+      "refersTo": "consent-check",
+      "description": "Round chat-select checkbox used site-wide for consent and terms.",
+      "html": "<label class=\"ds-consent\"><input type=\"checkbox\" checked><span>He leído y acepto los <a href=\"#\">términos y condiciones</a>.</span></label>",
+      "css": ".ds-consent { display: flex; align-items: flex-start; gap: 10px; max-width: 420px; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; font-size: 0.85rem; line-height: 1.4; color: #b7bbdb; cursor: pointer; } .ds-consent input { flex: none; width: 22px; height: 22px; margin: -1px 0 0; appearance: none; -webkit-appearance: none; border-radius: 50%; background: #181d4a center / 14px no-repeat; box-shadow: inset 0 0 0 1.5px rgba(228,228,232,0.22); cursor: pointer; transition: background-color 180ms ease, box-shadow 180ms ease, transform 160ms cubic-bezier(0.23,1,0.32,1); } .ds-consent input:checked { background-color: #3a63e0; background-image: url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23fff' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m5 12.5 4.5 4.5L19 7.5'/%3E%3C/svg%3E\"); box-shadow: inset 0 0 0 1.5px #3a63e0; } .ds-consent input:active { transform: scale(0.9); } .ds-consent input:focus-visible { outline: 2px solid #7d9dff; outline-offset: 3px; } .ds-consent a { color: #e4e4e8; text-underline-offset: 0.2em; }"
+    },
+    {
+      "name": "Payment-gateway Slot",
+      "kind": "custom",
+      "refersTo": "paygate",
+      "description": "Empty slot where the card form will appear; says plainly that nothing is charged while no gateway is connected.",
+      "html": "<div class=\"ds-paygate\"><p class=\"ds-paygate-state\"><span class=\"ds-paygate-dot\"></span> Pasarela de pago pendiente de conectar</p><p class=\"ds-paygate-text\">Aquí aparecerá el pago con tarjeta en cuanto la conectemos. Hasta entonces no se cobra nada.</p></div>",
+      "css": ".ds-paygate { max-width: 420px; padding: 18px 20px; border: 1px dashed rgba(228,228,232,0.22); border-radius: 18px; background: rgba(228,228,232,0.03); color: #e4e4e8; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; } .ds-paygate p { margin: 0; } .ds-paygate-state { display: flex; align-items: center; gap: 10px; font-weight: 600; } .ds-paygate-dot { flex: none; width: 7px; height: 7px; border-radius: 50%; background: #8d93c2; box-shadow: 0 0 0 3px rgba(141,147,194,0.2); } .ds-paygate-text { margin-top: 6px !important; font-size: 0.85rem; color: #b7bbdb; }"
     }
   ],
   "narrative": {
@@ -503,6 +599,10 @@
       "**Do** use ease-out (cubic-bezier(0.23, 1, 0.32, 1)) for arrivals and presses, the drawer curve for the toast, and gate hover effects behind fine pointers.",
       "**Do** keep photos and films as attachments with bubble corners and Attachment lift.",
       "Do grow every tap target to 44px under (pointer: coarse); underlined text links grow an invisible hit area instead of padding, so the underline stays put.",
+      "**Do** size a card that must sit above a fixed bar from the viewport height as well as its width, so photo and body clear the bar; under 720px a 220px legibility floor wins over the fit.",
+      "**Do** show deselection as stepping back (smaller, desaturated photo, legible text) rather than hiding or removing the item.",
+      "**Do** state money only as it is known: tabular totals that roll when they change, and \"se calcula al pagar\" where a cost does not exist yet.",
+      "**Do** draw selection as the round chat-select check that fills Sent Blue with a drawn white tick, never a square box.",
       "Do serve photos as WebP, the 480px version for thumbnails and mosaics, and play the light -sm (540px, muted) or -bg (14s loop) cut of a video wherever it autoplays; the original only opens on tap."
     ],
     "donts": [
@@ -510,6 +610,7 @@
       "**Don't** set body copy or controls in the display face or the serif.",
       "**Don't** use hard offset shadows or visible borders where an inset hairline ring is the established edge.",
       "**Don't** invent dates for drops: a drop without a confirmed date shows no stamp.",
+      "**Don't** let anything on a payment screen imply a charge while no gateway is connected: the slot reads as an empty placeholder (dashed hairline, switched-off dot), and the pay button and result message both say plainly that nothing is charged.",
       "**Don't** treat the current row of equal product cards as the shop pattern; it is an open defect (see below)."
     ]
   }

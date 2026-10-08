@@ -18,6 +18,7 @@ colors:
   sent-strong: "#7d9dff"
   line: "rgba(228, 228, 232, 0.12)"
   line-strong: "rgba(228, 228, 232, 0.22)"
+  error: "#ffb4b4"
 typography:
   display:
     fontFamily: "Big Shoulders Display, Arial Narrow, sans-serif"
@@ -84,6 +85,7 @@ rounded:
   tight: "8px"
   tail: "6px"
   control: "12px"
+  field: "14px"
   thumb: "15px"
   bubble: "22px"
   pill: "999px"
@@ -96,6 +98,7 @@ spacing:
   between-drops: "clamp(72px, 10vw, 128px)"
   max: "1280px"
   bar: "64px"
+  paybar: "68px"
 components:
   bubble-in:
     backgroundColor: "{colors.pearl}"
@@ -134,6 +137,19 @@ components:
     height: "46px"
   button-sent-hover:
     backgroundColor: "{colors.sent-strong}"
+    textColor: "{colors.navy-900}"
+  button-pay:
+    backgroundColor: "{colors.sent}"
+    textColor: "#ffffff"
+    rounded: "{rounded.pill}"
+    padding: "0 24px"
+    height: "52px"
+  button-pay-checkout:
+    backgroundColor: "{colors.sent}"
+    textColor: "#ffffff"
+    rounded: "{rounded.pill}"
+    padding: "8px 22px"
+    height: "60px"
   chip:
     backgroundColor: "transparent"
     textColor: "{colors.pearl}"
@@ -179,6 +195,54 @@ components:
     rounded: "{rounded.bubble}"
     padding: "16px 16px 18px"
     width: "440px"
+  fit-card:
+    backgroundColor: "{colors.navy-700}"
+    textColor: "{colors.pearl}"
+    rounded: "{rounded.bubble}"
+    padding: "16px 18px 18px"
+    width: "280px"
+  fit-check:
+    backgroundColor: "rgba(10, 12, 36, 0.5)"
+    textColor: "#ffffff"
+    rounded: "{rounded.pill}"
+    size: "30px"
+  fit-check-on:
+    backgroundColor: "{colors.sent}"
+    textColor: "#ffffff"
+  stepper:
+    backgroundColor: "transparent"
+    textColor: "{colors.pearl}"
+    rounded: "{rounded.pill}"
+    height: "44px"
+  paybar:
+    backgroundColor: "rgba(24, 29, 74, 0.92)"
+    textColor: "{colors.pearl}"
+    rounded: "{rounded.pill}"
+    padding: "8px 8px 8px 22px"
+    width: "640px"
+  receipt:
+    backgroundColor: "{colors.pearl}"
+    textColor: "{colors.navy-800}"
+    rounded: "{rounded.bubble}"
+    padding: "20px 22px 18px"
+  field:
+    backgroundColor: "{colors.navy-800}"
+    textColor: "{colors.pearl}"
+    rounded: "{rounded.field}"
+    padding: "0 18px"
+    height: "52px"
+  paygate:
+    backgroundColor: "rgba(228, 228, 232, 0.03)"
+    textColor: "{colors.pearl}"
+    rounded: "18px"
+    padding: "18px 20px"
+  consent-check:
+    backgroundColor: "{colors.navy-800}"
+    rounded: "{rounded.pill}"
+    size: "22px"
+  consent-check-on:
+    backgroundColor: "{colors.sent}"
+    textColor: "#ffffff"
 ---
 
 # Design System: nassville
@@ -205,8 +269,8 @@ Motion follows the grammar of messages arriving: a typing indicator, then bubble
 A single-hue navy world lit by pearl and one muted electric blue.
 
 ### Primary
-- **Sent Blue** (sent): the only accent. Outgoing bubbles, the active filter chip, "low stock" tags and dots, the lead drop's axis marker, the composer send button, the bag count. It means "this is you / this is live".
-- **Sent Blue Light** (sent-strong): the same blue lifted for use as text or line on navy: focus rings, the read-receipt "Leído" text, the manifesto's last word, hover on sent buttons.
+- **Sent Blue** (sent): the only accent. Outgoing bubbles, the active filter chip, "low stock" tags and dots, the lead drop's axis marker, the composer send button, the bag count, the fitting-room check, the consent checkbox and the pay button. It means "this is you / this is live".
+- **Sent Blue Light** (sent-strong): the same blue lifted for use as text or line on navy: focus rings, the read-receipt "Leído" text, the manifesto's last word, the stock suffix on a bag line ("quedan 2"), and the hover fill of sent buttons, where the label turns navy-900 because white does not hold on the lighter blue.
 
 ### Neutral
 - **Pearl** (pearl): the brand's speaking voice. Incoming bubble fill, primary buttons, link-preview cards, selected size, toast; also all primary text on navy.
@@ -214,7 +278,8 @@ A single-hue navy world lit by pearl and one muted electric blue.
 - **Navy 950 to 400** (navy-950 ... navy-400): the logo ground as an 8-step depth scale. 850 is the page; 900 the hero and nav glass; 800 is text on pearl and the composer field; 700 the product card and media placeholders; 600 is the logo ground (avatar, colour-blend tint on the hero video, footer wordmark); 500 and 400 are muted text on pearl (stamps, spec labels) and scrollbar/typing dots.
 - **Mist** (ink-soft): secondary text on navy (ledes, nav links, product type, descriptions).
 - **Haze** (ink-faint): timestamps, receipts, legends, placeholder text on navy.
-- **Hairline / Hairline Strong** (line, line-strong): 12% and 22% pearl strokes for dividers, ghost-button and chip outlines, the thread axis.
+- **Hairline / Hairline Strong** (line, line-strong): 12% and 22% pearl strokes for dividers, ghost-button and chip outlines, the thread axis, form-field rings.
+- **Error Pink** (error): form errors only, as 0.85rem text under a field or the composer and as the 1px ring of an invalid field. Never a fill, never a status tag; it is not a second accent.
 
 ### Named Rules
 **The One Blue Rule.** Sent Blue is the only chromatic accent and always means the visitor's side of the conversation or a live state (active, low stock, focus). It is never used for decoration or display type.
@@ -257,23 +322,27 @@ The thread is an ordered list down a 1px vertical axis (gradient from line-stron
 
 The shop is an auto-fill grid of cards (min 290px, gap clamp(16px, 2vw, 24px)); at 900px and up the lead product spans two columns as a media/info split. Sold-out items leave the grid for a dense archive list (52px thumb, name, struck-through price, "Leído").
 
-Breakpoints as built: 720px (mobile type size, tall hero video, two-column lead attachments, tighter thread axis), 800px (films two-up), 860px (nav collapses into a menu sheet), 900px (section heads split title/lede, lead product spans two, about and social go two-column), 960px (sticky drop rails).
+The bag (carrito.html) breaks out of the column: the fitting-room rail runs full-bleed with horizontal scroll-snap, its first card aligned to the column's gutter, 16px between cards, no visible scrollbar, and 48px glass arrows only where hover exists. Card width is derived from the viewport height as well as its width (desktop clamp(250px, 19vw, 280px), mobile 62vw with the next card peeking, legibility floor 220px on mobile) so photo and card body clear the fixed pay bar, which floats 14px above the bottom edge, max 640px wide; the page pads itself beneath it. Under 800px of height the head compacts. Checkout is one column with the receipt first on mobile; from 900px it splits 1.3fr form / 0.7fr receipt, the receipt sticky under the chat bar. Fields sit on a six-column grid (full, half, third, two-thirds); halves stack under 520px.
+
+Breakpoints as built: 520px (checkout half-fields stack), 720px (mobile type size, tall hero video, two-column lead attachments, tighter thread axis), 800px (films two-up), 860px (nav collapses into a menu sheet), 900px (section heads split title/lede, lead product spans two, about and social go two-column), 960px (sticky drop rails).
 
 ## Elevation & Depth
 
-Hybrid: depth comes mostly from the navy scale (page 850, cards 700, field 800, footer gradient 850 to 950) plus two soft, dark, negative-spread shadows that lift bubbles and media off the ground. Glass (blurred, translucent navy) appears only on the scrolled chat bar, the menu sheet, video badges and dialog backdrops. Outlines are inset hairlines rather than borders.
+Hybrid: depth comes mostly from the navy scale (page 850, cards 700, field 800, footer gradient 850 to 950) plus two soft, dark, negative-spread shadows that lift bubbles and media off the ground. Glass (blurred, translucent navy) appears only on the scrolled chat bar, the menu sheet, video badges, dialog backdrops, and the controls that float over photos or the page: the pay bar, the fitting-room check and remove discs, the rail arrows. Outlines are inset hairlines rather than borders.
 
 ### Shadow Vocabulary
 - **Bubble lift** (`0 1px 2px rgba(5,6,20,0.35), 0 8px 24px -8px rgba(5,6,20,0.55)`): bubbles, typing indicator, link cards, product cards.
 - **Attachment lift** (`0 2px 6px rgba(5,6,20,0.35), 0 24px 60px -20px rgba(5,6,20,0.75)`): photo and video attachments, films, about photo, feed, dialogs, toast.
-- **Hairline ring** (`inset 0 0 0 1px` line / line-strong): ghost buttons, chips, sizes, the composer, product card edge.
+- **Hairline ring** (`inset 0 0 0 1px` line / line-strong): ghost buttons, chips, sizes, the composer, product and fitting-room card edges, checkout fields, the stepper.
+- **Floating bar lift** (`0 18px 40px -16px rgba(5,6,20,0.8)` over a line-strong ring): the pay bar, the one control that floats above content for the whole visit.
+- **Focus halo** (`inset 0 0 0 1px` sent-strong plus `0 0 0 4px rgba(58,99,224,0.18)`): composer focus-within and focused checkout fields.
 
 ### Named Rules
 **The Soft Lift Rule.** Shadows are soft, dark-navy and negatively spread so they read as glow-less lift on navy; there are no hard offset shadows.
 
 ## Shapes
 
-The bubble is the silhouette of the system: 22px corners with one 6px tail corner. Incoming content tails bottom-left; outgoing tails bottom-right; a bubble following another in the same group also tightens its top-left corner to 6px so the group reads as one stack. The same tailed shape is applied to photo attachments, video attachments, films, link cards, product cards and the toast. Controls are full pills (999px): buttons, chips, colour swatches, tags, the composer. Size selectors use a firmer 12px, thumbnails 12 to 15px; small inner tiles (album photos, link thumbs inside mosaics) use a tight 8 to 10px, and bars and marks (editions segments, menu lines) a 2 to 3px hairline radius. The phone mockup in the thread keeps its own device radii (38px frame, 16 to 18px inner) because it draws real hardware, not system UI. Circles are reserved for the avatar, icon buttons (bag, menu, send, play, close) and round video notes, which get a 3px navy gap and a 2px hairline ring (blue while playing).
+The bubble is the silhouette of the system: 22px corners with one 6px tail corner. Incoming content tails bottom-left; outgoing tails bottom-right; a bubble following another in the same group also tightens its top-left corner to 6px so the group reads as one stack. The same tailed shape is applied to photo attachments, video attachments, films, link cards, product cards and the toast. Controls are full pills (999px): buttons, chips, colour swatches, tags, the composer. Size selectors use a firmer 12px, checkout fields 14px, the payment-gateway slot 18px, thumbnails 12 to 15px; small inner tiles (album photos, link thumbs inside mosaics) use a tight 8 to 10px, and bars and marks (editions segments, menu lines) a 2 to 3px hairline radius. The phone mockup in the thread keeps its own device radii (38px frame, 16 to 18px inner) because it draws real hardware, not system UI. Circles are reserved for the avatar, icon buttons (bag, menu, send, play, close, remove, stepper, rail arrows), selection checks (the fitting-room check, the consent checkbox) and round video notes, which get a 3px navy gap and a 2px hairline ring (blue while playing).
 
 ## Components
 
@@ -281,7 +350,8 @@ The bubble is the silhouette of the system: 22px corners with one 6px tail corne
 - **Shape:** pill (999px), 46px min height, 22px side padding, system 600 at 0.98rem, optional 20px stroked SVG icon.
 - **Primary:** pearl fill, navy-800 text; inside a pearl bubble it inverts to navy-700 fill with pearl text.
 - **Ghost:** transparent with a line-strong inset ring; ring turns pearl on hover (navy-700 inside bubbles).
-- **Sent:** Sent Blue fill, white text; hover lifts to Sent Blue Light. Used for "add to bag".
+- **Sent:** Sent Blue fill, white text; hover lifts to Sent Blue Light with navy-900 text. Used for "add to bag" and paying.
+- **Pay:** the sent button carrying the amount in tabular numerals ("Pagar 130 €"): 52px with 24px sides in the pay bar, full-width 60px on checkout. While no payment gateway is live the checkout button stacks a 0.8rem second line saying nothing is charged. With nothing marked, the pay-bar button goes quiet (10% pearl fill, ink-soft text) but still answers a tap with a toast explaining why.
 - **Hover / Focus / Active:** hover only on fine pointers; press scales to 0.97 over 160ms with ease-out; focus is a 2px sent-strong outline offset 3px. Disabled drops to 60% opacity.
 
 ### Chips
@@ -291,10 +361,16 @@ The bubble is the silhouette of the system: 22px corners with one 6px tail corne
 ### Cards / Containers
 - **Message bubble:** pearl (incoming) or Sent Blue (outgoing), 12px 16px padding, max 560px (720px wide variant, 92% on mobile), Bubble lift. A timestamp sits bottom-right in navy-400 at 0.72rem; messages end with "Entregado" receipts.
 - **Product card:** navy-700, tailed bubble corners, Bubble lift plus inner hairline, 4:5 media with editions bar (thin 3px segments, one per photo) and a status tag top-left: pearl "Disponible", blue "Últimas unidades", glass "Agotado". Body 18px/20px padding with display name, serif type, display price, swatches, sizes, full-width sent button. Arriving from a link card flashes a 2px sent-strong inner ring for 1.6s.
+- **Fitting-room card:** navy-700, tailed bubble corners (tail bottom-left), Bubble lift plus inner hairline. A 4:5 photo on navy-800 carries a round check top-left and a remove disc top-right, both 44px hit areas around smaller glass discs. Body 16px 18px 18px: display-caps name (1.7rem), serif garment type (1.1rem, ink-soft), meta line "colour · size" with a Sent Blue Light 600 stock suffix when stock is low, then a row with the display 800 line price (tabular) and the quantity stepper. A line that sold out after it was added keeps its card, takes the existing "Agotado" stamp (sized to the card width) and a fully grey photo, and cannot be ticked.
+- **Receipt:** the order summary as a brand message: pearl tailed bubble, 20px 22px 18px, Bubble lift, display-caps title, lines of 52 by 65px thumb (10px corners), display-caps name and navy-500 meta, tabular price; a hairline divider, then subtotal, shipping and a display 800 total.
 - **Archive row:** 52px desaturated thumb (grayscale 0.7, brightness 0.8), display name, struck price, blue "Leído" with a double-tick icon.
 
 ### Inputs / Fields
 - **Composer (email):** a chat "write" bar: navy-800 pill, hairline ring, 20px left padding, borderless 16px input and a 44px blue circular send button. Focus-within turns the ring sent-strong with a 4px blue halo. A successful send appends an outgoing bubble with "Entregado" and an incoming reply. Errors are a small pink line (#ffb4b4) under the bar.
+- **Checkout field:** 52px navy-800 field, 14px corners, 18px side padding, 16px text, a line-strong inset ring; label above in 0.85rem/500 ink-soft with optional hints in ink-faint. Focus is the Focus halo; invalid turns the ring Error Pink with the message below. Selects keep the same field and draw their own ink-soft chevron.
+- **Consent checkbox:** a 22px round check on navy-800 with a 1.5px line-strong ring; checked fills Sent Blue with a white stroked tick, press scales to 0.9, focus is the standard sent-strong outline. Used site-wide (newsletter, back-in-stock popover, checkout terms).
+- **Quantity stepper:** a pill with a line-strong ring holding two 44px circular minus/plus buttons and a 600 tabular count; a button at its limit (1, or the size's stock) drops to 32% opacity.
+- **Payment-gateway slot:** the place a card form will occupy, drawn as an empty slot: 18px corners, 1px dashed line-strong border, 3% pearl fill, a 7px ink-faint status dot with a faint halo (the "en línea" dot switched off), a 600 state line and a 0.85rem ink-soft explanation that nothing is charged yet.
 - **Size selector:** 48 by 42px radio labels (44px tall under a coarse pointer), 12px corners, hairline ring; checked is pearl with navy text; sold-out sizes are struck through on a darker well; low stock (1 to 3) shows a 10px blue dot on the corner, explained by an inline legend "quedan pocas".
 
 ### Navigation
@@ -313,6 +389,9 @@ Photo attachments are tailed-bubble mosaics with 3px gutters (2, 3, 4-up and a 4
 ### Signature: Back-in-Stock Popover
 On a sold-out colourway, "Avísame si vuelve" behaves by context. In the shop grid it scrolls to the footer composer, focuses it and gives the bar a single blue pulse (scale 1.035, 620ms). Inside the product viewer, where the page is covered, the button grows a popover instead: navy-900 glass at 90% (blur 18px), bubble corners, a tail pointing at the button, a 40px Sent Blue bell, display-caps title, meta line "product · colourway", the composer row, the consent checkbox and an inline error line. It opens with a 560ms spring from the button's centre (scale 0.2 to 1.045 to 0.99 to 1, blur 8px to 0), the button dips to 0.94, the contents arrive staggered 45ms and the bell rings once; it closes in 200ms back toward the button. On send the arrow becomes the check, the body turns into a one-line confirmation, and the popover closes itself after 2.4s. Reduced motion keeps only the show and hide.
 
+### Signature: The Fitting Room
+The bag is a rail of fitting-room cards rather than a cart table. Ticking a card's round check fills it Sent Blue (200ms) and draws the tick stroke in (260ms, 60ms late); the card stands at full colour and scale 1. Unticked cards step back onto the rail: scale 0.955 from the bottom edge over 340ms, photo at grayscale 0.85 and brightness 0.6, text kept legible at 0.86 opacity. Unticked lines stay saved in the bag. Below the rail floats the pay bar, the composer pill reborn as a till: 92% navy-800 glass, count and total on the left ("2 prendas · 130 €" over "Envío: se calcula al pagar"), the Pay button on the right; totals roll in like the bag counter (300ms odometer). Removing a line answers with a toast that carries a "Deshacer" link. Reduced motion drops the step-back, tick and roll transitions.
+
 ## Do's and Don'ts
 
 ### Do:
@@ -323,6 +402,10 @@ On a sold-out colourway, "Avísame si vuelve" behaves by context. In the shop gr
 - **Do** use ease-out (cubic-bezier(0.23, 1, 0.32, 1)) for arrivals and presses, the drawer curve for the toast, and gate hover effects behind fine pointers.
 - **Do** keep photos and films as attachments with bubble corners and Attachment lift.
 - **Do** grow every tap target to 44px under `(pointer: coarse)`; underlined text links grow an invisible hit area instead of padding, so the underline stays put.
+- **Do** size a card that must sit above a fixed bar from the viewport height as well as its width, so photo and body clear the bar; under 720px a 220px legibility floor wins over the fit.
+- **Do** show deselection as stepping back (smaller, desaturated photo, legible text) rather than hiding or removing the item.
+- **Do** state money only as it is known: tabular totals that roll when they change, and "se calcula al pagar" where a cost does not exist yet.
+- **Do** draw selection as the round chat-select check that fills Sent Blue with a drawn white tick, never a square box.
 - **Do** serve photos as WebP, the 480px version for thumbnails and mosaics, and play the light `-sm` (540px, muted) or `-bg` (14s loop) cut of a video wherever it autoplays; the original only opens on tap.
 
 ### Don't:
@@ -330,6 +413,7 @@ On a sold-out colourway, "Avísame si vuelve" behaves by context. In the shop gr
 - **Don't** set body copy or controls in the display face or the serif.
 - **Don't** use hard offset shadows or visible borders where an inset hairline ring is the established edge.
 - **Don't** invent dates for drops: a drop without a confirmed date shows no stamp.
+- **Don't** let anything on a payment screen imply a charge while no gateway is connected: the slot reads as an empty placeholder (dashed hairline, switched-off dot), and the pay button and result message both say plainly that nothing is charged.
 - **Don't** treat the current row of equal product cards as the shop pattern; it is an open defect (see below).
 
-<!-- Review status (2026-10-07): last finish verdict "fix". Open by user decision: (1) the three equal product cards in a row are not yet reshaped into bubble-shaped link-preview cards; (2) the lead product card's info column floats in empty space because its grid row matches the taller neighbouring card; (3) six of nine drops have no date on the timeline pending real dates. Prices and stock in js/data.js are placeholder data. -->
+<!-- Review status (2026-10-07): last finish verdict "fix". Open by user decision: (1) the three equal product cards in a row are not yet reshaped into bubble-shaped link-preview cards; (2) the lead product card's info column floats in empty space because its grid row matches the taller neighbouring card; (3) six of nine drops have no date on the timeline pending real dates. Prices and stock in js/data.js are placeholder data. carrito.html (2026-10-08): finish verdict "ship" with scored fixes; no payment gateway or shipping rates yet; on very short phone screens the last line of a fitting-room card can sit behind the pay bar until the page is nudged; the toast's "Deshacer" link is navy-800 text with a Sent Blue underline (Sent Blue text on pearl measured about 4.1:1 and was changed). -->

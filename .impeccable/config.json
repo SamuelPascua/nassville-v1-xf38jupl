@@ -41,6 +41,15 @@
         "value": "cubic-bezier(0.5, -0.1, 0.25, 1.35)",
         "createdAt": "2026-10-08T15:42:49.818Z",
         "reason": "agent: literal slot-machine reel that overshoots and settles (js/main.js slotButton, commented 'encaja con un rebote, como un rodillo'); domain-appropriate motion, not decorative bounce"
+      },
+      {
+        "rule": "pulsing-dot",
+        "value": "*",
+        "files": [
+          "carrito.html"
+        ],
+        "createdAt": "2026-10-08T19:04:40.921Z",
+        "reason": "agent: the only match is .typing i from the shared stylesheet (chat typing indicator used on index.html); carrito.html renders no .typing element"
       }
     ]
   }
