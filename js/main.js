@@ -1196,6 +1196,8 @@
     var err = $("[data-composer-error]");
     var sent = $("[data-composer-sent]");
     var send = $(".composer__send", form);
+    var consent = $("[data-composer-consent]", form);
+    consent.addEventListener("change", function () { if (consent.checked && err.dataset.kind === "consent") err.hidden = true; });
     // al volver a escribir, el check vuelve a ser la flecha de enviar
     input.addEventListener("input", function () {
       if (!send.classList.contains("is-sent")) return;
@@ -1212,13 +1214,24 @@
         input.focus();
         return;
       }
+      // el consentimiento tiene que ser expreso: sin la casilla no se apunta a nadie
+      if (!consent.checked) {
+        err.textContent = "Marca la casilla para que podamos escribirte.";
+        err.dataset.kind = "consent";
+        err.hidden = false;
+        input.removeAttribute("aria-invalid");
+        consent.focus();
+        return;
+      }
       err.hidden = true;
+      err.dataset.kind = "";
       input.removeAttribute("aria-invalid");
       sent.innerHTML = "";
       var out = el("div", { class: "bubble bubble--out" }, [el("p", { text: v })]);
       sent.appendChild(out);
       sent.appendChild(el("span", { class: "stamp stamp--out", text: "Entregado" }));
       input.value = "";
+      consent.checked = false; // el siguiente email necesita su propio consentimiento
       send.classList.add("is-sent");
       send.setAttribute("aria-label", "Enviado");
       setTimeout(function () {

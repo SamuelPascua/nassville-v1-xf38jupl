@@ -17,6 +17,24 @@
         ],
         "createdAt": "2026-10-08T06:51:27.456Z",
         "reason": "agent: only side-tab in this file is the WhatsApp quote bar inside chat bubbles (.msg__quote), part of the WhatsApp quoted-reply style the user chose; it re-flags as new on every edit because its line number shifts"
+      },
+      {
+        "rule": "nested-cards",
+        "value": "*",
+        "files": [
+          "privacidad.html"
+        ],
+        "createdAt": "2026-10-08T12:52:37.568Z",
+        "reason": "assistant triage: the only nesting is the temporary yellow mark.todo placeholder highlights inside the legal facts/notice blocks; they disappear once the owner fills in the legal data"
+      },
+      {
+        "rule": "nested-cards",
+        "value": "*",
+        "files": [
+          "terminos.html"
+        ],
+        "createdAt": "2026-10-08T12:52:38.510Z",
+        "reason": "assistant triage: the only nesting is the temporary yellow mark.todo placeholder highlights inside the legal facts/notice blocks; they disappear once the owner fills in the legal data"
       }
     ]
   }

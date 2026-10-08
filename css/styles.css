@@ -2314,3 +2314,216 @@ html.is-locked { overflow: hidden; }
 /* ---------- Logo 3D: aparece cuando ya está listo para girar ---------- */
 .hero__canvas { opacity: 0; transition: opacity 600ms ease; }
 .hero__canvas.is-ready { opacity: 1; }
+
+/* ==========================================================================
+   Legal: páginas de privacidad, cookies y términos, aviso de cookies y
+   consentimiento del formulario de email
+   ========================================================================== */
+
+/* huecos que hay que rellenar con los datos reales antes de vender */
+mark.todo {
+  padding: 0 4px;
+  border-radius: 4px;
+  background: rgba(255, 214, 102, 0.18);
+  box-shadow: inset 0 0 0 1px rgba(255, 214, 102, 0.45);
+  color: #ffe08a;
+}
+
+/* ---------- Pie: enlaces legales ---------- */
+.footer__legal a,
+.footer__legal .linklike {
+  color: var(--ink-soft);
+  font: inherit;
+  text-decoration: none;
+  border-bottom: 1px solid var(--line-strong);
+  transition: color 200ms ease, border-color 200ms ease;
+}
+@media (hover: hover) and (pointer: fine) {
+  .footer__legal a:hover,
+  .footer__legal .linklike:hover { color: var(--pearl); border-color: var(--pearl); }
+}
+.footer__legal [aria-current="page"] { color: var(--pearl); border-color: var(--sent-strong); }
+
+/* ---------- Formulario de email: consentimiento ---------- */
+.composer__consent {
+  display: flex; align-items: flex-start; gap: 10px;
+  padding: 0 8px 0 20px;
+  font-size: 0.88rem; line-height: 1.4;
+  color: var(--ink-soft);
+  cursor: pointer;
+}
+.composer__consent input {
+  flex: none;
+  width: 18px; height: 18px; margin: 1px 0 0;
+  accent-color: var(--sent);
+  cursor: pointer;
+}
+.composer__consent a,
+.composer__info a { color: var(--pearl); text-underline-offset: 0.2em; }
+.composer__info {
+  margin: 0;
+  padding: 0 8px 0 20px;
+  font-size: 0.76rem; line-height: 1.45;
+  color: var(--ink-faint);
+}
+
+/* ---------- Aviso de cookies ---------- */
+.cookies {
+  position: fixed; z-index: 90;
+  left: 50%; bottom: calc(16px + env(safe-area-inset-bottom));
+  width: min(calc(100% - 32px), 560px);
+  padding: 18px 20px 16px;
+  border-radius: var(--r-bubble);
+  border-bottom-left-radius: var(--r-tail);
+  background: var(--navy-800);
+  box-shadow: inset 0 0 0 1px var(--line-strong), 0 24px 60px -18px rgba(0, 0, 0, 0.7);
+  color: var(--pearl);
+  opacity: 0;
+  transform: translate(-50%, 16px);
+  transition: opacity 220ms ease, transform 320ms var(--ease-out);
+}
+.cookies.is-on { opacity: 1; transform: translate(-50%, 0); }
+/* en pantallas anchas, a la derecha: abajo a la izquierda está el aviso del drop */
+@media (min-width: 900px) {
+  .cookies { left: auto; right: var(--gutter); width: 440px; transform: translateY(16px); }
+  .cookies.is-on { transform: none; }
+}
+.cookies[hidden] { display: none; }
+.cookies__title {
+  margin: 0 0 4px;
+  font-family: var(--f-display); font-weight: 900; text-transform: uppercase;
+  font-size: 1.5rem; line-height: 1;
+}
+.cookies__text { margin: 0; font-size: 0.9rem; line-height: 1.45; color: var(--ink-soft); }
+.cookies__text a { color: var(--pearl); text-underline-offset: 0.2em; }
+/* aceptar y rechazar, igual de visibles (guía de cookies de la AEPD) */
+.cookies__actions { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 14px; }
+.cookies__btn { min-height: 44px; box-shadow: inset 0 0 0 1px var(--line-strong); }
+
+/* ---------- Páginas legales ---------- */
+.legal-page { min-height: 100vh; display: flex; flex-direction: column; }
+.legal__bar {
+  position: sticky; top: 0; z-index: 10;
+  display: flex; align-items: center; justify-content: space-between; gap: 16px;
+  padding: 14px var(--gutter);
+  background: rgba(19, 23, 64, 0.86);
+  -webkit-backdrop-filter: blur(12px); backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--line);
+}
+.legal__brand {
+  font-family: var(--f-serif); font-style: italic; font-size: 1.6rem; line-height: 1;
+  color: var(--pearl); text-decoration: none;
+}
+.legal__brand sup { font-family: var(--f-body); font-style: normal; font-size: 0.45em; }
+.legal__back {
+  display: inline-flex; align-items: center; gap: 8px;
+  min-height: 40px; padding: 0 16px;
+  border-radius: 999px;
+  box-shadow: inset 0 0 0 1px var(--line-strong);
+  color: var(--pearl); text-decoration: none; font-size: 0.9rem; font-weight: 600;
+}
+.legal__back::before { content: "←"; }
+.legal {
+  flex: 1;
+  width: min(100% - 2 * var(--gutter), 760px);
+  margin: 0 auto;
+  padding: clamp(40px, 7vw, 80px) 0 clamp(64px, 9vw, 112px);
+  line-height: 1.6;
+}
+.legal__kicker {
+  margin: 0;
+  font-family: var(--f-serif); font-style: italic; font-size: 1.3rem;
+  color: var(--sent-strong);
+}
+.legal__title {
+  margin: 4px 0 10px;
+  font-family: var(--f-display); font-weight: 900; text-transform: uppercase;
+  font-size: clamp(2.6rem, 8vw, 4.6rem); line-height: 0.92;
+  letter-spacing: -0.01em;
+}
+.legal__date { margin: 0 0 28px; font-size: 0.85rem; color: var(--ink-faint); }
+.legal__lead { font-size: 1.08rem; }
+.legal .legal__lead { color: var(--pearl); }
+.legal__todo {
+  margin: 0 0 24px;
+  padding: 12px 16px;
+  border-radius: 14px;
+  background: rgba(255, 214, 102, 0.08);
+  box-shadow: inset 0 0 0 1px rgba(255, 214, 102, 0.3);
+  font-size: 0.9rem; color: var(--ink-soft);
+}
+.legal__toc {
+  margin: 28px 0 8px;
+  padding: 18px 22px;
+  border-radius: var(--r-bubble);
+  background: var(--navy-800);
+  box-shadow: inset 0 0 0 1px var(--line);
+}
+.legal__toc ol { margin: 0; padding-left: 1.2em; columns: 2 220px; column-gap: 28px; }
+.legal__toc li { break-inside: avoid; padding: 2px 0; }
+.legal .legal__toc li + li { margin-top: 0; }
+.legal .legal__toc a { color: var(--ink-soft); text-decoration: none; }
+@media (hover: hover) and (pointer: fine) { .legal .legal__toc a:hover { color: var(--pearl); } }
+.legal section { scroll-margin-top: 84px; }
+.legal h2 {
+  margin: clamp(40px, 6vw, 56px) 0 12px;
+  font-family: var(--f-display); font-weight: 800; text-transform: uppercase;
+  font-size: clamp(1.7rem, 4vw, 2.2rem); line-height: 1;
+}
+.legal p, .legal li { color: var(--ink-soft); }
+.legal strong { color: var(--pearl); }
+.legal a { color: var(--pearl); text-underline-offset: 0.2em; }
+.legal ul, .legal ol { padding-left: 1.2em; }
+.legal li + li { margin-top: 8px; }
+.legal code { font-size: 0.9em; padding: 1px 6px; border-radius: 6px; background: var(--navy-800); color: var(--pearl); }
+.legal__facts {
+  display: grid; grid-template-columns: max-content 1fr; gap: 8px 20px;
+  margin: 16px 0;
+  padding: 16px 20px;
+  border-radius: var(--r-bubble);
+  background: var(--navy-800);
+  box-shadow: inset 0 0 0 1px var(--line);
+}
+.legal__facts dt { color: var(--ink-faint); font-size: 0.9rem; }
+.legal__facts dd { margin: 0; color: var(--pearl); }
+@media (max-width: 560px) {
+  .legal__facts { grid-template-columns: 1fr; gap: 2px; }
+  .legal__facts dd + dt { margin-top: 10px; }
+}
+.legal__table {
+  margin: 16px 0;
+  overflow-x: auto;
+  border-radius: var(--r-bubble);
+  box-shadow: inset 0 0 0 1px var(--line);
+}
+.legal__table:focus-visible { outline: 2px solid var(--sent-strong); outline-offset: 2px; }
+.legal table { width: 100%; min-width: 620px; border-collapse: collapse; font-size: 0.9rem; line-height: 1.45; }
+.legal th, .legal td { padding: 12px 14px; text-align: left; vertical-align: top; border-bottom: 1px solid var(--line); }
+.legal th { color: var(--pearl); font-weight: 600; background: var(--navy-800); }
+.legal td { color: var(--ink-soft); }
+.legal tbody tr:last-child td { border-bottom: 0; }
+.legal__steps li::marker { color: var(--sent-strong); font-weight: 700; }
+.legal__form {
+  padding: 18px 22px;
+  border-radius: var(--r-bubble);
+  background: var(--navy-800);
+  box-shadow: inset 0 0 0 1px var(--line);
+  font-size: 0.9rem;
+}
+.legal .legal__form p { margin: 0 0 8px; color: var(--pearl); }
+.legal__related { margin-top: 48px; padding-top: 20px; border-top: 1px solid var(--line); }
+.legal__foot {
+  display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 12px 28px;
+  padding: 20px var(--gutter) calc(24px + env(safe-area-inset-bottom));
+  border-top: 1px solid var(--line);
+  background: var(--navy-950);
+  font-size: 0.85rem; color: var(--ink-soft);
+}
+.legal__foot p { margin: 0; }
+
+@media (prefers-reduced-motion: reduce) {
+  .cookies { transition: opacity 160ms ease; transform: translate(-50%, 0); }
+}
+@media (prefers-reduced-motion: reduce) and (min-width: 900px) {
+  .cookies { transform: none; }
+}

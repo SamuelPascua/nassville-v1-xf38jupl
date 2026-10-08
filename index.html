@@ -11,7 +11,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@700;800;900&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/styles.css?v=50">
+  <link rel="stylesheet" href="css/styles.css?v=52">
   <script type="importmap">
     { "imports": {
       "three": "https://cdn.jsdelivr.net/npm/three@0.169.0/build/three.module.js",
@@ -291,6 +291,11 @@
           <svg class="composer__check" viewBox="0 0 24 24" aria-hidden="true"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg>
         </button>
       </div>
+      <label class="composer__consent">
+        <input type="checkbox" name="consent" data-composer-consent>
+        <span>Quiero recibir emails de nassville sobre nuevos drops y he leído la <a href="privacidad.html">política de privacidad</a>.</span>
+      </label>
+      <p class="composer__info">Responsable: <mark class="todo">[NOMBRE O RAZÓN SOCIAL]</mark> (nassville). Finalidad: avisarte de drops y novedades. Puedes darte de baja cuando quieras y ejercer tus derechos de acceso, rectificación y supresión, entre otros. <a href="privacidad.html">Más información</a>.</p>
       <p class="composer__error" data-composer-error role="alert" hidden></p>
       <div class="composer__sent" data-composer-sent aria-live="polite"></div>
     </form>
@@ -298,11 +303,14 @@
     <div class="footer__word" data-logo="word" aria-hidden="true"></div>
     <div class="footer__meta">
       <p>© 2026 nassville® · Zaragoza</p>
-      <div class="footer__legal">
-        <span>Envíos y devoluciones <small>pronto</small></span>
+      <nav class="footer__legal" aria-label="Información legal">
+        <a href="terminos.html#envios">Envíos y devoluciones</a>
         <span>Guía de tallas <small>pronto</small></span>
-        <span>Privacidad <small>pronto</small></span>
-      </div>
+        <a href="terminos.html">Términos y condiciones</a>
+        <a href="privacidad.html">Privacidad</a>
+        <a href="cookies.html">Cookies</a>
+        <button type="button" class="linklike" data-cookie-settings>Preferencias de cookies</button>
+      </nav>
       <p class="footer__note">v1 · precios y stock de ejemplo</p>
     </div>
   </footer>
@@ -373,9 +381,10 @@
 
   <div class="toast" data-toast role="status" aria-live="polite"></div>
 
-  <script src="js/data.js?v=50"></script>
-  <script src="js/logo-paths.js?v=50"></script>
-  <script src="js/main.js?v=50"></script>
-  <script src="js/hero3d.js?v=50"></script>
+  <script src="js/data.js?v=52"></script>
+  <script src="js/logo-paths.js?v=52"></script>
+  <script src="js/main.js?v=52"></script>
+  <script src="js/hero3d.js?v=52"></script>
+  <script src="js/consent.js?v=52"></script>
 </body>
 </html>
