@@ -514,13 +514,20 @@
     button._swap = (button._swap || 0) + 1; // anula un cambio de texto suave a medias
     button.getAnimations({ subtree: true }).forEach(function (a) { a.cancel(); });
     if (reduceMotion || !button.animate || !button.offsetParent) { button.textContent = text; return; }
-    var h = button.offsetHeight;
-    var place = "position:absolute;margin:0;z-index:2;pointer-events:none;transition:none;" +
-      "left:" + button.offsetLeft + "px;top:" + button.offsetTop + "px;width:" + button.offsetWidth + "px;height:" + h + "px;" +
-      "transform-origin:50% 50%;-webkit-backface-visibility:hidden;backface-visibility:hidden;" +
-      // radio real (media altura): con el 999px del botón mezclado con el radio
-      // animado, el navegador encogía todas las esquinas y la cara salía recta
-      "border-radius:" + h / 2 + "px;";
+    var h = button.offsetHeight, w = button.offsetWidth;
+    var bcs = getComputedStyle(button);
+    // Ventana con la forma exacta del botón (tamaño, redondeo y sombra): no
+    // cambia en ningún momento. Dentro gira el rodillo, como en una
+    // tragaperras: la cara actual sube y se aleja y la nueva llega desde abajo.
+    // (Un bloque que gira entero cambia de silueta: en diagonal es más alto y
+    // el borde crecía y se reajustaba al terminar.)
+    var win = el("span", { class: "slot-window", "aria-hidden": "true" });
+    win.style.cssText = "position:absolute;margin:0;z-index:2;pointer-events:none;overflow:hidden;" +
+      "left:" + button.offsetLeft + "px;top:" + button.offsetTop + "px;width:" + w + "px;height:" + h + "px;" +
+      "border-radius:" + bcs.borderTopLeftRadius + ";box-shadow:" + bcs.boxShadow + ";";
+    var place = "position:absolute;left:0;top:0;margin:0;width:" + w + "px;height:" + h + "px;" +
+      "border-radius:0;box-shadow:none;transition:none;pointer-events:none;" +
+      "-webkit-backface-visibility:hidden;backface-visibility:hidden;";
     function face(label, active) {
       var f = button.cloneNode(true);
       Array.prototype.slice.call(f.attributes).forEach(function (a) {
@@ -531,14 +538,15 @@
       f.textContent = label;
       f.classList.add("slot-face");
       f.style.cssText += place;
-      button.parentNode.insertBefore(f, button.nextSibling);
+      win.appendChild(f);
       return f;
     }
     // la cara que se va conserva su aspecto (atenuada si aún no había talla);
     // la nueva llega ya activa: elegir talla siempre habilita el botón
     var old = face(button.textContent, false), next = face(text, true);
-    // atenuado = semitransparente: en un bloque que gira se vería la otra cara
-    // a través. La cara se pinta opaca con el color que tenía atenuada.
+    button.parentNode.insertBefore(win, button.nextSibling);
+    // atenuado = semitransparente: en el rodillo se vería la otra cara a
+    // través. La cara se pinta opaca con el color que tenía atenuada.
     if (old.getAttribute("aria-disabled") === "true") {
       var o = parseFloat(getComputedStyle(old).opacity), under = rgbOf(behind(button));
       var cs = getComputedStyle(old);
@@ -546,6 +554,13 @@
       old.style.backgroundColor = mixRgb(rgbOf(cs.backgroundColor), under, o);
       old.style.color = mixRgb(rgbOf(cs.color), under, o);
     }
+    // fondo de la ventana: el tambor en sombra (lo que asoma entre caras)
+    win.style.backgroundColor = mixRgb(rgbOf(getComputedStyle(next).backgroundColor), [0, 0, 0], 0.55);
+    // sombra del rodillo arriba y abajo de la ventana mientras gira
+    var shade = el("span", { "aria-hidden": "true" });
+    shade.style.cssText = "position:absolute;inset:0;pointer-events:none;" +
+      "background:linear-gradient(180deg, rgba(0,0,0,0.32), rgba(0,0,0,0) 38%, rgba(0,0,0,0) 62%, rgba(0,0,0,0.32));";
+    win.appendChild(shade);
     button.textContent = text;
     // se oculta y se recupera sin transición: con el fundido de opacidad del
     // botón quedaba un hueco oscuro entre que se quitan las caras y reaparece
@@ -553,61 +568,25 @@
     button.style.opacity = "0";
     // coge un poco de impulso, gira y encaja con un rebote, como un rodillo
     var opt = { duration: SLOT_MS, easing: "cubic-bezier(0.5, -0.1, 0.25, 1.35)", fill: "both" };
-    // eje del rodillo a media altura por detrás de las caras. Va dentro de la
-    // transformación (no en transform-origin): así, en reposo, la cara mide
-    // exactamente lo que el botón y no hay salto ni bordes raros al empezar y
-    // al terminar el giro
+    // eje del rodillo a media altura por detrás de las caras; en reposo la
+    // cara coincide exactamente con el botón
     function roll(deg) { return "perspective(500px) translateZ(" + (-h / 2) + "px) rotateX(" + deg + "deg) translateZ(" + (h / 2) + "px)"; }
     old.animate([
       { transform: roll(0), filter: "brightness(1)" },
-      { transform: roll(90), filter: "brightness(0.55)" }
+      { transform: roll(90), filter: "brightness(0.5)" }
     ], opt);
     var spin = next.animate([
-      { transform: roll(-90), filter: "brightness(0.55)" },
+      { transform: roll(-90), filter: "brightness(0.5)" },
       { transform: roll(0), filter: "brightness(1)" }
     ], opt);
-    // Un bloque macizo, no dos botones: en la arista donde se juntan las dos
-    // caras las esquinas se suavizan a un redondeo menor durante el giro (con
-    // el redondeo completo quedaba una muesca a cada lado; rectas, se perdía
-    // el borde redondeado del botón) y vuelven al completo al encajar.
-    var rho = Math.round(h * 0.3), r = h / 2 + "px", sq = rho + "px";
-    var edge = { duration: SLOT_MS, easing: "linear", fill: "both" };
-    old.animate([
-      { borderBottomLeftRadius: r, borderBottomRightRadius: r },
-      { borderBottomLeftRadius: sq, borderBottomRightRadius: sq, offset: 0.14 },
-      { borderBottomLeftRadius: sq, borderBottomRightRadius: sq }
-    ], edge);
-    next.animate([
-      { borderTopLeftRadius: sq, borderTopRightRadius: sq },
-      { borderTopLeftRadius: sq, borderTopRightRadius: sq, offset: 0.72 },
-      { borderTopLeftRadius: r, borderTopRightRadius: r }
-    ], edge);
-    // La arista redondeada: una tira que va sobre el canto donde se juntan las
-    // caras, girada a medio camino entre ellas. Rellena el hueco que dejan sus
-    // esquinas redondeadas con un borde convexo, como el de una pieza maciza.
-    var j = rho * Math.SQRT2;                                // cuerda del redondeo
-    var d = (h / 2) * Math.SQRT2 - rho / Math.SQRT2;         // distancia del eje a la tira
-    var seam = el("span", { class: "slot-edge", "aria-hidden": "true" });
-    seam.style.cssText = "position:absolute;margin:0;z-index:1;pointer-events:none;" +
-      "left:" + button.offsetLeft + "px;top:" + (button.offsetTop + h / 2 - j / 2) + "px;width:" + button.offsetWidth + "px;height:" + j + "px;" +
-      "border-radius:" + j / 2 + "px;background:" + getComputedStyle(next).backgroundColor + ";" +
-      "-webkit-backface-visibility:hidden;backface-visibility:hidden;";
-    button.parentNode.insertBefore(seam, button.nextSibling);
-    function edgeAt(deg) { return "perspective(500px) translateZ(" + (-h / 2) + "px) rotateX(" + deg + "deg) translateZ(" + d + "px)"; }
-    seam.animate([
-      { transform: edgeAt(-45), filter: "brightness(0.8)" },
-      { transform: edgeAt(45), filter: "brightness(0.7)" }
-    ], opt);
-    // aparece cuando las esquinas ya se han suavizado y se va antes de encajar
-    seam.animate([
-      { opacity: 0 }, { opacity: 1, offset: 0.12 }, { opacity: 1, offset: 0.72 }, { opacity: 0, offset: 0.8 }, { opacity: 0 }
-    ], edge);
+    shade.animate([{ opacity: 0 }, { opacity: 1, offset: 0.25 }, { opacity: 1, offset: 0.6 }, { opacity: 0 }],
+      { duration: SLOT_MS, easing: "linear", fill: "both" });
     button._slot = function () {
       button._slot = null;
       button.style.opacity = "";
       void button.offsetWidth; // aplica la opacidad ya, antes de devolver la transición
       button.style.transition = "";
-      old.remove(); next.remove(); seam.remove();
+      win.remove();
     };
     spin.onfinish = function () { if (button._slot) button._slot(); };
   }
