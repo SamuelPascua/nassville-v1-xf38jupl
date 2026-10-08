@@ -1024,7 +1024,11 @@
       var o = base - progress;
       // una carta que da la vuelta al mazo (de un extremo al otro) no se anima
       var jump = card._o !== undefined && Math.abs(o - card._o) > 1.5;
-      card.style.transition = reduceMotion || instant || jump ? "none" : (transition || MOVE_EASE);
+      var still = reduceMotion || instant || jump;
+      card.style.transition = still ? "none" : (transition || MOVE_EASE);
+      // sin animación tampoco se anima la transparencia de las caras: así las
+      // cartas de reserva no se ven un instante al abrir y luego se desvanecen
+      card.classList.toggle("no-anim", !!still);
       pvPose(card, o, gap);
       card._o = o;
       card.dataset.pos = String(Math.max(-2, Math.min(2, base)));
@@ -1052,7 +1056,10 @@
     pv.meta.textContent = p.type + " · " + c.name + " · " + euro(p.price);
     pv.stamp.hidden = st !== "out";
     pv.cta.textContent = st === "out" ? "Avísame si vuelve" : "Elegir talla";
-    pv.cta.className = "btn " + (st === "out" ? "btn--ghost" : "btn--primary");
+    pv.cta.className = "btn pview__cta " + (st === "out" ? "btn--ghost" : "btn--primary");
+    pvSheet(false);
+    pv.size = null;
+    pvRenderSizes();
 
     // fondo: vídeo de la prenda con el filtro de su color
     if (c.video) {
@@ -1080,11 +1087,60 @@
       return card;
     });
     paintLogos();
-    pvLayout(true);
 
     document.documentElement.classList.add("is-locked");
     if (typeof pv.dialog.showModal === "function") pv.dialog.showModal(); else pv.dialog.setAttribute("open", "");
+    // colocar las cartas con la ventana ya visible: con ella oculta las cartas
+    // miden 0 px y los dorsos laterales quedaban escondidos tras la central
+    pvLayout(true);
     $("[data-pview-close]").focus();
+  }
+
+  /* Panel de tallas dentro de la vista ampliada */
+  pv.sheet = $("[data-pview-sheet]");
+  pv.sizes = $("[data-pview-sizes]");
+  pv.add = $("[data-pview-add]");
+  pv.legend = $("[data-pview-legend]");
+  pv.sheetMeta = $("[data-pview-sheet-meta]");
+
+  function pvSheet(open) {
+    pv.sheet.hidden = !open;
+    pv.cta.setAttribute("aria-expanded", open ? "true" : "false");
+    if (open) {
+      var first = $("input:not(:disabled)", pv.sizes);
+      if (first) setTimeout(function () { first.focus({ preventScroll: true }); }, 60);
+    }
+  }
+
+  function pvRenderSizes() {
+    var p = pv.product, c = p.colorways[pv.colorway];
+    pv.sheetMeta.textContent = c.name + " · " + euro(p.price);
+    pv.sizes.innerHTML = "";
+    pv.sizes.appendChild(el("legend", { class: "sr-only", text: "Talla" }));
+    Object.keys(c.stock).forEach(function (s) {
+      var n = c.stock[s];
+      var input = el("input", { type: "radio", name: "pview-size", value: s, disabled: n === 0 ? "" : null });
+      input.addEventListener("change", function () { pv.size = s; pvPaintAdd(); });
+      var label = el("label", { class: "size", title: n === 0 ? "Agotada" : n <= 3 ? "Quedan " + n : "" }, [input, el("span", { text: s })]);
+      if (n > 0 && n <= 3) label.appendChild(el("i", { class: "size__low", "aria-hidden": "true" }));
+      if (n === 0) label.appendChild(el("span", { class: "sr-only", text: " agotada" }));
+      else if (n <= 3) label.appendChild(el("span", { class: "sr-only", text: " últimas unidades" }));
+      pv.sizes.appendChild(label);
+    });
+    pv.legend.hidden = !Object.keys(c.stock).some(function (k) { return c.stock[k] > 0 && c.stock[k] <= 3; });
+    pvPaintAdd();
+  }
+
+  function pvPaintAdd() {
+    var c = pv.product.colorways[pv.colorway];
+    if (!pv.size) {
+      pv.add.textContent = "Elige una talla";
+      pv.add.setAttribute("aria-disabled", "true");
+    } else {
+      var left = c.stock[pv.size];
+      pv.add.textContent = "Añadir a la bolsa · " + pv.size + (left <= 3 ? " (quedan " + left + ")" : "");
+      pv.add.removeAttribute("aria-disabled");
+    }
   }
 
   function closeProductViewer() {
@@ -1099,7 +1155,11 @@
   function setupProductViewer() {
     if (!pv.dialog) return;
     $("[data-pview-close]").addEventListener("click", closeProductViewer);
-    pv.dialog.addEventListener("cancel", function (e) { e.preventDefault(); closeProductViewer(); });
+    pv.dialog.addEventListener("cancel", function (e) {
+      e.preventDefault();
+      if (!pv.sheet.hidden) { pvSheet(false); pv.cta.focus({ preventScroll: true }); return; }
+      closeProductViewer();
+    });
     pv.prev.addEventListener("click", function () { pvGo(-1); });
     window.addEventListener("resize", function () { if (pv.dialog.open) pvLayout(true); });
     pv.next.addEventListener("click", function () { pvGo(1); });
@@ -1114,12 +1174,22 @@
         toast("Te avisamos si vuelve <strong>" + p.name + " · " + c.name + "</strong>. Deja tu email abajo.");
         return;
       }
-      closeProductViewer();
-      var card = document.getElementById("product-" + p.id);
-      if (!card) return;
-      card.scrollIntoView({ block: "center", behavior: reduceMotion ? "auto" : "smooth" });
-      var first = $(".sizes input:not(:disabled)", card);
-      setTimeout(function () { if (first) first.focus({ preventScroll: true }); }, 450);
+      // las tallas se eligen aquí mismo, sin salir de la vista ampliada
+      pvSheet(pv.sheet.hidden);
+    });
+    pv.add.addEventListener("click", function () {
+      var p = pv.product, c = p.colorways[pv.colorway];
+      if (!pv.size) {
+        toast("Primero elige una talla.");
+        var first = $("input:not(:disabled)", pv.sizes);
+        if (first) first.focus();
+        return;
+      }
+      bag.push({ id: p.id, color: c.name, size: pv.size });
+      updateBag();
+      toast("<strong>" + p.name + "</strong> · " + c.name + " · " + pv.size + " a tu bolsa.");
+      pvSheet(false);
+      pv.cta.focus({ preventScroll: true });
     });
 
     // deslizar con dedo o ratón: izquierda = siguiente, derecha = anterior.
