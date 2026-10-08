@@ -14,7 +14,7 @@ window.NASS = {
       id: "losing-interest-crewneck",
       name: "Losing Interest",
       type: "Crewneck",
-      category: "sudaderas",
+      category: "camisetas",
       drop: "losing-interest",
       desc: "Oversize navy. Bordado delante y serigrafía gigante detrás.",
       price: 55,

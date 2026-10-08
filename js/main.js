@@ -709,8 +709,7 @@
       });
       var visible = 0;
       $$(".product").forEach(function (card) {
-        var show = filter === "todo" || card.dataset.category === filter ||
-          (filter === "disponible" && !card.querySelector(".product__tag--out"));
+        var show = filter === "todo" || card.dataset.category === filter;
         card.classList.toggle("is-hidden", !show);
         if (show) visible++;
       });
