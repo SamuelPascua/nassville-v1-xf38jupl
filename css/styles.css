@@ -1753,9 +1753,13 @@ html.is-locked { overflow: hidden; }
 }
 .pview__stamp { font-size: 1.4rem; color: var(--ink); transform: rotate(-8deg); }
 
+.soldcard__media { container-type: inline-size; }
 .sold-stamp {
   position: absolute; left: 50%; top: 46%;
+  /* proporcional a su tarjeta (no a la pantalla): mismo tamaño relativo en
+     móvil, donde la tarjeta ocupa todo el ancho, que en ordenador */
   font-size: clamp(1.7rem, 3.2vw, 2.4rem);
+  font-size: 13.7cqi;
   transform: translate(-50%, -50%) rotate(-12deg);
   pointer-events: none;
 }

@@ -497,6 +497,16 @@
   // siempre desde abajo, con un pequeño golpe al encajar. El botón real cambia
   // su texto al instante (lectores de pantalla) y solo se oculta durante el giro.
   var SLOT_MS = 560;
+  function rgbOf(c) { var m = (c || "").match(/[\d.]+/g) || [0, 0, 0]; return [+m[0], +m[1], +m[2], m[3] === undefined ? 1 : +m[3]]; }
+  function mixRgb(a, b, t) { return "rgb(" + [0, 1, 2].map(function (i) { return Math.round(a[i] * t + b[i] * (1 - t)); }).join(",") + ")"; }
+  // color de fondo real sobre el que está pintado un elemento
+  function behind(node) {
+    for (var n = node.parentElement; n; n = n.parentElement) {
+      var c = getComputedStyle(n).backgroundColor;
+      if (rgbOf(c)[3] > 0.5) return c;
+    }
+    return getComputedStyle(document.body).backgroundColor;
+  }
   function slotButton(button, text) {
     if (!button) return;
     if (button._slot) button._slot();
@@ -505,12 +515,17 @@
     button.getAnimations({ subtree: true }).forEach(function (a) { a.cancel(); });
     if (reduceMotion || !button.animate || !button.offsetParent) { button.textContent = text; return; }
     var h = button.offsetHeight;
-    var place = "position:absolute;margin:0;z-index:2;pointer-events:none;" +
+    var place = "position:absolute;margin:0;z-index:2;pointer-events:none;transition:none;" +
       "left:" + button.offsetLeft + "px;top:" + button.offsetTop + "px;width:" + button.offsetWidth + "px;height:" + h + "px;" +
-      "transform-origin:50% 50% " + (-h / 2) + "px;-webkit-backface-visibility:hidden;backface-visibility:hidden;";
-    function face(label) {
+      "transform-origin:50% 50%;-webkit-backface-visibility:hidden;backface-visibility:hidden;" +
+      // radio real (media altura): con el 999px del botón mezclado con el radio
+      // animado, el navegador encogía todas las esquinas y la cara salía recta
+      "border-radius:" + h / 2 + "px;";
+    function face(label, active) {
       var f = button.cloneNode(true);
-      Array.prototype.slice.call(f.attributes).forEach(function (a) { if (/^(id|data-|aria-)/.test(a.name)) f.removeAttribute(a.name); });
+      Array.prototype.slice.call(f.attributes).forEach(function (a) {
+        if (/^(id|data-|aria-)/.test(a.name) && !(a.name === "aria-disabled" && !active)) f.removeAttribute(a.name);
+      });
       f.setAttribute("aria-hidden", "true");
       f.tabIndex = -1;
       f.textContent = label;
@@ -519,7 +534,18 @@
       button.parentNode.insertBefore(f, button.nextSibling);
       return f;
     }
-    var old = face(button.textContent), next = face(text);
+    // la cara que se va conserva su aspecto (atenuada si aún no había talla);
+    // la nueva llega ya activa: elegir talla siempre habilita el botón
+    var old = face(button.textContent, false), next = face(text, true);
+    // atenuado = semitransparente: en un bloque que gira se vería la otra cara
+    // a través. La cara se pinta opaca con el color que tenía atenuada.
+    if (old.getAttribute("aria-disabled") === "true") {
+      var o = parseFloat(getComputedStyle(old).opacity), under = rgbOf(behind(button));
+      var cs = getComputedStyle(old);
+      old.style.opacity = "1";
+      old.style.backgroundColor = mixRgb(rgbOf(cs.backgroundColor), under, o);
+      old.style.color = mixRgb(rgbOf(cs.color), under, o);
+    }
     button.textContent = text;
     // se oculta y se recupera sin transición: con el fundido de opacidad del
     // botón quedaba un hueco oscuro entre que se quitan las caras y reaparece
@@ -527,20 +553,61 @@
     button.style.opacity = "0";
     // coge un poco de impulso, gira y encaja con un rebote, como un rodillo
     var opt = { duration: SLOT_MS, easing: "cubic-bezier(0.5, -0.1, 0.25, 1.35)", fill: "both" };
+    // eje del rodillo a media altura por detrás de las caras. Va dentro de la
+    // transformación (no en transform-origin): así, en reposo, la cara mide
+    // exactamente lo que el botón y no hay salto ni bordes raros al empezar y
+    // al terminar el giro
+    function roll(deg) { return "perspective(500px) translateZ(" + (-h / 2) + "px) rotateX(" + deg + "deg) translateZ(" + (h / 2) + "px)"; }
     old.animate([
-      { transform: "perspective(500px) rotateX(0deg)", filter: "brightness(1)" },
-      { transform: "perspective(500px) rotateX(90deg)", filter: "brightness(0.55)" }
+      { transform: roll(0), filter: "brightness(1)" },
+      { transform: roll(90), filter: "brightness(0.55)" }
     ], opt);
     var spin = next.animate([
-      { transform: "perspective(500px) rotateX(-90deg)", filter: "brightness(0.55)" },
-      { transform: "perspective(500px) rotateX(0deg)", filter: "brightness(1)" }
+      { transform: roll(-90), filter: "brightness(0.55)" },
+      { transform: roll(0), filter: "brightness(1)" }
     ], opt);
+    // Un bloque macizo, no dos botones: en la arista donde se juntan las dos
+    // caras las esquinas se suavizan a un redondeo menor durante el giro (con
+    // el redondeo completo quedaba una muesca a cada lado; rectas, se perdía
+    // el borde redondeado del botón) y vuelven al completo al encajar.
+    var rho = Math.round(h * 0.3), r = h / 2 + "px", sq = rho + "px";
+    var edge = { duration: SLOT_MS, easing: "linear", fill: "both" };
+    old.animate([
+      { borderBottomLeftRadius: r, borderBottomRightRadius: r },
+      { borderBottomLeftRadius: sq, borderBottomRightRadius: sq, offset: 0.14 },
+      { borderBottomLeftRadius: sq, borderBottomRightRadius: sq }
+    ], edge);
+    next.animate([
+      { borderTopLeftRadius: sq, borderTopRightRadius: sq },
+      { borderTopLeftRadius: sq, borderTopRightRadius: sq, offset: 0.72 },
+      { borderTopLeftRadius: r, borderTopRightRadius: r }
+    ], edge);
+    // La arista redondeada: una tira que va sobre el canto donde se juntan las
+    // caras, girada a medio camino entre ellas. Rellena el hueco que dejan sus
+    // esquinas redondeadas con un borde convexo, como el de una pieza maciza.
+    var j = rho * Math.SQRT2;                                // cuerda del redondeo
+    var d = (h / 2) * Math.SQRT2 - rho / Math.SQRT2;         // distancia del eje a la tira
+    var seam = el("span", { class: "slot-edge", "aria-hidden": "true" });
+    seam.style.cssText = "position:absolute;margin:0;z-index:1;pointer-events:none;" +
+      "left:" + button.offsetLeft + "px;top:" + (button.offsetTop + h / 2 - j / 2) + "px;width:" + button.offsetWidth + "px;height:" + j + "px;" +
+      "border-radius:" + j / 2 + "px;background:" + getComputedStyle(next).backgroundColor + ";" +
+      "-webkit-backface-visibility:hidden;backface-visibility:hidden;";
+    button.parentNode.insertBefore(seam, button.nextSibling);
+    function edgeAt(deg) { return "perspective(500px) translateZ(" + (-h / 2) + "px) rotateX(" + deg + "deg) translateZ(" + d + "px)"; }
+    seam.animate([
+      { transform: edgeAt(-45), filter: "brightness(0.8)" },
+      { transform: edgeAt(45), filter: "brightness(0.7)" }
+    ], opt);
+    // aparece cuando las esquinas ya se han suavizado y se va antes de encajar
+    seam.animate([
+      { opacity: 0 }, { opacity: 1, offset: 0.12 }, { opacity: 1, offset: 0.72 }, { opacity: 0, offset: 0.8 }, { opacity: 0 }
+    ], edge);
     button._slot = function () {
       button._slot = null;
       button.style.opacity = "";
       void button.offsetWidth; // aplica la opacidad ya, antes de devolver la transición
       button.style.transition = "";
-      old.remove(); next.remove();
+      old.remove(); next.remove(); seam.remove();
     };
     spin.onfinish = function () { if (button._slot) button._slot(); };
   }
@@ -679,7 +746,14 @@
             el("s", { text: euro(p.price) })
           ])
         ]);
-        card.addEventListener("click", function () { openProductViewer(p, ci, 0, $("img", card)); });
+        // como en la tienda: al cerrar, la tarjeta se queda en la foto que se miraba
+        card.addEventListener("click", function () {
+          openProductViewer(p, ci, card._i || 0, $("img", card), function (i) {
+            var im = $("img", card);
+            if (card._i !== i && c.images[i]) { im.src = IMG + c.images[i]; card._i = i; }
+            return im;
+          });
+        });
         archive.appendChild(el("li", null, [card]));
       });
     });
@@ -804,7 +878,7 @@
         var input = el("input", { type: "radio", name: name, value: s, disabled: n === 0 ? "" : null });
         if (state.size === s) input.checked = true;
         // de una talla a otra el botón gira como una tragaperras
-        input.addEventListener("change", function () { var was = state.size; state.size = s; paintCta(!!was && was !== s); });
+        input.addEventListener("change", function () { var was = state.size; state.size = s; paintCta(was !== s); });
         var label = el("label", { class: "size", title: n === 0 ? "Agotada" : n <= 3 ? "Quedan " + n : "" }, [
           input,
           el("span", { text: s })
@@ -1546,7 +1620,7 @@
     Object.keys(c.stock).forEach(function (s) {
       var n = c.stock[s];
       var input = el("input", { type: "radio", name: "pview-size", value: s, disabled: n === 0 ? "" : null });
-      input.addEventListener("change", function () { var was = pv.size; pv.size = s; pvPaintAdd(!!was && was !== s); });
+      input.addEventListener("change", function () { var was = pv.size; pv.size = s; pvPaintAdd(was !== s); });
       var label = el("label", { class: "size", title: n === 0 ? "Agotada" : n <= 3 ? "Quedan " + n : "" }, [input, el("span", { text: s })]);
       if (n > 0 && n <= 3) label.appendChild(el("i", { class: "size__low", "aria-hidden": "true" }));
       if (n === 0) label.appendChild(el("span", { class: "sr-only", text: " agotada" }));
