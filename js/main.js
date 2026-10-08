@@ -272,6 +272,39 @@
     next();
   }
 
+  /* ---------- Ventana del chat: scroll interno ---------- */
+  function chatBody() { return $("[data-thread]"); }
+  function scrollChatTo(top) {
+    chatBody().scrollTo({ top: top, behavior: reduceMotion ? "auto" : "smooth" });
+  }
+  function scrollChatToBottom() { scrollChatTo(chatBody().scrollHeight); }
+
+  function setupChatWindow() {
+    var body = chatBody();
+    if (!body) return;
+    var down = $("[data-chat-down]");
+    var chat = $(".chat");
+    var onScroll = function () {
+      var fromBottom = body.scrollHeight - body.scrollTop - body.clientHeight;
+      down.classList.toggle("is-on", fromBottom > 240);
+    };
+    body.addEventListener("scroll", onScroll, { passive: true });
+    onScroll();
+    down.addEventListener("click", scrollChatToBottom);
+
+    // el mensaje fijado lleva a su drop dentro de la ventana, sin saltar la página
+    $("[data-chat-pinned]").addEventListener("click", function (e) {
+      var target = document.getElementById("drop-" + C.pinned.drop);
+      if (!target) return;
+      e.preventDefault();
+      var r = chat.getBoundingClientRect();
+      if (r.top < 0 || r.bottom > window.innerHeight) chat.scrollIntoView({ block: "center", behavior: reduceMotion ? "auto" : "smooth" });
+      var body = chatBody();
+      // posición del drop dentro de la ventana (no respecto a la página)
+      scrollChatTo(target.getBoundingClientRect().top - body.getBoundingClientRect().top + body.scrollTop - 8);
+    });
+  }
+
   /* ---------- Barra de escribir del chat ---------- */
   function setupChatComposer() {
     var form = $("[data-chat-composer]");
@@ -289,14 +322,14 @@
         el("div", { class: "msg__bubble" }, [el("p", { text: text }), meta(hh, true)])
       ]);
       log.appendChild(mine);
-      mine.scrollIntoView({ block: "nearest", behavior: reduceMotion ? "auto" : "smooth" });
+      scrollChatToBottom();
       var typing = typingRow(NASS_USER);
       setTimeout(function () {
         $(".msg__checks", mine).classList.add("is-read");
         typing.hidden = false;
         log.appendChild(typing);
         setStatus("nassville está escribiendo…", true);
-        typing.scrollIntoView({ block: "nearest", behavior: reduceMotion ? "auto" : "smooth" });
+        scrollChatToBottom();
       }, 600);
       setTimeout(function () {
         typing.remove();
@@ -307,7 +340,7 @@
         reply.classList.remove("reveal");
         log.appendChild(reply);
         paintLogos();
-        reply.scrollIntoView({ block: "nearest", behavior: reduceMotion ? "auto" : "smooth" });
+        scrollChatToBottom();
       }, 1700);
     });
   }
@@ -366,25 +399,38 @@
       grid.appendChild(productCard(p, idx === 0));
     });
 
-    // archivo: cada color agotado es una línea, como mensajes leídos
+    // agotado: cada color agotado es una tarjeta; el sello se estampa al verla
+    var stampIndex = 0;
     D.products.forEach(function (p) {
       p.colorways.forEach(function (c, ci) {
         if (stockState(c.stock) !== "out") return;
-        var rowBtn = el("button", { class: "archive__row", type: "button", "aria-label": "Ver " + p.name + " " + c.name + " (agotado)" }, [
-          el("img", { src: IMG + c.images[0], alt: "", loading: "lazy" }),
-          el("div", { class: "archive__name" }, [
-            el("strong", { text: p.name }),
-            el("span", { text: p.type + " · " + c.name })
+        var card = el("button", { class: "soldcard", type: "button", "aria-label": "Ver " + p.name + " " + c.name + ", agotado", style: "--d:" + (stampIndex++ % 4) * 160 + "ms" }, [
+          el("span", { class: "soldcard__media" }, [
+            el("img", { src: IMG + c.images[0], alt: "", loading: "lazy" }),
+            el("span", { class: "sold-stamp", "aria-hidden": "true", text: "Agotado" })
           ]),
-          el("div", { class: "archive__meta" }, [
-            el("s", { text: euro(p.price) }),
-            el("span", { html: ICON.read + "Leído" })
+          el("span", { class: "soldcard__body" }, [
+            el("strong", { text: p.name }),
+            el("span", { text: p.type + " · " + c.name }),
+            el("s", { text: euro(p.price) })
           ])
         ]);
-        rowBtn.addEventListener("click", function () { openProductViewer(p, ci, 0); });
-        archive.appendChild(el("li", null, [rowBtn]));
+        card.addEventListener("click", function () { openProductViewer(p, ci, 0); });
+        archive.appendChild(el("li", null, [card]));
       });
     });
+    if ("IntersectionObserver" in window && !reduceMotion) {
+      var stampObs = new IntersectionObserver(function (entries) {
+        entries.forEach(function (e) {
+          if (!e.isIntersecting) return;
+          stampObs.unobserve(e.target);
+          e.target.classList.add("is-stamped");
+        });
+      }, { threshold: 0.55 });
+      $$(".soldcard", archive).forEach(function (c) { stampObs.observe(c); });
+    } else {
+      $$(".soldcard", archive).forEach(function (c) { c.classList.add("is-stamped"); });
+    }
   }
 
   function productCard(p, lead) {
@@ -824,10 +870,19 @@
   function heroMessage() {
     var typing = $("[data-typing]");
     var bubble = $("[data-hero-bubble]");
-    if (reduceMotion) { typing.classList.add("is-gone"); bubble.classList.add("is-in"); return; }
+    var notif = $("[data-hero-notif]");
+    var hero = $(".hero");
+    // en móvil el mensaje llega como notificación compacta; al tocarla se despliega
+    notif.addEventListener("click", function () {
+      var open = !hero.classList.contains("is-notif-open");
+      hero.classList.toggle("is-notif-open", open);
+      notif.setAttribute("aria-expanded", open ? "true" : "false");
+    });
+    if (reduceMotion) { typing.classList.add("is-gone"); bubble.classList.add("is-in"); notif.classList.add("is-in"); return; }
     setTimeout(function () {
       typing.classList.add("is-gone");
       bubble.classList.add("is-in");
+      notif.classList.add("is-in");
     }, 1500);
   }
 
@@ -1002,6 +1057,7 @@
   setupChrome();
   heroMessage();
   setupChatComposer();
+  setupChatWindow();
   setupProductViewer();
   setupReveal($$(".chat__drop").concat($$(".product"), $$("main > section > .reveal, .about .reveal, .social .reveal, .shop__head .reveal")));
 })();

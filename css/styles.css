@@ -646,24 +646,6 @@ em, .serif {
 }
 .archive__head .display { font-size: clamp(2.4rem, 5vw, 3.6rem); }
 .archive__head p { margin: 0; color: var(--ink-soft); font-family: var(--f-serif); font-style: italic; font-size: 1.2rem; }
-.archive__list { list-style: none; margin: 0; padding: 0; }
-.archive__row {
-  display: grid;
-  grid-template-columns: 52px 1fr auto;
-  align-items: center;
-  gap: 16px;
-  padding: 12px 0;
-  border-bottom: 1px solid var(--line);
-  font-size: 0.92rem;
-}
-.archive__row img { width: 52px; height: 52px; border-radius: 12px; object-fit: cover; filter: grayscale(0.7) brightness(0.8); }
-.archive__name { display: grid; line-height: 1.25; }
-.archive__name strong { font-family: var(--f-display); font-weight: 800; text-transform: uppercase; font-size: 1.35rem; line-height: 1; }
-.archive__name span { color: var(--ink-faint); font-size: 0.82rem; }
-.archive__meta { text-align: right; display: grid; justify-items: end; line-height: 1.3; }
-.archive__meta s { color: var(--ink-faint); font-variant-numeric: tabular-nums; }
-.archive__meta span { display: inline-flex; align-items: center; gap: 4px; font-size: 0.75rem; color: var(--sent-strong); }
-.archive__meta svg { width: 16px; height: 12px; fill: none; stroke: currentColor; stroke-width: 1.8; }
 
 /* ---------- 4 · Vídeos ---------- */
 
@@ -1429,20 +1411,6 @@ em, .serif {
 }
 .product__zoom svg { width: 17px; height: 17px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; }
 
-/* Archivo: cada fila abre su vista ampliada */
-button.archive__row {
-  width: 100%;
-  padding: 12px 0;
-  border: 0; border-bottom: 1px solid var(--line);
-  background: none;
-  color: inherit; font: inherit; text-align: left;
-  cursor: pointer;
-  transition: background-color 200ms ease;
-}
-@media (hover: hover) and (pointer: fine) {
-  button.archive__row:hover { background: rgba(228, 228, 232, 0.04); }
-}
-
 /* ---------- Vista ampliada de producto ---------- */
 
 html.is-locked { overflow: hidden; }
@@ -1494,15 +1462,7 @@ html.is-locked { overflow: hidden; }
   font-size: clamp(2.2rem, 5vw, 4rem); line-height: 0.9;
 }
 .pview__meta { margin: 6px 0 0; font-family: var(--f-serif); font-style: italic; font-size: 1.2rem; color: rgba(255, 255, 255, 0.82); }
-.pview__stamp {
-  align-self: center;
-  padding: 6px 14px;
-  border: 2px solid currentColor;
-  border-radius: 8px;
-  font-family: var(--f-display); font-weight: 900; text-transform: uppercase; font-size: 1.3rem; letter-spacing: 0.04em;
-  color: #ffd6d6;
-  transform: rotate(-6deg);
-}
+.pview__stamp { align-self: center; }
 .pview__stamp[hidden] { display: none; }
 .pview__close {
   flex: none;
@@ -1632,3 +1592,176 @@ html.is-locked { overflow: hidden; }
 }
 
 .product__media .product__track img { position: relative; inset: auto; opacity: 1; transform: none; transition: none; }
+
+/* ---------- Hero en móvil: el drop llega como notificación compacta ---------- */
+
+.hero__notif { display: none; }
+
+@media (max-width: 720px) {
+  .hero__thread { padding-bottom: calc(20px + env(safe-area-inset-bottom)); gap: 8px; }
+  .hero__thread .typing { display: none; }
+  .bubble--hero { display: none; }
+  .hero.is-notif-open .bubble--hero { display: block; }
+
+  .hero__notif {
+    display: flex; align-items: center; gap: 10px;
+    width: 100%;
+    padding: 8px 14px 8px 8px;
+    border: 0; border-radius: 18px;
+    background: rgba(15, 18, 51, 0.72);
+    -webkit-backdrop-filter: saturate(140%) blur(14px);
+    backdrop-filter: saturate(140%) blur(14px);
+    box-shadow: inset 0 0 0 1px var(--line-strong), var(--shadow-1);
+    color: var(--pearl);
+    font: inherit; text-align: left;
+    cursor: pointer;
+    transition: opacity 360ms var(--ease-out), transform 420ms var(--ease-out);
+  }
+  .js .hero__notif:not(.is-in) { opacity: 0; transform: translateY(12px); }
+  .hero__notif:active { transform: scale(0.98); }
+  .hero__notif .avatar { width: 36px; height: 36px; padding: 7px 5px; }
+  .hero__notif-text { flex: 1; min-width: 0; display: grid; line-height: 1.25; }
+  .hero__notif-text strong { font-size: 0.85rem; }
+  .hero__notif-text span { font-size: 0.85rem; color: var(--ink-soft); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .hero__notif-text em { font-size: 1.05em; color: var(--pearl); }
+  .hero__notif > svg { width: 20px; height: 20px; flex: none; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; transition: transform 300ms var(--ease-out); }
+  .hero.is-notif-open .hero__notif > svg { transform: rotate(180deg); }
+}
+
+/* ---------- El hilo: ventana de chat con altura fija y scroll interno ---------- */
+
+.chat {
+  display: flex;
+  flex-direction: column;
+  height: min(82vh, 860px);
+}
+.chat__top { position: relative; top: auto; flex: none; }
+.chat__body {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  overscroll-behavior-y: auto; /* al llegar al final, la página sigue bajando */
+  align-content: start;
+  scrollbar-width: thin;
+  scrollbar-color: var(--navy-500) transparent;
+}
+.chat__body::-webkit-scrollbar { width: 8px; }
+.chat__body::-webkit-scrollbar-track { background: transparent; }
+.chat__body::-webkit-scrollbar-thumb { background: var(--navy-500); border-radius: 8px; border: 2px solid var(--chat-bg); }
+.chat__drop { scroll-margin-top: 12px; }
+.chat__composer { flex: none; }
+
+/* botón para bajar al último mensaje, como en WhatsApp */
+.chat__down {
+  position: absolute; right: 18px; bottom: 84px; z-index: 4;
+  width: 44px; height: 44px;
+  display: grid; place-items: center;
+  border: 0; border-radius: 50%;
+  background: var(--navy-700);
+  color: var(--pearl);
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.45), inset 0 0 0 1px var(--line);
+  cursor: pointer;
+  opacity: 0; transform: translateY(8px) scale(0.92); pointer-events: none;
+  transition: opacity 220ms ease, transform 260ms var(--ease-out);
+}
+.chat__down.is-on { opacity: 1; transform: none; pointer-events: auto; }
+.chat__down:active { transform: scale(0.94); }
+.chat__down svg { width: 22px; height: 22px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+
+@media (max-width: 720px) {
+  .chat { height: calc(100svh - var(--bar-h) - 24px); max-height: 760px; }
+  .chat__down { right: 12px; bottom: 78px; }
+}
+
+/* ---------- Agotado: tarjetas con sello de tinta ---------- */
+
+.archive__grid {
+  list-style: none; margin: 22px 0 0; padding: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 230px), 1fr));
+  gap: clamp(14px, 2vw, 22px);
+}
+.soldcard {
+  display: grid;
+  width: 100%;
+  padding: 0; border: 0;
+  border-radius: var(--r-bubble);
+  border-bottom-left-radius: var(--r-tail);
+  overflow: hidden;
+  background: var(--navy-800);
+  box-shadow: var(--shadow-1), inset 0 0 0 1px var(--line);
+  color: var(--pearl); font: inherit; text-align: left;
+  cursor: zoom-in;
+  transition: transform 160ms var(--ease-out);
+}
+.soldcard:active { transform: scale(0.98); }
+.soldcard__media {
+  position: relative;
+  aspect-ratio: 4 / 5;
+  overflow: hidden;
+  background: var(--navy-900);
+}
+.soldcard__media img {
+  width: 100%; height: 100%;
+  object-fit: cover;
+  filter: grayscale(0.85) brightness(0.62) contrast(1.05);
+  transition: filter 400ms ease, transform 700ms var(--ease-out);
+}
+@media (hover: hover) and (pointer: fine) {
+  .soldcard:hover .soldcard__media img { filter: grayscale(0.5) brightness(0.75); transform: scale(1.03); }
+}
+.soldcard__body { display: grid; gap: 2px; padding: 14px 16px 16px; }
+.soldcard__body strong { font-family: var(--f-display); font-weight: 900; text-transform: uppercase; font-size: 1.7rem; line-height: 0.95; }
+.soldcard__body span { font-family: var(--f-serif); font-style: italic; font-size: 1.05rem; color: var(--ink-soft); }
+.soldcard__body s { margin-top: 4px; font-size: 0.9rem; color: var(--ink-faint); font-variant-numeric: tabular-nums; }
+
+/* Sello "AGOTADO": mismo diseño en las tarjetas y en la vista ampliada */
+.sold-stamp,
+.pview__stamp {
+  --ink: #ff5d6c;
+  display: inline-block;
+  padding: 6px 16px 4px;
+  border: 3px solid var(--ink);
+  border-radius: 10px;
+  box-shadow: inset 0 0 0 2px rgba(255, 93, 108, 0.35);
+  color: var(--ink);
+  font-family: var(--f-display); font-weight: 900; text-transform: uppercase;
+  letter-spacing: 0.06em;
+  line-height: 1;
+  white-space: nowrap;
+  /* textura de tinta: huecos irregulares como un sello de goma */
+  -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='2' seed='7'/%3E%3CfeColorMatrix values='0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 -2.2 1.75'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='2' seed='7'/%3E%3CfeColorMatrix values='0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 -2.2 1.75'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  -webkit-mask-size: 160px 160px;
+  mask-size: 160px 160px;
+}
+.pview__stamp { font-size: 1.4rem; color: var(--ink); transform: rotate(-8deg); }
+
+.sold-stamp {
+  position: absolute; left: 50%; top: 46%;
+  font-size: clamp(1.7rem, 3.2vw, 2.4rem);
+  transform: translate(-50%, -50%) rotate(-12deg);
+  pointer-events: none;
+}
+/* el sello cae y se estampa al entrar en pantalla */
+.js .soldcard .sold-stamp { opacity: 0; }
+.js .soldcard.is-stamped .sold-stamp { animation: stamp 560ms cubic-bezier(0.2, 0.9, 0.25, 1) var(--d, 0ms) both; }
+.js .soldcard.is-stamped .soldcard__media { animation: thud 320ms var(--ease-out) calc(var(--d, 0ms) + 280ms) both; }
+@keyframes stamp {
+  0%   { opacity: 0; transform: translate(-50%, -50%) rotate(-22deg) scale(2.6); }
+  55%  { opacity: 1; transform: translate(-50%, -50%) rotate(-11deg) scale(0.92); }
+  75%  { transform: translate(-50%, -50%) rotate(-12.5deg) scale(1.04); }
+  100% { opacity: 1; transform: translate(-50%, -50%) rotate(-12deg) scale(1); }
+}
+@keyframes thud {
+  0%   { transform: none; }
+  35%  { transform: scale(0.965); }
+  100% { transform: none; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .js .soldcard .sold-stamp,
+  .js .soldcard.is-stamped .sold-stamp { opacity: 1; animation: none; }
+  .js .soldcard.is-stamped .soldcard__media { animation: none; }
+  .chat__body { scroll-behavior: auto; }
+}

@@ -11,7 +11,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@700;800;900&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/styles.css?v=16">
+  <link rel="stylesheet" href="css/styles.css?v=18">
   <script type="importmap">
     { "imports": {
       "three": "https://cdn.jsdelivr.net/npm/three@0.169.0/build/three.module.js",
@@ -81,7 +81,7 @@
 
       <div class="hero__thread">
         <div class="typing" data-typing aria-hidden="true"><i></i><i></i><i></i></div>
-        <div class="bubble bubble--in bubble--hero" data-hero-bubble>
+        <div class="bubble bubble--in bubble--hero" id="hero-bubble" data-hero-bubble>
           <p class="bubble__muted">me vas a matar pero...</p>
           <p>Nuevo drop: <em>Losing Interest</em>. Navy, oversize, quedan pocas tallas.</p>
           <div class="bubble__actions">
@@ -90,6 +90,14 @@
           </div>
           <span class="stamp">22:05</span>
         </div>
+        <button class="hero__notif" type="button" data-hero-notif aria-expanded="false" aria-controls="hero-bubble">
+          <span class="avatar" data-logo="emblem" aria-hidden="true"></span>
+          <span class="hero__notif-text">
+            <strong>nassville</strong>
+            <span>Nuevo drop · <em>Losing Interest</em></span>
+          </span>
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 15l6-6 6 6"/></svg>
+        </button>
       </div>
 
       <a class="hero__scroll" href="#hilo" aria-label="Bajar al hilo">
@@ -127,7 +135,10 @@
           </a>
         </div>
 
-        <div class="chat__body" data-thread role="log" aria-label="Mensajes del grupo"></div>
+        <div class="chat__body" data-thread role="log" aria-label="Mensajes del grupo" tabindex="0"></div>
+        <button class="chat__down" type="button" data-chat-down aria-label="Ir al último mensaje">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg>
+        </button>
 
         <form class="chat__composer" data-chat-composer>
           <label class="chat__field">
@@ -163,10 +174,10 @@
 
       <div class="archive" aria-labelledby="archivo-title">
         <div class="archive__head">
-          <h3 id="archivo-title" class="display">Archivo</h3>
-          <p>Agotado. Leído y no contestado.</p>
+          <h3 id="archivo-title" class="display">Agotado</h3>
+          <p>Ya volaron. Tócalas para verlas en grande o pide que te avisemos si vuelven.</p>
         </div>
-        <ul class="archive__list" data-archive></ul>
+        <ul class="archive__grid" data-archive></ul>
       </div>
     </section>
 
@@ -315,9 +326,9 @@
 
   <div class="toast" data-toast role="status" aria-live="polite"></div>
 
-  <script src="js/data.js?v=16"></script>
-  <script src="js/logo-paths.js?v=16"></script>
-  <script src="js/main.js?v=16"></script>
-  <script src="js/hero3d.js?v=16"></script>
+  <script src="js/data.js?v=18"></script>
+  <script src="js/logo-paths.js?v=18"></script>
+  <script src="js/main.js?v=18"></script>
+  <script src="js/hero3d.js?v=18"></script>
 </body>
 </html>

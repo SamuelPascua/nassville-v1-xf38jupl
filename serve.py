@@ -6,7 +6,6 @@ copias de los archivos, así cada recarga muestra siempre la última versión.
 Uso:  python serve.py        (abre http://127.0.0.1:5173/)
 """
 import http.server
-import socketserver
 
 PORT = 5173
 
@@ -17,7 +16,8 @@ class NoCacheHandler(http.server.SimpleHTTPRequestHandler):
         super().end_headers()
 
 
-socketserver.TCPServer.allow_reuse_address = True
-with socketserver.TCPServer(("127.0.0.1", PORT), NoCacheHandler) as httpd:
+# varias conexiones a la vez: los vídeos no bloquean el resto de archivos
+http.server.ThreadingHTTPServer.allow_reuse_address = True
+with http.server.ThreadingHTTPServer(("127.0.0.1", PORT), NoCacheHandler) as httpd:
     print(f"nassville en http://127.0.0.1:{PORT}/  (Ctrl+C para parar)")
     httpd.serve_forever()
