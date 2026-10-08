@@ -166,8 +166,9 @@ em, .serif {
   letter-spacing: -0.005em;
   text-decoration: none;
   cursor: pointer;
-  transition: transform 160ms var(--ease-out), background-color 200ms ease, color 200ms ease, box-shadow 200ms ease;
+  transition: transform 160ms var(--ease-out), background-color 200ms ease, color 200ms ease, box-shadow 200ms ease, opacity 240ms ease;
 }
+.btn__label { display: inline-block; }
 .btn:active { transform: scale(0.97); }
 .btn svg { width: 20px; height: 20px; fill: none; stroke: currentColor; stroke-width: 1.8; }
 .btn svg .fill { fill: currentColor; stroke: none; }
@@ -626,7 +627,7 @@ em, .serif {
 
 .product__foot { display: grid; gap: 8px; margin-top: 2px; }
 .product__foot .btn { width: 100%; }
-.product__state { margin: 0; font-size: 0.8rem; color: var(--ink-soft); min-height: 1.2em; }
+.product__state { margin: 0; font-size: 0.8rem; line-height: 1.45; color: var(--ink-soft); min-height: 1.45em; }
 
 /* Archivo: bloque denso de lo agotado */
 .archive { margin-top: clamp(64px, 9vw, 112px); }
@@ -2259,9 +2260,6 @@ html.is-locked { overflow: hidden; }
 /* al cerrar: la ventana se vuelve transparente y deja ver la página */
 .pview.is-closing { pointer-events: none; background-color: transparent; transition: background-color 300ms ease; }
 .pview.is-closing::backdrop { opacity: 0; transition: opacity 300ms ease; }
-.pview.is-closing .pview__bg,
-.pview.is-closing .pview__head,
-.pview.is-closing .pview__foot { opacity: 0; transition: opacity 200ms ease; }
 
 /* ---------- Aviso de talla en el sitio ---------- */
 .sizes .size { transition: color 220ms ease, box-shadow 260ms ease, transform 140ms var(--ease-out); }

@@ -455,20 +455,35 @@
 
   // Cambia el texto en el sitio: sale hacia arriba con un leve desenfoque y el
   // nuevo entra desde abajo (receta "text state swap"). Interrumpible.
+  // En un botón solo se mueve su texto (en una etiqueta interior): animar el
+  // botón entero lo hacía desaparecer, fondo incluido, a mitad del cambio.
+  function labelOf(node) {
+    if (node.tagName !== "BUTTON" || node.querySelector("svg")) return node;
+    var label = node.firstElementChild;
+    if (!label || !label.classList.contains("btn__label") || node.childNodes.length !== 1) {
+      label = el("span", { class: "btn__label", text: node.textContent });
+      node.textContent = "";
+      node.appendChild(label);
+    }
+    return label;
+  }
   function swapText(node, text) {
     if (node && node._slot) node._slot();
     if (!node || node.textContent === text) return;
     if (reduceMotion || !node.animate || !node.isConnected) { node.textContent = text; return; }
     var token = (node._swap || 0) + 1;
     node._swap = token;
+    var host = node;
+    node = labelOf(host);
     var out = node.animate([
       { opacity: 1, transform: "translateY(0)", filter: "blur(0)" },
       { opacity: 0, transform: "translateY(-6px)", filter: "blur(3px)" }
     ], { duration: 110, easing: "ease-in", fill: "forwards" });
     out.onfinish = function () {
-      if (node._swap !== token) return;
-      node.textContent = text;
+      if (host._swap !== token) return;
       out.cancel();
+      if (!host.contains(node)) { host.textContent = text; return; } // el botón se reescribió entretanto
+      node.textContent = text;
       node.animate([
         { opacity: 0, transform: "translateY(6px)", filter: "blur(3px)" },
         { opacity: 1, transform: "translateY(0)", filter: "blur(0)" }
@@ -487,7 +502,7 @@
     if (button._slot) button._slot();
     if (button.textContent === text) return;
     button._swap = (button._swap || 0) + 1; // anula un cambio de texto suave a medias
-    button.getAnimations().forEach(function (a) { a.cancel(); });
+    button.getAnimations({ subtree: true }).forEach(function (a) { a.cancel(); });
     if (reduceMotion || !button.animate || !button.offsetParent) { button.textContent = text; return; }
     var h = button.offsetHeight;
     var place = "position:absolute;margin:0;z-index:2;pointer-events:none;" +
@@ -506,6 +521,9 @@
     }
     var old = face(button.textContent), next = face(text);
     button.textContent = text;
+    // se oculta y se recupera sin transición: con el fundido de opacidad del
+    // botón quedaba un hueco oscuro entre que se quitan las caras y reaparece
+    button.style.transition = "none";
     button.style.opacity = "0";
     // coge un poco de impulso, gira y encaja con un rebote, como un rodillo
     var opt = { duration: SLOT_MS, easing: "cubic-bezier(0.5, -0.1, 0.25, 1.35)", fill: "both" };
@@ -519,8 +537,10 @@
     ], opt);
     button._slot = function () {
       button._slot = null;
-      old.remove(); next.remove();
       button.style.opacity = "";
+      void button.offsetWidth; // aplica la opacidad ya, antes de devolver la transición
+      button.style.transition = "";
+      old.remove(); next.remove();
     };
     spin.onfinish = function () { if (button._slot) button._slot(); };
   }
@@ -827,6 +847,17 @@
     function showImage() {
       $$("button", editions).forEach(function (b, i) { b.classList.toggle("is-on", i === state.image); });
     }
+    // al cerrar la vista ampliada, el carrusel se queda en la foto que se
+    // estaba mirando (sin animar: ocurre debajo de la carta que vuelve)
+    function showFromViewer(i) {
+      var im = imgs[i];
+      if (!im) return null;
+      if (im.dataset.src) { im.src = im.dataset.src; im.removeAttribute("data-src"); }
+      state.image = i;
+      track.scrollTo({ left: i * track.clientWidth, behavior: "instant" });
+      showImage();
+      return im;
+    }
     function goImage(i) {
       var n = imgs.length;
       i = Math.max(0, Math.min(n - 1, i));
@@ -841,7 +872,7 @@
     track.addEventListener("keydown", function (e) {
       if (e.key === "ArrowRight") { e.preventDefault(); goImage(state.image + 1); }
       if (e.key === "ArrowLeft") { e.preventDefault(); goImage(state.image - 1); }
-      if (e.key === "Enter" || e.key === " ") { e.preventDefault(); openProductViewer(p, state.color, state.image, imgs[state.image]); }
+      if (e.key === "Enter" || e.key === " ") { e.preventDefault(); openProductViewer(p, state.color, state.image, imgs[state.image], showFromViewer); }
     });
     // ratón: arrastrar para deslizar; un clic sin arrastre amplía. En táctil el
     // deslizamiento es nativo y un toque simple amplía.
@@ -868,7 +899,7 @@
         var from = Math.round(d.sl / Math.max(track.clientWidth, 1));
         goImage(from + (dx < -40 ? 1 : dx > 40 ? -1 : 0));
       }
-      if (!d.moved) openProductViewer(p, state.color, state.image, imgs[state.image]);
+      if (!d.moved) openProductViewer(p, state.color, state.image, imgs[state.image], showFromViewer);
     });
     track.addEventListener("pointercancel", function () { tDrag = null; track.classList.remove("is-dragging"); });
 
@@ -1428,12 +1459,13 @@
     }
   }
 
-  function openProductViewer(p, ci, start, origin) {
+  function openProductViewer(p, ci, start, origin, onReturn) {
     var c = p.colorways[ci];
     var st = stockState(c.stock);
     pv.product = p; pv.colorway = ci; pv.i = start || 0;
     pv.opener = document.activeElement;
     pv.origin = origin || null;
+    pv.onReturn = onReturn || null;
     pv.dialog.style.setProperty("--tint", c.tint || "#262c57");
     pv.name.textContent = p.name;
     pv.meta.textContent = p.type + " · " + c.name + " · " + euro(p.price);
@@ -1544,6 +1576,9 @@
     if (!pv.dialog.open || pv.closing) return;
     pv.closing = true;
     pvEndEmerge();
+    // la tarjeta de la tienda pasa a la foto en la que se ha quedado la vista
+    // y la carta vuelve justo a esa foto
+    if (pv.onReturn) { var back = pv.onReturn(pv.i); if (back) pv.origin = back; }
     var center = pv.cards[pv.i];
     var to = pvVisible(pv.origin);
     var img = center && $(".pcard__front img", center);
@@ -1554,6 +1589,12 @@
     pv.dialog.appendChild(g.el);
     center.style.visibility = "hidden";
     pv.dialog.classList.add("is-closing");
+    // vídeo de fondo, cabecera y pie se funden aquí (la entrada los dejaba
+    // fijados a opacidad 1 y la regla de CSS no podía con ello: el fondo tapaba
+    // la página durante todo el cierre y desaparecía de golpe al final)
+    pv.closeFades = $$(".pview__bg, .pview__head, .pview__foot", pv.dialog).map(function (n) {
+      return n.animate([{ opacity: getComputedStyle(n).opacity }, { opacity: 0 }], { duration: 220, easing: "ease-out", fill: "forwards" });
+    });
     var ms = 380, opt = { duration: ms, easing: "cubic-bezier(0.4, 0, 0.1, 1)", fill: "both" };
     var fly = pvFly(g, false, opt);
     if (g.grey) g.colour.animate([{ opacity: 1 }, { opacity: 0 }], { duration: ms, easing: "ease-in-out", fill: "both" });
@@ -1575,6 +1616,8 @@
     document.documentElement.style.paddingRight = "";
     if (pv.dialog.open) pv.dialog.close();
     pv.dialog.classList.remove("is-closing", "is-emerging");
+    (pv.closeFades || []).forEach(function (a) { a.cancel(); });
+    pv.closeFades = null;
     pv.cards.forEach(function (card) { card.style.visibility = ""; card.getAnimations({ subtree: true }).forEach(function (a) { a.cancel(); }); });
     pv.closing = false;
     if (pv.opener) pv.opener.focus({ preventScroll: true });
