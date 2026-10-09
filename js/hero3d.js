@@ -200,6 +200,7 @@
     var FAST_SPEED = 6;                    // rad/s a partir de los cuales cuenta como rápido
     var morphStart = MORPH_SLOW;
     var speed = 0, prevAngle = 0;          // velocidad angular suavizada (también al arrastrar)
+    var lastPass = 0, SOUND_FROM = 1.6;    // rad/s: por debajo, sin «bum» (el giro de reposo va a ~0,5)
     function showFace(a) {
       var MORPH_START = morphStart;
       var c = Math.cos(a), sn = Math.sin(a);
@@ -241,6 +242,18 @@
       speed += (inst - speed) * (1 - Math.exp(-dt / 0.25));
       var fast = Math.min(Math.max((speed - BASE) / (FAST_SPEED - BASE), 0), 1);
       morphStart = MORPH_SLOW + (MORPH_FAST - MORPH_SLOW) * fast;
+
+      // sonido: cada vez que el emblema pasa de canto (cada media vuelta)
+      // suena un «bum»; solo cuando alguien lo ha hecho girar, y más fuerte
+      // cuanto más fuerte se le ha dado. El giro lento de reposo no suena.
+      var pass = Math.floor((angle - Math.PI / 2) / Math.PI);
+      if (pass !== lastPass) {
+        lastPass = pass;
+        if (window.Sfx && speed > SOUND_FROM) {
+          var push = Math.min((speed - SOUND_FROM) / (MAX_SPIN * 0.6), 1);
+          window.Sfx.play("spin", { gain: 0.25 + 0.75 * Math.pow(push, 0.7), fast: push });
+        }
+      }
 
       var face = showFace(angle);
       group.rotation.y = face.rotation;

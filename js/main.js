@@ -282,6 +282,24 @@
     s.textContent = text;
     s.classList.toggle("is-typing", !!typing);
   }
+  // las teclas suenan solo cuando los puntitos se ven de verdad en pantalla
+  // (al bajar rápido en el móvil la pantalla va con retraso): se espera a que
+  // la fila esté visible y pintada, y suena solo el tiempo que le queda
+  function typingSound(row, ms, force) {
+    if (!window.Sfx || !("IntersectionObserver" in window)) return;
+    var end = performance.now() + ms;
+    var io = new IntersectionObserver(function (list) {
+      if (!list[list.length - 1].isIntersecting) return;
+      io.disconnect();
+      requestAnimationFrame(function () { requestAnimationFrame(function () {
+        var left = end - performance.now();
+        if (row.hidden || !row.isConnected || left < 250) return;
+        sfx("typing", { ms: left, force: force });
+      }); });
+    }, { threshold: 0.9 });
+    io.observe(row);
+    setTimeout(function () { io.disconnect(); }, ms);
+  }
   function playDrop(block) {
     var sep = $(".chat__sep", block);
     if (sep) sep.classList.remove("is-pending");
@@ -295,7 +313,7 @@
       if (typing) {
         typing.hidden = false;
         setStatus(typing.dataset.who + " está escribiendo…", true);
-        sfx("typing", { ms: 700 });
+        typingSound(typing, 700);
       }
       setTimeout(function () {
         if (typing) typing.hidden = true;
@@ -398,7 +416,7 @@
         typing.hidden = false;
         log.appendChild(typing);
         setStatus("nassville está escribiendo…", true);
-        sfx("typing", { ms: 1100, force: true });
+        typingSound(typing, 1100, true);
         scrollChatToBottom();
       }, 600);
       setTimeout(function () {

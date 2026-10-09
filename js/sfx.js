@@ -34,7 +34,7 @@
   var GAP = {
     tap: 45, hover: 120, tick: 30, reel: 160, key: 0, typing: 1800, stamp: 130,
     card: 70, deal: 600, register: 250, remove: 150, deny: 300, send: 200,
-    receive: 300, on: 0, check: 60
+    receive: 300, on: 0, check: 60, spin: 65
   };
 
   function unlock() {
@@ -188,6 +188,16 @@
     receive: function (t) {
       tone(t, { f: 880, d: 0.14, peak: 0.05 });
       tone(t + 0.07, { f: 1320, d: 0.18, peak: 0.035 });
+    },
+    // el emblema pasa de canto al girar: un «bum» grave de aire, como una
+    // pala que corta el aire. gain (0–1) sube con la fuerza del giro; cuanto
+    // más rápido, más corto y un pelín más agudo
+    spin: function (t, o) {
+      var g = Math.max(0, Math.min(1, (o && o.gain) || 0)), fast = (o && o.fast) || 0;
+      if (g < 0.02) return;
+      var d = 0.2 - 0.09 * fast, r = vary(0.05);
+      tone(t, { f: (78 + 30 * fast) * r, to: 48 * r, a: 0.018, d: d, peak: 0.32 * g });
+      noise(t, { type: "lowpass", f: 260 + 380 * fast, to: 140, a: 0.03, d: d * 0.9, q: 0.7, peak: 0.22 * g });
     },
     // sonido activado
     on: function (t) {
