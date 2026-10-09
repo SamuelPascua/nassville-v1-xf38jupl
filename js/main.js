@@ -12,6 +12,8 @@
   function photo(src) { return IMG + src.replace(/\.jpg$/, ".webp"); }
   function thumb(src) { return IMG + src.replace(/\.jpg$/, "-480.webp"); }
   var reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  // sonidos de la interfaz (js/sfx.js); si no está cargado, no pasa nada
+  function sfx(name, opts) { if (window.Sfx) window.Sfx.play(name, opts); }
   var $ = function (sel, root) { return (root || document).querySelector(sel); };
   var $$ = function (sel, root) { return Array.prototype.slice.call((root || document).querySelectorAll(sel)); };
 
@@ -293,6 +295,7 @@
       if (typing) {
         typing.hidden = false;
         setStatus(typing.dataset.who + " está escribiendo…", true);
+        sfx("typing", { ms: 700 });
       }
       setTimeout(function () {
         if (typing) typing.hidden = true;
@@ -388,12 +391,14 @@
       ]);
       log.appendChild(mine);
       scrollChatToBottom();
+      sfx("send");
       var typing = typingRow(NASS_USER);
       setTimeout(function () {
         $(".msg__checks", mine).classList.add("is-read");
         typing.hidden = false;
         log.appendChild(typing);
         setStatus("nassville está escribiendo…", true);
+        sfx("typing", { ms: 1100, force: true });
         scrollChatToBottom();
       }, 600);
       setTimeout(function () {
@@ -404,6 +409,7 @@
         var reply = row(NASS_USER, true, [el("p", { text: C.autoReply }), go, meta(hh, false)]);
         reply.classList.remove("reveal");
         log.appendChild(reply);
+        sfx("receive");
         paintLogos();
         scrollChatToBottom();
       }, 1700);
@@ -518,6 +524,7 @@
     if (!button) return;
     if (button._slot) button._slot();
     if (button.textContent === text) return;
+    sfx("reel");
     button._swap = (button._swap || 0) + 1; // anula un cambio de texto suave a medias
     button.getAnimations({ subtree: true }).forEach(function (a) { a.cancel(); });
     if (reduceMotion || !button.animate || !button.offsetParent) { button.textContent = text; return; }
@@ -673,6 +680,7 @@
   // Falta la talla: las tallas se sacuden en el sitio, se marcan un instante y
   // el aviso aparece junto a ellas (receta "error state shake"), sin toast
   function nudgeSizes(fieldset, note) {
+    sfx("deny");
     if (note) swapText(note, "Elige una talla primero.");
     if (!reduceMotion && fieldset.animate) {
       fieldset.animate([
@@ -745,10 +753,15 @@
     });
     if ("IntersectionObserver" in window && !reduceMotion) {
       var stampObs = new IntersectionObserver(function (entries) {
+        var k = 0;
         entries.forEach(function (e) {
           if (!e.isIntersecting) return;
           stampObs.unobserve(e.target);
           e.target.classList.add("is-stamped");
+          // el golpe suena cuando el sello toca el papel (55 % de su caída);
+          // en una tanda, cada sello un poco más suave que el anterior
+          var d = parseFloat(e.target.style.getPropertyValue("--d")) || 0;
+          sfx("stamp", { delay: d + 300, gain: Math.max(0.45, 1 - k++ * 0.18) });
         });
       }, { threshold: 0.55 });
       $$(".soldcard", archive).forEach(function (c) { stampObs.observe(c); });
@@ -970,11 +983,13 @@
       if (!state.size) { nudgeSizes(sizes, note); return; }
       var left = c.stock[state.size];
       if (Bag.add({ id: p.id, color: c.name, size: state.size }, left).capped) {
+        sfx("deny");
         swapText(note, "Ya tienes en la bolsa " + (left === 1 ? "la única" : "las " + left) + " que " + (left === 1 ? "queda" : "quedan") + " en " + state.size + ".");
         return;
       }
       // la prenda vuela a la bolsa y el botón confirma en el sitio
       flyToBag(cta, thumb(c.images[state.image || 0]), updateBag);
+      sfx("register", { land: reduceMotion ? 120 : 700 });
       confirmOn(cta, paintCta);
       toast("<strong>" + p.name + "</strong> · " + c.name + " · " + state.size + " a tu bolsa. <a href=\"carrito.html\">Ver bolsa</a>");
     });
@@ -1273,6 +1288,7 @@
       consent.checked = false; // el siguiente email necesita su propio consentimiento
       send.classList.add("is-sent");
       send.setAttribute("aria-label", "Enviado");
+      sfx("send");
       setTimeout(function () {
         sent.appendChild(el("div", { class: "bubble bubble--in" }, [el("p", { text: "Apuntado. Te escribimos antes del próximo drop." })]));
       }, reduceMotion ? 0 : 900);
@@ -1462,6 +1478,7 @@
     pvEndEmerge(); // si se mueve el mazo mientras aún llega, la llegada termina ya
     var n = pv.cards.length;
     if (n < 2) return;
+    sfx("card");
     pv.i = (pv.i + step + n) % n;
     pvLayout(false, 0, transition);
   }
@@ -1522,6 +1539,7 @@
     pv.dialog.classList.add("is-emerging");
     var opt = { duration: FLY_MS, easing: FLY_EASE, fill: "both" };
     var fly = pvFly(g, false, opt);
+    sfx("deal", { delay: FLY_MS * 0.4 });
     if (g.grey) g.colour.animate([{ opacity: 0 }, { opacity: 1 }], { duration: FLY_MS, easing: "ease-in-out", fill: "both" });
     // mesa vacía mientras la foto viaja; las demás salen de detrás cuando ya la tapa
     var centerT = center.style.transform;
@@ -1790,6 +1808,7 @@
     pv.notifyEmail.removeAttribute("aria-invalid");
     pv.notifySend.classList.add("is-sent");
     pv.notifySend.setAttribute("aria-label", "Enviado");
+    sfx("send");
     pv.notifyEmail.value = "";
     pv.notifyConsent.checked = false; // cada aviso necesita su propio consentimiento
     // la flecha pasa a check y la burbuja se convierte en la confirmación
@@ -1811,6 +1830,7 @@
   function closeProductViewer() {
     if (!pv.dialog.open || pv.closing) return;
     pv.closing = true;
+    sfx("card", { gain: 0.6 });
     pvEndEmerge();
     // la tarjeta de la tienda pasa a la foto en la que se ha quedado la vista
     // y la carta vuelve justo a esa foto
@@ -1897,6 +1917,7 @@
       var p = pv.product, c = p.colorways[pv.colorway];
       if (!pv.size) { nudgeSizes(pv.sizes, null); return; }
       if (Bag.add({ id: p.id, color: c.name, size: pv.size }, c.stock[pv.size]).capped) {
+        sfx("deny");
         swapText(pv.add, "Ya tienes todas las de la " + pv.size + " en la bolsa");
         clearTimeout(pv.add._capped);
         pv.add._capped = setTimeout(pvPaintAdd, 1800);
@@ -1905,6 +1926,7 @@
       // la foto de la carta vuela a la bolsa de la vista; el botón confirma y
       // el panel se recoge cuando la prenda ya ha llegado
       flyToBag(pv.add, thumb(c.images[pv.i]), updateBag);
+      sfx("register", { land: reduceMotion ? 120 : 700 });
       confirmOn(pv.add, pvPaintAdd);
       toast("<strong>" + p.name + "</strong> · " + c.name + " · " + pv.size + " a tu bolsa.");
       setTimeout(function () {

@@ -329,6 +329,26 @@ em, .serif {
 .bag.bump { animation: bump 400ms var(--ease-out); }
 @keyframes bump { 30% { transform: scale(1.12); } 100% { transform: scale(1); } }
 
+/* Botón de sonido: junto a la bolsa, mismo círculo pero más discreto */
+.sound {
+  display: grid; place-items: center;
+  width: 44px; height: 44px; border-radius: 50%; margin-right: -14px;
+  border: 0; background: transparent; cursor: pointer;
+  color: var(--ink-soft);
+  touch-action: manipulation;
+  transition: transform 160ms var(--ease-out), background-color 200ms ease, color 200ms ease;
+}
+.sound:active { transform: scale(0.95); }
+.sound svg { width: 20px; height: 20px; fill: none; stroke: currentColor; stroke-width: 1.7; stroke-linecap: round; stroke-linejoin: round; }
+.sound__cone { fill: currentColor; fill-opacity: 0.18; }
+.sound__wave, .sound__mute { transition: opacity 180ms ease; }
+.sound__mute { opacity: 0; }
+.sound.is-muted .sound__wave { opacity: 0; }
+.sound.is-muted .sound__mute { opacity: 1; }
+@media (hover: hover) and (pointer: fine) {
+  .sound:hover { color: var(--pearl); background: rgba(228, 228, 232, 0.08); }
+}
+
 .menu {
   display: none;
   width: 44px; height: 44px; border: 0; border-radius: 50%;
@@ -930,6 +950,8 @@ em, .serif {
   .chatbar__nav { display: none; }
   .menu { display: grid; }
   .bag { margin-left: auto; }
+  .sound { margin-left: auto; margin-right: -6px; }
+  .sound + .bag { margin-left: 0; }
   .chatbar { gap: 10px; }
 }
 

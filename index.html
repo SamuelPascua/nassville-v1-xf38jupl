@@ -14,7 +14,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@700;800;900&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/styles.css?v=54">
+  <link rel="stylesheet" href="css/styles.css?v=55">
   <script type="importmap">
     { "imports": {
       "three": "https://cdn.jsdelivr.net/npm/three@0.169.0/build/three.module.js",
@@ -46,6 +46,9 @@
       <a href="#conocenos">Conócenos</a>
       <a href="#redes">Redes</a>
     </nav>
+    <button class="sound" type="button" data-sound-toggle aria-pressed="true" aria-label="Sonido activado. Pulsa para silenciar">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path class="sound__cone" d="M4 9.5h3.2L12 5.5v13l-4.8-4H4z"/><path class="sound__wave" d="M15.5 9.2a4 4 0 0 1 0 5.6"/><path class="sound__wave sound__wave--far" d="M18 6.8a7.5 7.5 0 0 1 0 10.4"/><path class="sound__mute" d="M16 9.5l5 5M21 9.5l-5 5"/></svg>
+    </button>
     <a class="bag" href="carrito.html" data-bag-button aria-label="Bolsa, 0 prendas">
       <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 8h12l-1 12H7L6 8Z"/><path d="M9 8V6a3 3 0 0 1 6 0v2"/></svg>
       <span class="bag__count" data-bag-count>0</span>
@@ -415,11 +418,12 @@
 
   <div class="toast" data-toast role="status" aria-live="polite"></div>
 
-  <script src="js/data.js?v=54"></script>
-  <script src="js/logo-paths.js?v=54"></script>
-  <script src="js/bag-store.js?v=54"></script>
-  <script src="js/main.js?v=54"></script>
-  <script src="js/hero3d.js?v=54"></script>
-  <script src="js/consent.js?v=54"></script>
+  <script src="js/data.js?v=55"></script>
+  <script src="js/logo-paths.js?v=55"></script>
+  <script src="js/bag-store.js?v=55"></script>
+  <script src="js/sfx.js?v=55"></script>
+  <script src="js/main.js?v=55"></script>
+  <script src="js/hero3d.js?v=55"></script>
+  <script src="js/consent.js?v=55"></script>
 </body>
 </html>

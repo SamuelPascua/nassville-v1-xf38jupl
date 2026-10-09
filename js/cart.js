@@ -283,6 +283,7 @@
 
   // Quitar: la carta se recoge en el riel y el toast deja deshacerlo
   function removeLine(r, li) {
+    if (window.Sfx) window.Sfx.play("remove");
     var removed = Bag.remove(r.key);
     var finish = function () {
       render();
@@ -445,6 +446,7 @@
     var termsErr = $('[data-error-for="terms"]');
     termsErr.hidden = terms.checked;
     termsErr.textContent = "Marca la casilla para aceptar las condiciones de compra.";
+    if (bad.length || !terms.checked) { if (window.Sfx) window.Sfx.play("deny"); }
     if (bad.length) { document.getElementById(bad[0]).focus(); return; }
     if (!terms.checked) { terms.focus(); return; }
 
