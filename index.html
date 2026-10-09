@@ -1,0 +1,429 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>nassville® — Tienda oficial</title>
+  <meta name="description" content="nassville, streetwear de Zaragoza. Drops, catálogo y todo lo que queda en tu talla.">
+  <meta name="theme-color" content="#151a40">
+  <link rel="icon" href="favicon.ico" sizes="48x48">
+  <link rel="icon" href="favicon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="apple-touch-icon.png">
+  <!-- versión de prueba: fuera de buscadores, solo se entra con el enlace -->
+  <meta name="robots" content="noindex, nofollow, noarchive">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@700;800;900&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/styles.css?v=56">
+  <script type="importmap">
+    { "imports": {
+      "three": "https://cdn.jsdelivr.net/npm/three@0.169.0/build/three.module.js",
+      "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.169.0/examples/jsm/"
+    } }
+  </script>
+  <!-- el logo 3D: Three.js empieza a bajar ya, a la vez que la página
+       (siempre después del importmap, o el navegador lo ignora) -->
+  <link rel="modulepreload" href="https://cdn.jsdelivr.net/npm/three@0.169.0/build/three.module.js" crossorigin>
+  <link rel="modulepreload" href="https://cdn.jsdelivr.net/npm/three@0.169.0/examples/jsm/loaders/SVGLoader.js" crossorigin>
+  <link rel="modulepreload" href="https://cdn.jsdelivr.net/npm/three@0.169.0/examples/jsm/environments/RoomEnvironment.js" crossorigin>
+</head>
+<body>
+  <a class="skip" href="#tienda">Saltar a la tienda</a>
+
+  <!-- Barra superior: cabecera de conversación -->
+  <header class="chatbar" data-chatbar>
+    <a class="chatbar__who" href="#top" aria-label="nassville, inicio">
+      <span class="avatar" data-logo="emblem" aria-hidden="true"></span>
+      <span class="chatbar__name">
+        <strong>nassville<sup>®</sup></strong>
+        <small><span class="dot" aria-hidden="true"></span> en línea</small>
+      </span>
+    </a>
+    <nav class="chatbar__nav" aria-label="Secciones">
+      <a href="#hilo">Drops</a>
+      <a href="#tienda">Tienda</a>
+      <a href="#videos">Vídeos</a>
+      <a href="#conocenos">Conócenos</a>
+      <a href="#redes">Redes</a>
+    </nav>
+    <button class="sound" type="button" data-sound-toggle aria-pressed="true" aria-label="Sonido activado. Pulsa para silenciar">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path class="sound__cone" d="M4 9.5h3.2L12 5.5v13l-4.8-4H4z"/><path class="sound__wave" d="M15.5 9.2a4 4 0 0 1 0 5.6"/><path class="sound__wave sound__wave--far" d="M18 6.8a7.5 7.5 0 0 1 0 10.4"/><path class="sound__mute" d="M16 9.5l5 5M21 9.5l-5 5"/></svg>
+    </button>
+    <a class="bag" href="carrito.html" data-bag-button aria-label="Bolsa, 0 prendas">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 8h12l-1 12H7L6 8Z"/><path d="M9 8V6a3 3 0 0 1 6 0v2"/></svg>
+      <span class="bag__count" data-bag-count>0</span>
+    </a>
+    <button class="menu" type="button" data-menu-button aria-expanded="false" aria-controls="menu" aria-label="Abrir menú">
+      <span></span><span></span>
+    </button>
+  </header>
+
+  <div class="sheet" id="menu" data-menu hidden>
+    <nav aria-label="Menú">
+      <a href="#hilo">Drops</a>
+      <a href="#tienda">Tienda</a>
+      <a href="#videos">Vídeos</a>
+      <a href="#conocenos">Conócenos</a>
+      <a href="#redes">Redes</a>
+    </nav>
+  </div>
+
+  <main id="top">
+    <!-- 1 · HERO: logo 3D sobre vídeo -->
+    <section class="hero" aria-label="nassville">
+      <div class="hero__media" aria-hidden="true">
+        <video class="hero__video hero__video--wide" muted loop playsinline preload="none" poster="assets/video/hero.jpg">
+          <source src="assets/video/hero.mp4" type="video/mp4">
+        </video>
+        <video class="hero__video hero__video--tall" muted loop playsinline preload="none" poster="assets/video/hero-mobile.jpg">
+          <source src="assets/video/hero-mobile.mp4" type="video/mp4">
+        </video>
+        <div class="hero__veil"></div>
+      </div>
+
+      <div class="hero__stage">
+        <canvas class="hero__canvas" data-hero-canvas aria-hidden="true"></canvas>
+        <span class="hero__emblem-fallback" data-logo="emblem" aria-hidden="true"></span>
+        <h1 class="hero__word">
+          <span class="sr-only">nassville</span>
+          <span data-logo="word" aria-hidden="true"></span>
+        </h1>
+      </div>
+
+      <div class="hero__thread">
+        <div class="hero__drop">
+        <div class="bubble bubble--in bubble--hero" id="hero-bubble" data-hero-bubble hidden>
+          <button class="hero__close" type="button" data-hero-close aria-label="Cerrar mensaje">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg>
+          </button>
+          <p class="bubble__muted">me vas a matar pero...</p>
+          <p>Nuevo drop: <em>Losing Interest</em>. Navy, oversize, quedan pocas tallas.</p>
+          <div class="bubble__actions">
+            <a class="btn btn--primary" href="#tienda" data-filter-link="camisetas">Ver drop</a>
+            <a class="btn btn--ghost" href="#hilo">Ver el hilo</a>
+          </div>
+          <span class="stamp">22:05</span>
+        </div>
+        <button class="hero__notif" type="button" data-hero-notif aria-expanded="false" aria-controls="hero-bubble">
+          <span class="avatar" data-logo="emblem" aria-hidden="true"></span>
+          <span class="hero__notif-text">
+            <strong>nassville</strong>
+            <span>Nuevo drop · <em>Losing Interest</em></span>
+          </span>
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 15l6-6 6 6"/></svg>
+        </button>
+        </div>
+      </div>
+
+      <a class="hero__scroll" href="#hilo" aria-label="Bajar al hilo">
+        <span>desliza</span>
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 4v16m0 0-6-6m6 6 6-6"/></svg>
+      </a>
+    </section>
+
+    <!-- 2 · EL HILO: drops como conversación -->
+    <section class="thread" id="hilo" aria-labelledby="hilo-title">
+      <div class="thread__head reveal reveal--title">
+        <h2 id="hilo-title" class="display">El hilo</h2>
+        <p class="lede">El grupo donde soltamos cada drop y donde la gente responde. Del primero al último.</p>
+        <p class="thread__hint">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14m0 0-5-5m5 5 5-5"/></svg>
+          Desliza dentro de la pantalla para leer la conversación.
+        </p>
+        <nav class="thread__index" aria-label="Ir a un drop del hilo">
+          <ol data-drop-index></ol>
+        </nav>
+      </div>
+      <div class="phone" data-device>
+        <span class="phone__btn phone__btn--action" aria-hidden="true"></span>
+        <span class="phone__btn phone__btn--vol-up" aria-hidden="true"></span>
+        <span class="phone__btn phone__btn--vol-down" aria-hidden="true"></span>
+        <span class="phone__btn phone__btn--power" aria-hidden="true"></span>
+        <span class="phone__camera" aria-hidden="true"></span>
+        <div class="phone__screen">
+          <div class="phone__status" aria-hidden="true">
+            <span class="phone__time" data-phone-time>22:05</span>
+            <span class="phone__island"></span>
+            <span class="phone__icons">
+              <svg viewBox="0 0 20 14"><rect x="0" y="9" width="3" height="5" rx="1"/><rect x="5" y="6" width="3" height="8" rx="1"/><rect x="10" y="3" width="3" height="11" rx="1"/><rect x="15" y="0" width="3" height="14" rx="1"/></svg>
+              <svg viewBox="0 0 18 14"><path d="M9 13.2 11.6 10a3.6 3.6 0 0 0-5.2 0Z"/><path d="M3.8 7.4a7.4 7.4 0 0 1 10.4 0l-1.6 1.9a5 5 0 0 0-7.2 0Z"/><path d="M1 4.6a11.4 11.4 0 0 1 16 0l-1.6 1.9a9 9 0 0 0-12.8 0Z"/></svg>
+              <svg class="phone__battery" viewBox="0 0 28 14"><rect x="0.75" y="0.75" width="23" height="12.5" rx="3.5" fill="none" stroke="currentColor" stroke-width="1.5" opacity="0.5"/><rect x="2.75" y="2.75" width="16" height="8.5" rx="2"/><path d="M25.8 5v4a2 2 0 0 0 0-4Z" opacity="0.5"/></svg>
+            </span>
+          </div>
+      <div class="chat" aria-label="Grupo de chat nassville drops">
+        <div class="chat__top">
+          <header class="chat__head">
+            <span class="chat__back" aria-hidden="true">
+              <svg viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7"/></svg>
+            </span>
+            <span class="avatar chat__avatar" data-logo="emblem" aria-hidden="true"></span>
+            <div class="chat__title">
+              <strong data-chat-name>nassville drops</strong>
+              <small data-chat-status aria-live="polite"></small>
+            </div>
+            <div class="chat__tools" aria-hidden="true">
+              <svg viewBox="0 0 24 24"><rect x="2.5" y="6" width="13" height="12" rx="3"/><path d="m15.5 10.5 6-3.5v10l-6-3.5"/></svg>
+              <svg viewBox="0 0 24 24"><path d="M6.6 3.5h2.6l1.5 4-2 1.3a12 12 0 0 0 6.5 6.5l1.3-2 4 1.5v2.6a2 2 0 0 1-2.2 2A17 17 0 0 1 4.6 5.7a2 2 0 0 1 2-2.2Z"/></svg>
+              <svg viewBox="0 0 24 24"><circle cx="12" cy="5" r="1.4" class="fill"/><circle cx="12" cy="12" r="1.4" class="fill"/><circle cx="12" cy="19" r="1.4" class="fill"/></svg>
+            </div>
+          </header>
+          <a class="chat__pinned" data-chat-pinned href="#hilo">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 3.5h6l-1 6 3 3v2H7v-2l3-3-1-6ZM12 14.5v6"/></svg>
+            <span><small>Mensaje fijado</small><span data-chat-pinned-text></span></span>
+          </a>
+        </div>
+
+        <div class="chat__body" data-thread role="log" aria-label="Mensajes del grupo" tabindex="0"></div>
+        <button class="chat__down" type="button" data-chat-down aria-label="Ir al último mensaje">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg>
+        </button>
+
+        <form class="chat__composer" data-chat-composer>
+          <label class="chat__field">
+            <span class="sr-only">Escribe un mensaje al grupo</span>
+            <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M8.5 14.5a4.5 4.5 0 0 0 7 0"/><circle cx="9" cy="10" r="1" class="fill"/><circle cx="15" cy="10" r="1" class="fill"/></svg>
+            <input type="text" name="message" placeholder="Escribe un mensaje" autocomplete="off" maxlength="300">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m20 11.5-8 8a5 5 0 0 1-7-7l8.5-8.5a3.3 3.3 0 0 1 4.7 4.7l-8.5 8.5a1.7 1.7 0 0 1-2.4-2.4l7.5-7.5"/></svg>
+          </label>
+          <button class="chat__send" type="submit" aria-label="Enviar mensaje">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 12 20 4l-4 16-4-7-8-1Z"/></svg>
+          </button>
+        </form>
+      </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 3 · TIENDA -->
+    <section class="shop" id="tienda" aria-labelledby="tienda-title">
+      <div class="shop__head">
+        <div class="bubble bubble--in bubble--wide reveal">
+          <h2 id="tienda-title" class="display display--xl">Lo que queda</h2>
+          <p>Elige prenda y talla. Lo agotado baja al archivo.</p>
+        </div>
+        <div class="chips" role="toolbar" aria-label="Filtrar productos" data-filters>
+          <button class="chip is-active" type="button" data-filter="todo" aria-pressed="true">Todo</button>
+          <button class="chip" type="button" data-filter="sudaderas" aria-pressed="false">Sudaderas</button>
+          <button class="chip" type="button" data-filter="camisetas" aria-pressed="false">Camisetas</button>
+        </div>
+      </div>
+
+      <ul class="products" data-products aria-live="polite"></ul>
+      <p class="products__empty" data-products-empty hidden>Nada por aquí con ese filtro. Prueba con <button type="button" class="linklike" data-filter-reset>todo</button>.</p>
+
+      <div class="archive" aria-labelledby="archivo-title">
+        <div class="archive__head reveal reveal--title">
+          <h3 id="archivo-title" class="display">Agotado</h3>
+          <p>Ya volaron. Tócalas para verlas en grande o pide que te avisemos si vuelven.</p>
+        </div>
+        <ul class="archive__grid" data-archive></ul>
+      </div>
+    </section>
+
+    <!-- 4 · VÍDEOS -->
+    <section class="videos" id="videos" aria-labelledby="videos-title">
+      <div class="videos__head reveal reveal--title">
+        <h2 id="videos-title" class="display display--xl">Notas de vídeo</h2>
+        <p class="lede">Lo que grabamos mientras lo hacemos. Toca para verlo con sonido.</p>
+      </div>
+      <ul class="notes" data-notes></ul>
+      <ul class="films" data-films></ul>
+    </section>
+
+    <!-- 5 · CONÓCENOS -->
+    <section class="about" id="conocenos" aria-labelledby="about-title">
+      <h2 id="about-title" class="sr-only">Conócenos</h2>
+      <p class="manifesto reveal" aria-label="Actuamos primero, pensamos después, nos lamentamos: nunca.">
+        <span>Actuamos primero,</span>
+        <span>pensamos después,</span>
+        <span>nos lamentamos:</span>
+        <span class="manifesto__last">nunca.</span>
+      </p>
+
+      <div class="about__grid">
+        <figure class="about__photo reveal">
+          <img src="assets/img/DQ6awDBiDKX-3.webp" srcset="assets/img/DQ6awDBiDKX-3-480.webp 480w, assets/img/DQ6awDBiDKX-3.webp 1055w" sizes="(max-width: 720px) 92vw, 40vw" alt="Dos personas con la crewneck Losing Interest navy en el estudio" loading="lazy" width="1120" height="1400">
+        </figure>
+        <div class="about__thread">
+          <div class="bubble bubble--in reveal">
+            <p>Somos nassville, una marca de streetwear nacida en Zaragoza. Diseñamos cada prenda, la fotografiamos nosotros y la soltamos en drops cortos. Cuando se acaba, se acaba.</p>
+          </div>
+          <div class="bubble bubble--in reveal">
+            <p>Hacemos camisetas boxy, crewnecks y zip-ups pensadas para durar: algodón pesado, hombro caído y costura doble.</p>
+          </div>
+          <div class="bubble bubble--in bubble--attach reveal">
+            <img src="assets/img/DNJDF6FIfKv-4.webp" srcset="assets/img/DNJDF6FIfKv-4-480.webp 480w, assets/img/DNJDF6FIfKv-4.webp 1178w" sizes="(max-width: 720px) 92vw, 40vw" alt="Ficha técnica de la camiseta boxy de nassville" loading="lazy" width="1120" height="1400">
+            <dl class="spec">
+              <div><dt>Corte</dt><dd>Boxy fit</dd></div>
+              <div><dt>Gramaje</dt><dd>195 GSM</dd></div>
+              <div><dt>Tejido</dt><dd>100% algodón</dd></div>
+              <div><dt>Costura</dt><dd>Doble pespunte</dd></div>
+            </dl>
+          </div>
+          <div class="bubble bubble--in reveal">
+            <p>Nos verás en pop-ups por Zaragoza, en el campo de la Almozara y, a veces, delante de unas pirámides.</p>
+            <span class="stamp">Leído</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 6 · REDES -->
+    <section class="social" id="redes" aria-labelledby="redes-title">
+      <div class="social__card reveal">
+        <span class="avatar avatar--xl" data-logo="emblem" aria-hidden="true"></span>
+        <h2 id="redes-title" class="display display--xl">Síguenos</h2>
+        <p class="social__handle" data-handle>@nassville.inc</p>
+        <div class="social__links">
+          <a class="btn btn--primary" data-ig-link href="https://www.instagram.com/nassville.inc/" target="_blank" rel="noopener">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1" class="fill"/></svg>
+            Instagram
+          </a>
+          <a class="btn btn--ghost" href="#tienda">Ir a la tienda</a>
+        </div>
+      </div>
+      <ul class="feed" data-feed aria-label="Últimas fotos de Instagram"></ul>
+    </section>
+  </main>
+
+  <!-- Cierre: la barra de escribir -->
+  <footer class="footer">
+    <form class="composer" data-composer novalidate>
+      <label for="email" class="composer__label">Avísame del próximo drop</label>
+      <div class="composer__row">
+        <input id="email" name="email" type="email" inputmode="email" autocomplete="email" placeholder="Escribe tu email…" required>
+        <button type="submit" class="composer__send" aria-label="Enviar">
+          <svg class="composer__arrow" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 19V5m0 0-6 6m6-6 6 6"/></svg>
+          <svg class="composer__check" viewBox="0 0 24 24" aria-hidden="true"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg>
+        </button>
+      </div>
+      <label class="composer__consent">
+        <input type="checkbox" name="consent" data-composer-consent>
+        <span>Quiero recibir emails de nassville sobre nuevos drops y he leído la <a href="privacidad.html">política de privacidad</a>.</span>
+      </label>
+      <p class="composer__info">Responsable: <mark class="todo">[NOMBRE O RAZÓN SOCIAL]</mark> (nassville). Finalidad: avisarte de drops y novedades. Puedes darte de baja cuando quieras y ejercer tus derechos de acceso, rectificación y supresión, entre otros. <a href="privacidad.html">Más información</a>.</p>
+      <p class="composer__error" data-composer-error role="alert" hidden></p>
+      <div class="composer__sent" data-composer-sent aria-live="polite"></div>
+    </form>
+
+    <div class="footer__word" data-logo="word" aria-hidden="true"></div>
+    <div class="footer__meta">
+      <p>© 2026 nassville® · Zaragoza</p>
+      <nav class="footer__legal" aria-label="Información legal">
+        <a href="terminos.html#envios">Envíos y devoluciones</a>
+        <span>Guía de tallas <small>pronto</small></span>
+        <a href="terminos.html">Términos y condiciones</a>
+        <a href="privacidad.html">Privacidad</a>
+        <a href="cookies.html">Cookies</a>
+        <button type="button" class="linklike" data-cookie-settings>Preferencias de cookies</button>
+      </nav>
+      <p class="footer__note">v1 · precios y stock de ejemplo</p>
+    </div>
+  </footer>
+
+  <!-- Reproductor de vídeo -->
+  <dialog class="player" data-player aria-label="Reproductor de vídeo">
+    <button class="player__close" type="button" data-player-close aria-label="Cerrar vídeo">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg>
+    </button>
+    <video data-player-video controls playsinline></video>
+  </dialog>
+
+  <!-- Visor de fotos -->
+  <dialog class="viewer" data-viewer aria-label="Foto">
+    <button class="player__close" type="button" data-viewer-close aria-label="Cerrar foto">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg>
+    </button>
+    <img data-viewer-img src="assets/video/hero.jpg" alt="">
+  </dialog>
+
+  <!-- Vista ampliada de producto: cartas sobre vídeo con el color de la prenda -->
+  <dialog class="pview" data-pview aria-labelledby="pview-name">
+    <div class="pview__bg" aria-hidden="true">
+      <video class="pview__video" data-pview-video muted playsinline preload="none"></video>
+      <div class="pview__tint"></div>
+      <div class="pview__shade"></div>
+    </div>
+
+    <header class="pview__head">
+      <div class="pview__title">
+        <h2 id="pview-name" class="pview__name" data-pview-name>Producto</h2>
+        <p class="pview__meta" data-pview-meta></p>
+      </div>
+      <span class="pview__stamp" data-pview-stamp hidden>Agotado</span>
+      <a class="bag pview__bag" href="carrito.html" data-bag-button aria-label="Bolsa, 0 prendas">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 8h12l-1 12H7L6 8Z"/><path d="M9 8V6a3 3 0 0 1 6 0v2"/></svg>
+        <span class="bag__count" data-bag-count>0</span>
+      </a>
+      <button class="pview__close" type="button" data-pview-close aria-label="Cerrar">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg>
+      </button>
+    </header>
+
+    <div class="pview__stage" data-pview-stage>
+      <div class="pview__deck" data-pview-deck></div>
+    </div>
+
+    <footer class="pview__foot">
+      <button class="pview__arrow" type="button" data-pview-prev aria-label="Foto anterior">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg>
+      </button>
+      <span class="pview__count" data-pview-count aria-live="polite">1 / 1</span>
+      <button class="pview__arrow" type="button" data-pview-next aria-label="Foto siguiente">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 5l7 7-7 7"/></svg>
+      </button>
+      <button class="btn btn--primary pview__cta" type="button" data-pview-cta aria-expanded="false" aria-controls="pview-sheet">Elegir talla</button>
+      <div class="pview__sheet" id="pview-sheet" data-pview-sheet data-open="false" aria-hidden="true" inert>
+        <div class="pview__sheet-head">
+          <strong>Elige tu talla</strong>
+          <span data-pview-sheet-meta></span>
+        </div>
+        <fieldset class="sizes pview__sizes" data-pview-sizes></fieldset>
+        <p class="sizes__legend" data-pview-legend><i class="size__low size__low--inline" aria-hidden="true"></i> quedan pocas</p>
+        <button class="btn btn--primary pview__add" type="button" data-pview-add>Elige una talla</button>
+      </div>
+      <!-- agotado: el aviso se pide aquí mismo, sin salir de las cartas -->
+      <form class="pview__notify" id="pview-notify" data-pview-notify data-open="false" aria-hidden="true" aria-labelledby="pview-notify-title" inert novalidate>
+        <div class="pview__notify-head">
+          <span class="pview__bell" aria-hidden="true">
+            <svg viewBox="0 0 24 24"><path d="M6 16V11a6 6 0 0 1 12 0v5l1.5 2h-15L6 16Z"/><path d="M10 20.5a2 2 0 0 0 4 0"/></svg>
+          </span>
+          <div>
+            <strong id="pview-notify-title">Avísame si vuelve</strong>
+            <span data-pview-notify-meta></span>
+          </div>
+          <button class="pview__notify-close" type="button" data-pview-notify-close aria-label="Cerrar aviso">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg>
+          </button>
+        </div>
+        <div class="pview__notify-body">
+          <div class="composer__row pview__notify-row">
+            <label for="pview-email" class="sr-only">Tu email</label>
+            <input id="pview-email" name="email" type="email" inputmode="email" autocomplete="email" placeholder="Escribe tu email…" required>
+            <button type="submit" class="composer__send" aria-label="Avisarme">
+              <svg class="composer__arrow" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 19V5m0 0-6 6m6-6 6 6"/></svg>
+              <svg class="composer__check" viewBox="0 0 24 24" aria-hidden="true"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg>
+            </button>
+          </div>
+          <label class="composer__consent pview__notify-consent">
+            <input type="checkbox" name="consent" data-pview-notify-consent>
+            <span>Quiero que nassville me escriba cuando vuelva y he leído la <a href="privacidad.html">política de privacidad</a>.</span>
+          </label>
+          <p class="composer__error pview__notify-error" data-pview-notify-error role="alert" hidden></p>
+        </div>
+        <p class="pview__notify-done" data-pview-notify-done aria-live="polite"></p>
+      </form>
+    </footer>
+  </dialog>
+
+  <div class="toast" data-toast role="status" aria-live="polite"></div>
+
+  <script src="js/data.js?v=56"></script>
+  <script src="js/logo-paths.js?v=56"></script>
+  <script src="js/bag-store.js?v=56"></script>
+  <script src="js/sfx.js?v=56"></script>
+  <script src="js/main.js?v=56"></script>
+  <script src="js/hero3d.js?v=56"></script>
+  <script src="js/consent.js?v=56"></script>
+</body>
+</html>
