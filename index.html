@@ -5,27 +5,38 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <title>nassville® — Tienda oficial</title>
   <meta name="description" content="nassville, streetwear de Zaragoza. Drops, catálogo y todo lo que queda en tu talla.">
+  <!-- dominio definitivo: canonical y vista previa al compartir (WhatsApp, Instagram, X) -->
+  <link rel="canonical" href="https://nassville.com/">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="nassville®">
+  <meta property="og:locale" content="es_ES">
+  <meta property="og:title" content="nassville® — Tienda oficial">
+  <meta property="og:description" content="nassville, streetwear de Zaragoza. Drops, catálogo y todo lo que queda en tu talla.">
+  <meta property="og:url" content="https://nassville.com/">
+  <meta property="og:image" content="https://nassville.com/assets/og.jpg">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:image:alt" content="Tres personas de espaldas con la sudadera Losing Interest de nassville">
+  <meta name="twitter:card" content="summary_large_image">
   <meta name="theme-color" content="#151a40">
   <link rel="icon" href="favicon.ico" sizes="48x48">
   <link rel="icon" href="favicon.svg" type="image/svg+xml">
   <link rel="apple-touch-icon" href="apple-touch-icon.png">
   <!-- versión de prueba: fuera de buscadores, solo se entra con el enlace -->
   <meta name="robots" content="noindex, nofollow, noarchive">
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@700;800;900&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/styles.css?v=56">
+  <link rel="preload" href="assets/fonts/big-shoulders-display-latin-900-normal.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="stylesheet" href="css/styles.css?v=57">
   <script type="importmap">
     { "imports": {
-      "three": "https://cdn.jsdelivr.net/npm/three@0.169.0/build/three.module.js",
-      "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.169.0/examples/jsm/"
+      "three": "./js/vendor/three/build/three.module.js",
+      "three/addons/": "./js/vendor/three/examples/jsm/"
     } }
   </script>
   <!-- el logo 3D: Three.js empieza a bajar ya, a la vez que la página
        (siempre después del importmap, o el navegador lo ignora) -->
-  <link rel="modulepreload" href="https://cdn.jsdelivr.net/npm/three@0.169.0/build/three.module.js" crossorigin>
-  <link rel="modulepreload" href="https://cdn.jsdelivr.net/npm/three@0.169.0/examples/jsm/loaders/SVGLoader.js" crossorigin>
-  <link rel="modulepreload" href="https://cdn.jsdelivr.net/npm/three@0.169.0/examples/jsm/environments/RoomEnvironment.js" crossorigin>
+  <link rel="modulepreload" href="js/vendor/three/build/three.module.js">
+  <link rel="modulepreload" href="js/vendor/three/examples/jsm/loaders/SVGLoader.js">
+  <link rel="modulepreload" href="js/vendor/three/examples/jsm/environments/RoomEnvironment.js">
 </head>
 <body>
   <a class="skip" href="#tienda">Saltar a la tienda</a>
@@ -315,7 +326,6 @@
         <a href="terminos.html">Términos y condiciones</a>
         <a href="privacidad.html">Privacidad</a>
         <a href="cookies.html">Cookies</a>
-        <button type="button" class="linklike" data-cookie-settings>Preferencias de cookies</button>
       </nav>
       <p class="footer__note">v1 · precios y stock de ejemplo</p>
     </div>
@@ -418,12 +428,11 @@
 
   <div class="toast" data-toast role="status" aria-live="polite"></div>
 
-  <script src="js/data.js?v=56"></script>
-  <script src="js/logo-paths.js?v=56"></script>
-  <script src="js/bag-store.js?v=56"></script>
-  <script src="js/sfx.js?v=56"></script>
-  <script src="js/main.js?v=56"></script>
-  <script src="js/hero3d.js?v=56"></script>
-  <script src="js/consent.js?v=56"></script>
+  <script src="js/data.js?v=57"></script>
+  <script src="js/logo-paths.js?v=57"></script>
+  <script src="js/bag-store.js?v=57"></script>
+  <script src="js/sfx.js?v=57"></script>
+  <script src="js/main.js?v=57"></script>
+  <script src="js/hero3d.js?v=57"></script>
 </body>
 </html>

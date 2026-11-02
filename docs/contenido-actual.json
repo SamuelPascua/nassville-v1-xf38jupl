@@ -1,0 +1,1033 @@
+{
+  "_info": {
+    "que_es": "Desglose del contenido actual de la web de nassville, para comparar con los cambios que pidan los clientes.",
+    "fecha": "2026-11-02",
+    "commit_base": "6c93700",
+    "donde_vive_cada_cosa": {
+      "textos_fijos": "index.html, carrito.html, privacidad.html, terminos.html, cookies.html",
+      "productos_drops_chat_videos_redes": "js/data.js (window.NASS)",
+      "fotos_y_videos": "assets/img/ y assets/video/ (no van al repositorio main, solo a gh-pages)"
+    },
+    "notas": "Las rutas de imagen son nombres de archivo dentro de assets/img/; los vídeos son ids dentro de assets/video/. Precios, stock y chat de la comunidad son DATOS DE EJEMPLO."
+  },
+  "sitio": {
+    "marca": "nassville®",
+    "ciudad": "Zaragoza",
+    "idioma": "es",
+    "titulo_pestana": "nassville®",
+    "meta_descripcion": "nassville, streetwear de Zaragoza. Drops, catálogo y todo lo que queda en tu talla.",
+    "color_tema": "#151a40",
+    "tipografias": [
+      "Big Shoulders Display (700, 800, 900) — servida desde assets/fonts/",
+      "Instrument Serif (normal e itálica) — servida desde assets/fonts/"
+    ],
+    "indexable_en_buscadores": false,
+    "url_actual": "https://samuelpascua.github.io/nassville-v1-xf38jupl/",
+    "dominio_previsto": "nassville.com",
+    "sonidos_de_interfaz": true,
+    "logo_3d_en_hero": true,
+    "librerias_de_terceros_al_cargar": [],
+    "seo": {
+      "canonical_base": "https://nassville.com/",
+      "imagen_compartir": "assets/og.jpg (1200×630, campaña Losing Interest)",
+      "sitemap": "sitemap.xml",
+      "noindex_activo": true,
+      "guia_publicacion": "docs/publicar-en-dominio.md"
+    }
+  },
+  "cabecera": {
+    "nombre": "nassville®",
+    "estado": "en línea",
+    "menu": [
+      {
+        "texto": "Drops",
+        "ancla": "#hilo"
+      },
+      {
+        "texto": "Tienda",
+        "ancla": "#tienda"
+      },
+      {
+        "texto": "Vídeos",
+        "ancla": "#videos"
+      },
+      {
+        "texto": "Conócenos",
+        "ancla": "#conocenos"
+      },
+      {
+        "texto": "Redes",
+        "ancla": "#redes"
+      }
+    ],
+    "botones": [
+      "Sonido (activar/silenciar)",
+      "Bolsa (contador de prendas)",
+      "Menú (móvil)"
+    ]
+  },
+  "inicio": {
+    "secciones_en_orden": [
+      "hero",
+      "hilo",
+      "tienda",
+      "videos",
+      "conocenos",
+      "redes",
+      "pie"
+    ],
+    "hero": {
+      "video_horizontal": {
+        "src": "assets/video/hero.mp4",
+        "poster": "assets/video/hero.jpg"
+      },
+      "video_vertical_movil": {
+        "src": "assets/video/hero-mobile.mp4",
+        "poster": "assets/video/hero-mobile.jpg"
+      },
+      "logo": "Emblema 3D + wordmark «nassville»",
+      "notificacion": {
+        "remitente": "nassville",
+        "texto": "Nuevo drop · Losing Interest"
+      },
+      "burbuja_mensaje": {
+        "previo": "me vas a matar pero...",
+        "texto": "Nuevo drop: Losing Interest. Navy, oversize, quedan pocas tallas.",
+        "boton_principal": {
+          "texto": "Ver drop",
+          "destino": "#tienda",
+          "filtro": "camisetas"
+        },
+        "boton_secundario": {
+          "texto": "Ver el hilo",
+          "destino": "#hilo"
+        },
+        "hora": "22:05"
+      },
+      "indicador_scroll": "desliza"
+    },
+    "hilo": {
+      "titulo": "El hilo",
+      "entradilla": "El grupo donde soltamos cada drop y donde la gente responde. Del primero al último.",
+      "pista": "Desliza dentro de la pantalla para leer la conversación.",
+      "formato": "Móvil simulado con un chat de grupo; un índice permite saltar a cada drop.",
+      "chat": {
+        "nombre_grupo": "nassville drops",
+        "miembros": "nassville, Lucía, Marcos, Irene y 1.247 más",
+        "mensaje_fijado": {
+          "drop": "losing-interest",
+          "texto": "Nuevo drop: Losing Interest. Ya disponible en la tienda."
+        },
+        "respuesta_automatica": "¡Te leemos! 🙌 Para enterarte del próximo drop antes que nadie, deja tu email aquí abajo.",
+        "usuarios_de_ejemplo": {
+          "lucia": {
+            "nombre": "Lucía",
+            "color": "#f0a3c4"
+          },
+          "marcos": {
+            "nombre": "Marcos",
+            "color": "#7fd6b8"
+          },
+          "irene": {
+            "nombre": "Irene",
+            "color": "#f5c27a"
+          },
+          "dani": {
+            "nombre": "Dani",
+            "color": "#9fb4ff"
+          },
+          "hugo": {
+            "nombre": "Hugo",
+            "color": "#c9a6ff"
+          },
+          "paula": {
+            "nombre": "Paula",
+            "color": "#8fd0f0"
+          }
+        }
+      },
+      "drops_orden_antiguo_a_reciente": [
+        {
+          "id": "50003",
+          "titulo": "50003",
+          "fecha": "",
+          "textos": [
+            "nassville arrives in Milano.",
+            "Design Brand Official Site. Boxy, 195 GSM, todo algodón."
+          ],
+          "fotos": [
+            "DGqSayZImc2.jpg",
+            "DGqSayZImc2-2.jpg",
+            "DIlode2oLMI.jpg",
+            "DLfqKT4ILU7.jpg"
+          ],
+          "video": {
+            "src": "DL7bctRIjTd",
+            "formato": "9/16"
+          },
+          "chat": {
+            "hora": "20:30",
+            "reacciones": [
+              [
+                "🔥",
+                18
+              ],
+              [
+                "🙌",
+                6
+              ]
+            ],
+            "respuestas": [
+              {
+                "quien": "Lucía",
+                "hora": "20:32",
+                "cita_drop": true,
+                "texto": "ese 50003 en gris es una locura"
+              },
+              {
+                "quien": "nassville",
+                "hora": "20:35",
+                "responde_a": "Lucía",
+                "texto": "Gracias Lucía 🖤 boxy y 195 GSM, pensada para durar"
+              }
+            ]
+          }
+        },
+        {
+          "id": "toppings",
+          "titulo": "Toppings",
+          "fecha": "",
+          "textos": [
+            "Verano. Everything taste much better by adding some toppings.",
+            "The details make the difference."
+          ],
+          "fotos": [
+            "DNJDF6FIfKv-2.jpg",
+            "DLfqI2MoGwb-3.jpg",
+            "DNBLCdfoB7N.jpg",
+            "DNJDF6FIfKv-3.jpg",
+            "DLfqI2MoGwb-4.jpg"
+          ],
+          "video": {
+            "src": "DNBLGHuIDVZ",
+            "formato": "9/16"
+          },
+          "chat": {
+            "hora": "19:00",
+            "reacciones": [
+              [
+                "🍋",
+                11
+              ],
+              [
+                "🔥",
+                9
+              ]
+            ],
+            "respuestas": [
+              {
+                "quien": "Marcos",
+                "hora": "19:04",
+                "cita_drop": true,
+                "texto": "¿la Toppings queda en M?"
+              },
+              {
+                "quien": "nassville",
+                "hora": "19:06",
+                "responde_a": "Marcos",
+                "texto": "Queda en M, corre 🏃"
+              }
+            ]
+          }
+        },
+        {
+          "id": "losing-interest",
+          "titulo": "Losing Interest",
+          "fecha": "jue, 29 oct · 22:05",
+          "destacado": true,
+          "textos": [
+            "me vas a matar pero...",
+            "Losing Interest. New drop. Navy, oversize, bordado delante y serigrafía gigante detrás."
+          ],
+          "fotos": [
+            "DQ6aqPhCNO7-7.jpg",
+            "DQ6aqPhCNO7.jpg",
+            "DQ6awDBiDKX-3.jpg",
+            "DQ_jUEKCJ6J-4.jpg",
+            "DQ6aqPhCNO7-5.jpg",
+            "DQ6awDBiDKX-4.jpg",
+            "DQ_jUEKCJ6J-5.jpg",
+            "DQ6aqPhCNO7-8.jpg"
+          ],
+          "video": {
+            "src": "DQ6aqPhCNO7-6",
+            "formato": "3/4"
+          },
+          "chat": {
+            "hora": "22:05",
+            "reacciones": [
+              [
+                "🔥",
+                54
+              ],
+              [
+                "😭",
+                21
+              ],
+              [
+                "🖤",
+                17
+              ]
+            ],
+            "respuestas": [
+              {
+                "quien": "Irene",
+                "hora": "22:06",
+                "cita_frase": 0,
+                "texto": "me vas a matar tú a mí 😭 la navy es preciosa"
+              },
+              {
+                "quien": "Dani",
+                "hora": "22:07",
+                "texto": "¿el bordado va delante?"
+              },
+              {
+                "quien": "nassville",
+                "hora": "22:09",
+                "responde_a": "Dani",
+                "texto": "Sí 🙌 bordado delante y serigrafía gigante detrás"
+              }
+            ]
+          }
+        },
+        {
+          "id": "almozara",
+          "titulo": "CD La Almozara",
+          "fecha": "",
+          "textos": [
+            "Equipación CD La Almozara, Zaragoza. nassville brand official design.",
+            "El barrio también juega."
+          ],
+          "fotos": [
+            "DRCKPUsiIOW-2.jpg",
+            "DRCKPUsiIOW-3.jpg",
+            "DRCKPUsiIOW.jpg",
+            "DRCKPUsiIOW-4.jpg"
+          ],
+          "video": null,
+          "chat": {
+            "hora": "18:15",
+            "reacciones": [
+              [
+                "⚽",
+                23
+              ],
+              [
+                "💙",
+                12
+              ]
+            ],
+            "respuestas": [
+              {
+                "quien": "Hugo",
+                "hora": "18:20",
+                "texto": "por fin una equipación del barrio"
+              }
+            ]
+          }
+        },
+        {
+          "id": "mascu",
+          "titulo": "Mascu",
+          "fecha": "",
+          "textos": [
+            "Sorteo Black Friday.",
+            "Mascu se vino a vivir con nosotros."
+          ],
+          "fotos": [
+            "DRsAAoPiDvX-3.jpg",
+            "DRsAAoPiDvX-4.jpg",
+            "DRfVckdiCQq-3.jpg",
+            "DRsAAoPiDvX-2.jpg"
+          ],
+          "video": null,
+          "chat": {
+            "hora": "21:00",
+            "reacciones": [
+              [
+                "🧸",
+                15
+              ],
+              [
+                "😍",
+                9
+              ]
+            ],
+            "respuestas": [
+              {
+                "quien": "Paula",
+                "hora": "21:12",
+                "cita_drop": true,
+                "texto": "me quedé sin Mascu 😭"
+              },
+              {
+                "quien": "nassville",
+                "hora": "21:15",
+                "responde_a": "Paula",
+                "texto": "Se fue volando 🫡 avisaremos si vuelve"
+              }
+            ]
+          }
+        },
+        {
+          "id": "egipto",
+          "titulo": "Egipto",
+          "fecha": "",
+          "textos": [
+            "Giza. Nos llevamos la navy a ver las pirámides."
+          ],
+          "fotos": [
+            "DSz7F5_iDeO.jpg",
+            "DSz7F5_iDeO-4.jpg",
+            "DSz7F5_iDeO-2.jpg",
+            "DSz7F5_iDeO-5.jpg"
+          ],
+          "video": {
+            "src": "DSz7F5_iDeO-6",
+            "formato": "3/4"
+          },
+          "chat": {
+            "hora": "17:40",
+            "reacciones": [
+              [
+                "🐪",
+                19
+              ],
+              [
+                "😂",
+                14
+              ]
+            ],
+            "respuestas": [
+              {
+                "quien": "Lucía",
+                "hora": "17:42",
+                "texto": "¿esto es real? 😂"
+              }
+            ]
+          }
+        },
+        {
+          "id": "nass",
+          "titulo": "NASS Zip-Up",
+          "fecha": "06 de mayo",
+          "textos": [
+            "Exclusive new zip-up.",
+            "Born to belive."
+          ],
+          "fotos": [
+            "DYUDHQyiAkA-5.jpg",
+            "DZF4fGhCOD9.jpg",
+            "DYUDHQyiAkA-2.jpg",
+            "DZpqpVXiM4U-3.jpg",
+            "DZF4fGhCOD9-3.jpg",
+            "DYUDHQyiAkA-4.jpg"
+          ],
+          "video": {
+            "src": "DYUDJ-aR84h",
+            "formato": "16/9",
+            "empieza_en_segundo": 30
+          },
+          "chat": {
+            "hora": "20:00",
+            "reacciones": [
+              [
+                "🔥",
+                31
+              ],
+              [
+                "🤎",
+                13
+              ]
+            ],
+            "respuestas": [
+              {
+                "quien": "Marcos",
+                "hora": "20:01",
+                "cita_drop": true,
+                "texto": "el zip marrón 🔥🔥"
+              },
+              {
+                "quien": "Irene",
+                "hora": "20:03",
+                "texto": "yo voy a por la olive"
+              }
+            ]
+          }
+        },
+        {
+          "id": "popup",
+          "titulo": "Pop Up",
+          "fecha": "12 de junio · 19:00",
+          "textos": [
+            "Pop up en Tierra y Fuego, Parque Macanaz.",
+            "Junto a las mejores marcas de Zaragoza."
+          ],
+          "fotos": [
+            "DZQHwcjCDXU.jpg",
+            "DZQHwcjCDXU-2.jpg"
+          ],
+          "video": null,
+          "chat": {
+            "hora": "12:00",
+            "reacciones": [
+              [
+                "📍",
+                8
+              ],
+              [
+                "🙌",
+                11
+              ]
+            ],
+            "respuestas": [
+              {
+                "quien": "Dani",
+                "hora": "12:10",
+                "texto": "allí estaremos"
+              }
+            ]
+          }
+        },
+        {
+          "id": "summer",
+          "titulo": "Actuamos primero",
+          "fecha": "",
+          "textos": [
+            "Summer favs. Actuamos primero, pensamos después, nos lamentamos: nunca."
+          ],
+          "fotos": [
+            "DaAwdtOCP5l.jpg",
+            "DaAwdtOCP5l-2.jpg",
+            "DaAwdtOCP5l-3.jpg",
+            "Dbdkoc_CCcC.jpg",
+            "Dbdkoc_CCcC-3.jpg"
+          ],
+          "video": null,
+          "chat": {
+            "hora": "13:30",
+            "reacciones": [
+              [
+                "🤝",
+                16
+              ]
+            ],
+            "respuestas": [
+              {
+                "quien": "Irene",
+                "hora": "13:31",
+                "cita_drop": true,
+                "texto": "nunca 🤝"
+              }
+            ]
+          }
+        }
+      ]
+    },
+    "tienda": {
+      "titulo": "Lo que queda",
+      "subtitulo": "Elige prenda y talla. Lo agotado baja al archivo.",
+      "filtros": [
+        "Todo",
+        "Sudaderas",
+        "Camisetas"
+      ],
+      "texto_sin_resultados": "Nada por aquí con ese filtro. Prueba con todo.",
+      "archivo_agotados": {
+        "titulo": "Agotado",
+        "texto": "Ya volaron. Tócalas para verlas en grande o pide que te avisemos si vuelven."
+      },
+      "regla_stock": "0 = agotada · 1-3 = quedan pocas · más de 3 = disponible",
+      "moneda": "EUR (IVA incluido)",
+      "productos": [
+        {
+          "id": "losing-interest-crewneck",
+          "nombre": "Losing Interest",
+          "tipo": "Crewneck",
+          "categoria": "camisetas",
+          "drop": "losing-interest",
+          "descripcion": "Oversize navy. Bordado delante y serigrafía gigante detrás.",
+          "precio": 55,
+          "colores": [
+            {
+              "nombre": "Navy",
+              "tinte": "#2a3a8c",
+              "video": {
+                "src": "Dc6hz_ooqou"
+              },
+              "stock": {
+                "S": 0,
+                "M": 2,
+                "L": 6,
+                "XL": 3
+              },
+              "fotos": [
+                "DQ6ai3OCIwG-2.jpg",
+                "DQ6ai3OCIwG-4.jpg",
+                "DQ6ai3OCIwG-5.jpg",
+                "DQ6ai3OCIwG-3.jpg",
+                "DQ6awDBiDKX-3.jpg",
+                "DQ6ai3OCIwG.jpg",
+                "DQ6awDBiDKX-4.jpg",
+                "DQ6aqPhCNO7-7.jpg",
+                "DQ_jUEKCJ6J-5.jpg",
+                "DQ_jUEKCJ6J-4.jpg",
+                "DQ_jUEKCJ6J.jpg",
+                "DSz7F5_iDeO.jpg"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "nass-zip-up",
+          "nombre": "NASS Zip-Up",
+          "tipo": "Zip hoodie",
+          "categoria": "sudaderas",
+          "drop": "nass",
+          "descripcion": null,
+          "precio": 75,
+          "colores": [
+            {
+              "nombre": "Brown washed",
+              "tinte": "#7a5236",
+              "video": {
+                "src": "DYUDJ-aR84h",
+                "empieza_en_segundo": 30
+              },
+              "stock": {
+                "S": 4,
+                "M": 5,
+                "L": 1,
+                "XL": 0
+              },
+              "fotos": [
+                "DZpqpVXiM4U-2.jpg",
+                "DZpqpVXiM4U.jpg",
+                "DZpqpVXiM4U-3.jpg",
+                "DZF4fGhCOD9-3.jpg",
+                "DZF4fGhCOD9.jpg",
+                "DZF4fGhCOD9-2.jpg",
+                "Dbdkoc_CCcC.jpg",
+                "Dbdkoc_CCcC-3.jpg",
+                "DYjpaJziJEB-2.jpg"
+              ]
+            },
+            {
+              "nombre": "Olive washed",
+              "tinte": "#6f6a3c",
+              "video": {
+                "src": "DYUDJ-aR84h",
+                "empieza_en_segundo": 30
+              },
+              "stock": {
+                "S": 0,
+                "M": 0,
+                "L": 0,
+                "XL": 0
+              },
+              "fotos": [
+                "DYUDHm_CC5l.jpg",
+                "DYUDHQyiAkA-5.jpg",
+                "DYUDHQyiAkA.jpg",
+                "DYUDHQyiAkA-2.jpg",
+                "DYUDHQyiAkA-6.jpg",
+                "DYUDHQyiAkA-4.jpg",
+                "DYUDHQyiAkA-3.jpg",
+                "DYUDHm_CC5l-2.jpg"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "toppings-tee",
+          "nombre": "Toppings",
+          "tipo": "Boxy tee",
+          "categoria": "camisetas",
+          "drop": "toppings",
+          "descripcion": "Boxy fit, 195 GSM, 100% algodón.",
+          "precio": 35,
+          "colores": [
+            {
+              "nombre": "Cream",
+              "tinte": "#2e9b55",
+              "video": {
+                "src": "DNBLGHuIDVZ"
+              },
+              "stock": {
+                "S": 5,
+                "M": 8,
+                "L": 7,
+                "XL": 2
+              },
+              "fotos": [
+                "DNJDF6FIfKv-2.jpg",
+                "DNJDF6FIfKv.jpg",
+                "DLfqI2MoGwb-2.jpg",
+                "DLfqI2MoGwb-3.jpg",
+                "DNBLCdfoB7N.jpg",
+                "DaAwdtOCP5l-3.jpg"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "almozara-kit",
+          "nombre": "CD La Almozara",
+          "tipo": "Equipación 25/26",
+          "categoria": "camisetas",
+          "drop": "almozara",
+          "descripcion": null,
+          "precio": 60,
+          "colores": [
+            {
+              "nombre": "Navy",
+              "tinte": "#1e5bd6",
+              "video": {
+                "src": "DQ6aekxiN1R",
+                "empieza_en_segundo": 20
+              },
+              "stock": {
+                "S": 3,
+                "M": 6,
+                "L": 6,
+                "XL": 4
+              },
+              "fotos": [
+                "DRCKPUsiIOW-4.jpg",
+                "DRCKPUsiIOW-2.jpg",
+                "DRCKPUsiIOW-3.jpg",
+                "DRCKPUsiIOW.jpg"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "washed-hoodie",
+          "nombre": "NASS Hoodie",
+          "tipo": "Hoodie lavada",
+          "categoria": "sudaderas",
+          "drop": "nass",
+          "descripcion": null,
+          "precio": 70,
+          "colores": [
+            {
+              "nombre": "Washed grey",
+              "tinte": "#7a7a82",
+              "video": {
+                "src": "DXjCNpUiHGI-5"
+              },
+              "stock": {
+                "S": 2,
+                "M": 3,
+                "L": 3,
+                "XL": 1
+              },
+              "fotos": [
+                "DXjCNpUiHGI-3.jpg"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "50003-tee",
+          "nombre": "50003",
+          "tipo": "Boxy tee",
+          "categoria": "camisetas",
+          "drop": "50003",
+          "descripcion": null,
+          "precio": 35,
+          "colores": [
+            {
+              "nombre": "Charcoal",
+              "tinte": "#4a4a55",
+              "video": {
+                "src": "DL7bctRIjTd"
+              },
+              "stock": {
+                "S": 0,
+                "M": 0,
+                "L": 0,
+                "XL": 0
+              },
+              "fotos": [
+                "DIlode2oLMI.jpg",
+                "DIlode2oLMI-2.jpg",
+                "DLfqKT4ILU7.jpg",
+                "DGqSayZImc2.jpg",
+                "DHJISclIC7f.jpg"
+              ]
+            },
+            {
+              "nombre": "Black",
+              "tinte": "#26262c",
+              "video": {
+                "src": "DL7bctRIjTd"
+              },
+              "stock": {
+                "S": 0,
+                "M": 0,
+                "L": 0,
+                "XL": 0
+              },
+              "fotos": [
+                "DHJISclIC7f.jpg",
+                "DLfqI2MoGwb.jpg",
+                "DaAwdtOCP5l-2.jpg"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "mascu",
+          "nombre": "Mascu",
+          "tipo": "Figura de colección",
+          "categoria": "objetos",
+          "drop": "mascu",
+          "descripcion": null,
+          "precio": 30,
+          "colores": [
+            {
+              "nombre": "Edición limitada",
+              "tinte": "#2f6f86",
+              "video": {
+                "src": "DXjCCKQiGWc",
+                "empieza_en_segundo": 40
+              },
+              "stock": {
+                "Única": 0
+              },
+              "fotos": [
+                "DRsAAoPiDvX-4.jpg",
+                "DRsAAoPiDvX-3.jpg",
+                "DRsAAoPiDvX-5.jpg"
+              ]
+            }
+          ]
+        }
+      ],
+      "vista_ampliada_producto": {
+        "boton_tallas": "Elegir talla",
+        "titulo_tallas": "Elige tu talla",
+        "leyenda": "quedan pocas",
+        "boton_anadir_sin_talla": "Elige una talla",
+        "etiqueta_agotado": "Agotado",
+        "aviso_si_vuelve": {
+          "titulo": "Avísame si vuelve",
+          "casilla": "Quiero que nassville me escriba cuando vuelva y he leído la política de privacidad."
+        }
+      }
+    },
+    "videos": {
+      "titulo": "Notas de vídeo",
+      "entradilla": "Lo que grabamos mientras lo hacemos. Toca para verlo con sonido.",
+      "notas_redondas": [
+        "DSz7F5_iDeO-3",
+        "DQ_jUEKCJ6J-8",
+        "DXjCNpUiHGI-2",
+        "DSSpv1FCEN-",
+        "DK2M5QNoEAw",
+        "DSz7F5_iDeO-6"
+      ],
+      "peliculas": [
+        {
+          "src": "Dc6hz_ooqou",
+          "titulo": "Losing Interest",
+          "nota": "Película de campaña"
+        },
+        {
+          "src": "DdL5jSjIFfg",
+          "titulo": "End of season",
+          "nota": "Thank you"
+        },
+        {
+          "src": "DQ6aekxiN1R",
+          "titulo": "No, yo no puedo",
+          "nota": "Corto · Almozara y Losing Interest"
+        }
+      ]
+    },
+    "conocenos": {
+      "manifiesto": [
+        "Actuamos primero,",
+        "pensamos después,",
+        "nos lamentamos:",
+        "nunca."
+      ],
+      "foto_principal": {
+        "src": "DQ6awDBiDKX-3.webp",
+        "alt": "Dos personas con la crewneck Losing Interest navy en el estudio"
+      },
+      "mensajes": [
+        "Somos nassville, una marca de streetwear nacida en Zaragoza. Diseñamos cada prenda, la fotografiamos nosotros y la soltamos en drops cortos. Cuando se acaba, se acaba.",
+        "Hacemos camisetas boxy, crewnecks y zip-ups pensadas para durar: algodón pesado, hombro caído y costura doble.",
+        "Nos verás en pop-ups por Zaragoza, en el campo de la Almozara y, a veces, delante de unas pirámides."
+      ],
+      "ficha_tecnica": {
+        "foto": {
+          "src": "DNJDF6FIfKv-4.webp",
+          "alt": "Ficha técnica de la camiseta boxy de nassville"
+        },
+        "Corte": "Boxy fit",
+        "Gramaje": "195 GSM",
+        "Tejido": "100% algodón",
+        "Costura": "Doble pespunte"
+      }
+    },
+    "redes": {
+      "titulo": "Síguenos",
+      "usuario": "@nassville.inc",
+      "instagram": "https://www.instagram.com/nassville.inc/",
+      "otras_redes": [],
+      "botones": [
+        "Instagram",
+        "Ir a la tienda"
+      ],
+      "galeria": [
+        "DQ6aqPhCNO7-2.jpg",
+        "DZF4fGhCOD9-2.jpg",
+        "DSz7F5_iDeO-4.jpg",
+        "DNBLCdfoB7N-3.jpg",
+        "DQ_jUEKCJ6J.jpg",
+        "DYUDHm_CC5l-3.jpg",
+        "DRJ8EnBiPA-.jpg",
+        "Dbdkoc_CCcC-5.jpg",
+        "DQ6awDBiDKX-5.jpg"
+      ]
+    },
+    "pie": {
+      "newsletter": {
+        "etiqueta": "Avísame del próximo drop",
+        "placeholder": "Escribe tu email…",
+        "casilla": "Quiero recibir emails de nassville sobre nuevos drops y he leído la política de privacidad.",
+        "info_legal": "Responsable: [NOMBRE O RAZÓN SOCIAL] (nassville). Finalidad: avisarte de drops y novedades. Puedes darte de baja cuando quieras y ejercer tus derechos de acceso, rectificación y supresión, entre otros.",
+        "respuesta": "Apuntado. Te escribimos antes del próximo drop.",
+        "conectado_a_proveedor": false
+      },
+      "copyright": "© 2026 nassville® · Zaragoza",
+      "enlaces_legales": [
+        {
+          "texto": "Envíos y devoluciones",
+          "destino": "terminos.html#envios"
+        },
+        {
+          "texto": "Guía de tallas",
+          "destino": null,
+          "estado": "pronto"
+        },
+        {
+          "texto": "Términos y condiciones",
+          "destino": "terminos.html"
+        },
+        {
+          "texto": "Privacidad",
+          "destino": "privacidad.html"
+        },
+        {
+          "texto": "Cookies",
+          "destino": "cookies.html"
+        }
+      ],
+      "nota_version": "v1 · precios y stock de ejemplo"
+    }
+  },
+  "carrito": {
+    "bolsa": {
+      "titulo": "Tu bolsa",
+      "entradilla": "Marca lo que te llevas. Lo que no marques se queda aquí guardado.",
+      "boton_marcar": "Marcar todo / Desmarcar todo",
+      "vacia": {
+        "texto": "Aún no hay nada en tu bolsa. Elige prenda y talla en la tienda y aparecerá aquí.",
+        "boton": "Ir a la tienda"
+      }
+    },
+    "pago": {
+      "titulo": "Pago",
+      "entradilla": "Solo van las prendas que marcaste. Las demás siguen en tu bolsa.",
+      "campos_contacto": [
+        "Email",
+        "Teléfono (para el transportista)"
+      ],
+      "campos_envio": [
+        "Nombre",
+        "Apellidos",
+        "Dirección",
+        "Piso, puerta… (opcional)",
+        "Código postal",
+        "Ciudad",
+        "Provincia",
+        "País"
+      ],
+      "paises_envio": [
+        "España"
+      ],
+      "pasarela": {
+        "proveedor": null,
+        "texto": "Pasarela de pago pendiente de conectar. Aquí aparecerá el pago con tarjeta en cuanto la conectemos. Hasta entonces no se cobra nada."
+      },
+      "casilla_terminos": "He leído y acepto los términos y condiciones y la política de privacidad.",
+      "resumen": {
+        "titulo": "Tu pedido",
+        "envio": "Se calcula al pagar",
+        "nota": "IVA incluido. El envío se suma cuando conectemos las tarifas."
+      },
+      "boton": "Pagar"
+    }
+  },
+  "legal": {
+    "datos_titular_pendientes": {
+      "nombre_o_razon_social": null,
+      "nif_cif": null,
+      "direccion_completa": null,
+      "email_contacto": null,
+      "datos_registrales_si_es_sociedad": null
+    },
+    "proveedores_pendientes": {
+      "email_marketing": null,
+      "pasarela_pago": null,
+      "empresa_transporte": null
+    },
+    "condiciones_venta_pendientes": {
+      "coste_envio": null,
+      "envio_gratis_desde": null,
+      "metodos_pago": null,
+      "adhesion_junta_arbitral_consumo_aragon": null
+    },
+    "privacidad": {
+      "archivo": "privacidad.html",
+      "ultima_actualizacion": "2 de noviembre de 2026"
+    },
+    "terminos": {
+      "archivo": "terminos.html",
+      "ultima_actualizacion": "8 de octubre de 2026"
+    },
+    "cookies": {
+      "archivo": "cookies.html",
+      "ultima_actualizacion": "2 de noviembre de 2026",
+      "banner_de_cookies": false,
+      "almacenamiento_usado": [
+        {
+          "nombre": "nassville-bag",
+          "tipo": "técnico",
+          "para": "guardar la bolsa"
+        },
+        {
+          "nombre": "nass-sfx",
+          "tipo": "técnico / personalización",
+          "para": "recordar sonido activado o silenciado"
+        }
+      ],
+      "analitica": false,
+      "publicidad": false
+    }
+  }
+}
